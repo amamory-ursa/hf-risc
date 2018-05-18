@@ -1,0 +1,57 @@
+
+Discarded input sections
+
+ .data          0x0000000000000000        0x0 coisa.o
+ .bss           0x0000000000000000        0x0 coisa.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+rom              0x0000000000000000 0x0000000010000000
+ram              0x0000000040000000 0x0000000010000000
+ram_top          0x000000004ffffc00 0x0000000000000400
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x000000004ffffffc                _stack = 0x4ffffffc
+                0x0000000000000000                . = 0x0
+
+.text           0x0000000040000000       0x70
+ *(.text.init)
+                0x0000000040000000                _text = .
+ *(.text)
+ .text          0x0000000040000000       0x70 coisa.o
+                0x0000000040000000                _entry
+ *(.text.*)
+                0x0000000040000070                _etext = .
+
+.rela.dyn       0x0000000040000070        0x0
+ .rela.text     0x0000000040000070        0x0 coisa.o
+
+.data           0x0000000040000070        0x0
+                0x0000000040000070                _rodata = .
+ *(.rdata)
+ *(.rodata)
+ *(.rodata.*)
+                0x0000000040000070                _erodata = .
+                0x0000000040000070                _data = .
+ *(.data)
+ *(.data.*)
+                0x0000000040000870                _gp = (. + 0x800)
+ *(.sdata)
+ *(.sdata.*)
+                0x0000000040000070                . = ALIGN (0x10)
+                0x0000000040000070                _edata = .
+
+.bss            0x0000000040000070        0x0
+                0x0000000040000070                _bss_start = .
+ *(.sbss)
+ *(.sbss.*)
+ *(.bss)
+ *(.bss.*)
+                0x0000000040000070                . = ALIGN (0x4)
+                0x0000000040000070                _bss_end = .
+                0x0000000040000070                _end = .
+LOAD coisa.o
+OUTPUT(test.elf elf32-littleriscv)
