@@ -18,6 +18,7 @@ class memory_model;
 		 (logic [31:0] address,
 			logic [31:0] w_data,
 			logic [3:0]  we);
+			
 			logic [31:0] read_data;
 			integer 		 offset = address - base;
 			logic [31:0] mask = {8{we[3]},8{we[2]},8{we{1}},8{we[0]}};

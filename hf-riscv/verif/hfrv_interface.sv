@@ -22,6 +22,13 @@ interface hfrv_interface(input logic clk);
 			output 					data_read;
 	 endclocking; // drv_cb
 
+	 clocking mem_monitor @(posedge clk);
+			input 					address;
+			input 					data_write;
+			input 					data_we;
+			input 					data_read;
+	 endclocking; // mem_monitor
+
 	 modport uart(input uart_tx,
 								output uart_rx);
 
@@ -34,7 +41,7 @@ interface hfrv_interface(input logic clk);
 									clocking mem);
 
 	 modport monitor(input reset, stall,
-									 clocking mem);
+									 clocking mem_monitor);
 
 	 modport cpu(input reset, clk, data_read, extio_in, uart_rx,
 							 output address, data_write, data_we, extio_out, uart_tx);
