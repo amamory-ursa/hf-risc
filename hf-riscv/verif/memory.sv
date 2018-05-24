@@ -6,13 +6,13 @@
 class memory_model;
 	 logic [31:0] data[$];
 	 logic [31:0] base;
-	 logic [31:0] length;
+	 integer length;
 
-	 function new(logic [31:0] data[$], logic [31:0] base, logic [31:0] length);
+	 function new(logic [31:0] data[$], logic [31:0] base);
 			this.data = data;
 			this.base = base;
-			this.length = length;
-	 endfunction; // new
+			this.length = $size(data);
+	 endfunction // new
 	 
 	 function logic [31:0] read_write
 		 (logic [31:0] address,
@@ -39,30 +39,32 @@ class memory_driver;
 	 mailbox gen2mem;
 	 mailbox mem2mon;
 	 hfrv_interface.memory iface;
+	 event 	 dumpmem;
 
-	 function new(hfrv_interface.memory iface, mailbox gen2mem, mailbox mem2mon);
+	 function new(hfrv_interface.memory iface,
+								mailbox gen2mem,
+								mailbox mem2mon,
+								event dumpmem);
 			this.iface = iface;
 			this.gen2mem = gen2mem;
 			this.mem2mon = mem2mon;
+			this.dumpmem = dumpmem;
 	 endfunction; // new
 	 
 	 task run();
 			automatic memory new_memory;
 			gen2mem.get(memory);
-			forever begin
-				 fork: memory_server;
+			fork;
 						forever @(iface.mem) begin
 							 iface.mem.data_read <= memory.read_write(iface.mem.addres,
 																												iface.mem.data_write,
 																												iface.mem.data_we);
 						end
-						begin
-							 gen2mem.get(new_memory);
-							 mem2mon.put(memory);
-							 memory = new_memory;
-						end
-				 join_any;
-				 disable memory_server;
+						forever
+							gen2mem.get(memory);
+						forever @(dumpmem)
+							mem2mon.put(memory);
+				 join;
 			end
 	 endtask; // run
 endclass; // memory_driver
