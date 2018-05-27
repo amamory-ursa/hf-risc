@@ -8,7 +8,7 @@ class memory_model;
 	 logic [31:0] base;
 	 integer length;
 
-	 function new(logic [31:0] data[$], logic [31:0] base);
+	 function new(logic [31:0] data [$], logic [31:0] base);
 			this.data = data;
 			this.base = base;
 			this.length = $size(data);
@@ -31,17 +31,16 @@ class memory_model;
 			
 			return read_data;
 	 endfunction // read_write
-	 
 endclass; // memory_model
 
 class memory_driver;
 	 memory_model memory;
 	 mailbox gen2mem;
 	 mailbox mem2mon;
-	 hfrv_interface.memory iface;
+	 virtual hfrv_interface.memory iface;
 	 event 	 dumpmem;
 
-	 function new(hfrv_interface.memory iface,
+	 function new(virtual hfrv_interface.memory iface,
 								mailbox gen2mem,
 								mailbox mem2mon,
 								event dumpmem);
