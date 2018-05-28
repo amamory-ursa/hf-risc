@@ -41,7 +41,7 @@ class monitor;
    
    task termination_monitor();
       forever @(iface.mem)
-        if (iface.mem_monitor.address = 32'he0000000 &&
+        if (iface.mem_monitor.address == 32'he0000000 &&
             iface.mem_monitor.we != 4'h0)
           ->terminated;
    endtask; // termination_monitor

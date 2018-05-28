@@ -23,8 +23,8 @@ class checkr;
    endtask // run
 
    task mem_dumper();
-      automatic memory ram;
-      automatic memory rom;
+      automatic var memory ram;
+      automatic var memory rom;
 
       forever begin
          dut_ramdump.get(ram);

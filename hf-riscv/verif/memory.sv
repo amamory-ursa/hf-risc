@@ -14,7 +14,7 @@ class memory_model;
 			this.length = length;
    endfunction // new
    
-   automatic function logic [31:0] read_write
+   function logic [31:0] read_write
      (logic [31:0] address,
       logic [31:0] w_data,
       logic [3:0]  we);
@@ -24,7 +24,7 @@ class memory_model;
       logic [31:0] offset;
       logic [31:0] mask;
       
-      mask = {{8{we[3]}}, {8{we[2]}}, {8{we[1]}}, {8{we[0]}}}
+      mask = {{8{we[3]}}, {8{we[2]}}, {8{we[1]}}, {8{we[0]}}};
       offset = address - base;
       offset = {offset[31:2], 2'b00};
       

@@ -40,8 +40,9 @@ class agent;
 
 	 task feed_dut(memory_model trans);
 			logic [31:0] boot_rom [$];
+      memory_model boot;
 			$readmemh("boot.txt", boot_rom);
-			memory_model boot = new(boot_rom, h0, h100000);
+			boot = new(boot_rom, h0, h100000);
 			agt2ram.put(trans);
 			agt2rom.put(boot);
 			agt2drv.put(start);
@@ -49,7 +50,7 @@ class agent;
 
 	 task halt_dut();
 			agt2drv.put(stop);
-			->dumpram;			
+			->dumpmem;			
 	 endtask // halt_dut
 	 
 	 

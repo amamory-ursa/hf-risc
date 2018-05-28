@@ -6,7 +6,7 @@
 typedef class platform_driver;
 
 virtual class platform_transaction;
-	 pure virtual automatic task run(platform_driver cb);
+	 pure virtual task run(platform_driver cb);
 endclass // platform_transaction
 
 class platform_driver;
@@ -36,15 +36,15 @@ endclass; // platform_driver
 
 class start_cpu extends platform_transaction;
 	 virtual task run(platform_driver cb);
-			#1
+			#1;
 			cb.iface.reset <= 1'b0;
 	 endtask; // run
 endclass // start_cpu
 
 class stop_cpu extends platform_transaction;
-	 virtual automatic task run(platform_driver cb);
+	 virtual task run(platform_driver cb);
 			cb.iface.reset <= 1'b1;
-			#10
+			#10;
 	 endtask; // run
 endclass // stop_cpu
 	 
