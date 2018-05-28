@@ -43,9 +43,9 @@ interface hfrv_interface(input logic clk);
 	 modport monitor(input reset, stall,
 									 clocking mem_monitor);
 
-	 modport cpu(input reset, clk, data_read, extio_in, uart_rx,
-							 output address, data_write, data_we, extio_out, uart_tx);
-	 
+   modport cpu(input reset, clk, data_read, extio_in, uart_rx,
+               output address, data_write, data_we, extio_out, uart_tx);
+   
 endinterface; // hfrv_interface
 
 `endif
