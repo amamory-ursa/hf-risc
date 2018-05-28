@@ -11,16 +11,13 @@ endclass // platform_transaction
 
 class platform_driver;
 	 virtual hfrv_interface.driver iface;
-	 event 	 program_finished;
 	 mailbox gen2drv;
 
 	 function new
 		 (virtual hfrv_interface.driver iface,
-			event 	program_finished,
 			mailbox gen2drv);
 			
 			this.iface = iface;
-			this.program_finished = program_finished;
 			this.gen2drv = gen2drv;
 	 endfunction; // new
 
@@ -28,17 +25,11 @@ class platform_driver;
 			automatic platform_transaction cmd;
 			iface.reset = 1;
 			iface.stall = 0;
-			#10
-			fork:
-				 forever @(iface.mem)
-					 if (iface.mem.address = 32'he0000000 && iface.mem.we != 4'h0)
-						 ->program_finished;
-				 forever begin
-						gen2drv.get(cmd);
-						cmd.run(this);
-				 end
-			join;
-			
+			#10;
+			forever begin
+				 gen2drv.get(cmd);
+				 cmd.run(this);
+			end
 	 endtask; // run
 	 
 endclass; // platform_driver
