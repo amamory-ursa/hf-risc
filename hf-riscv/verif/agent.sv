@@ -42,7 +42,7 @@ class agent;
 			logic [31:0] boot_rom [$];
       memory_model boot;
 			$readmemh("boot.txt", boot_rom);
-			boot = new(boot_rom, h0, h100000);
+			boot = new(boot_rom, 'h0, 'h100000);
 			agt2ram.put(trans);
 			agt2rom.put(boot);
 			agt2drv.put(start);

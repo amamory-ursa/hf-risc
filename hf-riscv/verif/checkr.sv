@@ -23,8 +23,8 @@ class checkr;
    endtask // run
 
    task mem_dumper();
-      automatic var memory ram;
-      automatic var memory rom;
+      automatic memory_model ram;
+      automatic memory_model rom;
 
       forever begin
          dut_ramdump.get(ram);
@@ -44,7 +44,7 @@ class checkr;
       end   
    endtask // print_msg
 
-   task read_ram(memory ram);
+   task read_ram(memory_model ram);
       int read_data; // file descriptor
       logic [31:0] inst_add, last_add;    
       inst_add = ram.base;

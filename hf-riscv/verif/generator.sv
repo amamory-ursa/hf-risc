@@ -13,7 +13,7 @@ class generator;
                 input event terminated);
       this.gen2agent = gen2agent;
       this.terminated = terminated;
-      ram = new({}, 32'h40000000, h100000);
+      ram = new({}, 32'h40000000, 'h100000);
    endfunction : new
 
    task run();
@@ -21,7 +21,7 @@ class generator;
          write_ram();
          gen2agent.put(ram);
          @(terminated);
-         ram = new({}, 32'h40000000, h100000);
+         ram = new({}, 32'h40000000, 'h100000);
       end
    endtask // run
 

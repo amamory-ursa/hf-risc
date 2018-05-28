@@ -13,8 +13,8 @@ module tp_top;
    dut_top dut (.*);
 
    initial begin
-      environment env = new(iface);
+      static environment env = new(iface);
       env.run();
    end
    
-endmodule; // tp_top
+endmodule // tp_top
