@@ -1,7 +1,9 @@
+`timescale 1ns/1ps
+
 `include "hfrv_interface.sv"
 `include "dut_top.sv"
 
-module tp_top;
+module tb_top;
 `include "environment.sv"
 
    logic clk = 1'b0;
@@ -17,4 +19,4 @@ module tp_top;
       env.run();
    end
    
-endmodule // tp_top
+endmodule // tb_top

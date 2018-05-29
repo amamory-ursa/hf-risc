@@ -3,7 +3,7 @@
 
 `include "hfrv_interface.sv"
 
-module dut_top (cpu_interface.cpu iface);
+module dut_top (hfrv_interface.cpu iface);
 
 	 logic        stall_cpu;
 	 logic        irq_cpu;
@@ -16,17 +16,17 @@ module dut_top (cpu_interface.cpu iface);
 	 logic [3:0] 	data_w_cpu;
 	 logic 				data_access_cpu;
 
-	 perfipherals_busmux bus_mux(.clock(iface.clk),
-															 .reset(iface.reset),
-															 .stall(iface.stall),
-															 .addr_mem(iface.address),
-															 .data_read_mem(iface.data_read),
-															 .data_write_mem(iface.data_write),
-															 .data_we_mem(iface.data_we),
-															 .extio_in(iface.extio_in),
-															 .extio_out(iface.extio_out),
-															 .uart_read(iface.uart_rx),
-															 .uart_write(iface.uart_tx), .*);
+	 busmux bus_mux(.clock(iface.clk),
+									.reset(iface.reset),
+									.stall(iface.stall),
+									.addr_mem(iface.address),
+									.data_read_mem(iface.data_read),
+									.data_write_mem(iface.data_write),
+									.data_we_mem(iface.data_we),
+									.extio_in(iface.extio_in),
+									.extio_out(iface.extio_out),
+									.uart_read(iface.uart_rx),
+									.uart_write(iface.uart_tx), .*);
 
 	 datapath cpu(.clock(iface.clk),
 								.reset(iface.reset),

@@ -76,9 +76,9 @@ class memory_driver;
 
    task memory_iface();
       forever @(iface.mem)
-        iface.mem.data_read = memory.read_write(iface.mem.addres,
-                                                iface.mem.data_write,
-                                                iface.mem.data_we);
+        iface.mem.data_read <= memory.read_write(iface.mem.address,
+                                                 iface.mem.data_write,
+                                                 iface.mem.data_we);
    endtask // memory_iface
 
    task memory_feeder();

@@ -1,0 +1,12 @@
+*~
+hf-riscv/verif/work/
+*.o
+*.map
+*.elf
+*.lst
+*.sec
+*.cnt
+software/*.txt
+*.bin
+*.wlf
+transcript

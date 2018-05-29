@@ -25,10 +25,11 @@ class monitor;
 
    task fake_uart();
       string line = "";
-      forever @(iface.mem_monitor)
-        if((iface.mem_monitor.address == 32'hf00000d0) &&
-           (iface.mem_monitor.data_we /= 4'h0)) begin
-           automatic byte char = iface.mem_monitor.data_out[31:24];
+      forever @(iface.mem)
+        if((iface.mem.address == 32'hf00000d0) &&
+           (iface.mem.data_we /= 4'h0)) begin
+           automatic byte char = iface.mem.data_write[31:24];
+           iface.mem.data_read <= {32{1'b0}};
            if (char != 8'h0A)
              line = {line, char};
            
@@ -41,9 +42,11 @@ class monitor;
    
    task termination_monitor();
       forever @(iface.mem)
-        if (iface.mem_monitor.address == 32'he0000000 &&
-            iface.mem_monitor.we != 4'h0)
+        if (iface.mem.address == 32'he0000000 &&
+            iface.mem.data_we != 4'h0) begin
+           iface.mem.data_read <= {32{1'b0}};
           ->terminated;
+        end
    endtask; // termination_monitor
    
 endclass // monitor

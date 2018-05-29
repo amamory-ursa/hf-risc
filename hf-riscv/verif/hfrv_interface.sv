@@ -1,4 +1,4 @@
-`ifdef HFRV_INTERFACE_SV
+`ifndef HFRV_INTERFACE_SV
  `define HFRV_INTERFACE_SV
 
 interface hfrv_interface(input logic clk);
@@ -8,12 +8,12 @@ interface hfrv_interface(input logic clk);
 	 logic [31:0] address;
 	 logic [31:0] data_read;
 	 logic [31:0] data_write;
-	 logic [3:0] 	data_we;
+	 logic [3:0]  data_we;
 
-	 logic [7 downto 0] extio_in;
-	 logic [7 downto 0] extio_out;
-	 logic 							uart_rx;
-	 logic 							uart_tx;
+	 logic [7:0] extio_in;
+	 logic [7:0] extio_out;
+	 logic       uart_rx;
+	 logic       uart_tx;
 
 	 clocking mem @(posedge clk);
 			input 					address;
@@ -22,12 +22,6 @@ interface hfrv_interface(input logic clk);
 			output 					data_read;
 	 endclocking; // drv_cb
 
-	 clocking mem_monitor @(posedge clk);
-			input 					address;
-			input 					data_write;
-			input 					data_we;
-			input 					data_read;
-	 endclocking; // mem_monitor
 
 	 modport uart(input uart_tx,
 								output uart_rx);
@@ -41,9 +35,9 @@ interface hfrv_interface(input logic clk);
 									clocking mem);
 
 	 modport monitor(input reset, stall,
-									 clocking mem_monitor);
+									 clocking mem);
 
-   modport cpu(input reset, clk, data_read, extio_in, uart_rx,
+   modport cpu(input reset, clk, data_read, extio_in, uart_rx, stall,
                output address, data_write, data_we, extio_out, uart_tx);
    
 endinterface; // hfrv_interface
