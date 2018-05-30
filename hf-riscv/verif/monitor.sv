@@ -4,13 +4,11 @@
  `include "hfrv_interface.sv"
 
 class monitor;
-
    virtual hfrv_interface.monitor iface;
    event   terminated;
    mailbox msgout;
    
-   
-   function new(virtual hfrv_interface.monitor iface, event terminated, mailbox msgout);
+   function new(virtual hfrv_interface.monitor iface, input event terminated, mailbox msgout);
       this.iface = iface;
       this.terminated = terminated;
       this.msgout = msgout;
@@ -45,7 +43,7 @@ class monitor;
         if (iface.mem.address == 32'he0000000 &&
             iface.mem.data_we != 4'h0) begin
            iface.mem.data_read <= {32{1'b0}};
-          ->terminated;
+          #1 -> terminated;
         end
    endtask; // termination_monitor
    

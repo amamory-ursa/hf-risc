@@ -16,6 +16,8 @@ module dut_top (hfrv_interface.cpu iface);
 	 logic [3:0] 	data_w_cpu;
 	 logic 				data_access_cpu;
 
+   assign iface.data_access = data_access_cpu;
+
 	 busmux bus_mux(.clock(iface.clk),
 									.reset(iface.reset),
 									.stall(iface.stall),

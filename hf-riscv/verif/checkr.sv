@@ -17,7 +17,7 @@ class checkr;
 
    task run();
       fork;
-         mem_dumper;
+//         mem_dumper;
          msg_printer;
       join;
    endtask // run
@@ -29,9 +29,8 @@ class checkr;
       forever begin
          dut_ramdump.get(ram);
          dut_romdump.get(rom);
-         
-         read_ram(ram);
-         read_ram(rom);
+
+         $display("Ram dump received");
       end      
    endtask // mem_dumper
 
@@ -51,7 +50,7 @@ class checkr;
       last_add = ram.base + ram.length;
       while(inst_add < last_add) begin
          read_data = ram.read_write(inst_add,0,0); //reading the RAM
-         inst_add = inst_add + 1;
+         inst_add = inst_add + 4;
          $display("%h: %h",inst_add,read_data);
       end 
    endtask : read_ram

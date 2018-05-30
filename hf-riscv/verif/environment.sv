@@ -11,10 +11,10 @@
 
 class environment;
    virtual hfrv_interface iface;
-   mailbox gen2agent;
-   mailbox gen2rom;
-   mailbox gen2ram;
-   mailbox gen2drv;
+   mailbox gen2agt;
+   mailbox agt2rom;
+   mailbox agt2ram;
+   mailbox agt2drv;
    mailbox ramdump;
    mailbox romdump;
    mailbox dut_msg;
@@ -31,24 +31,26 @@ class environment;
 
    function new (virtual hfrv_interface iface);
       this.iface = iface;
-      gen2agent = new();
-      gen2rom = new();
-      gen2ram = new();
-      gen2drv = new();
+      gen2agt = new();
+      agt2rom = new();
+      agt2ram = new();
+      agt2drv = new();
       ramdump = new();
       romdump = new();
       dut_msg = new();
-      gen = new(gen2agent, dut_terminated);
-      ram = new(iface, gen2ram, ramdump, dump_memory);
-      rom = new(iface, gen2rom, romdump, dump_memory);
-      drv = new(iface, gen2drv);
+      gen = new(gen2agt, dut_terminated);
+      ram = new(iface, agt2ram, ramdump, dump_memory);
+      rom = new(iface, agt2rom, romdump, dump_memory);
+      drv = new(iface, agt2drv);
       mon = new(iface, dut_terminated, dut_msg);
       chk = new(dut_msg, romdump, ramdump);
+      agt = new(gen2agt, agt2rom, agt2ram, agt2drv, dump_memory, dut_terminated);
    endfunction // new
 
    task run();
       fork;
          gen.run;
+         agt.run;
          ram.run;
          rom.run;
          drv.run;

@@ -12,12 +12,12 @@ class agent;
 	 mailbox agt2drv;
 	 event 	 dumpmem;
    event   terminated;
+   
    stop_cpu stop;
    start_cpu start;
    
-   
 	 function new (mailbox gen2agt, mailbox agt2rom, mailbox agt2ram, mailbox agt2drv,
-								 event dumpmem, event terminated);
+								 input event dumpmem, input event terminated);
 			this.gen2agt = gen2agt;
 			this.agt2ram = agt2ram;
 			this.agt2rom = agt2rom;
@@ -32,6 +32,7 @@ class agent;
 			forever begin
 				 automatic memory_model trans;
 				 gen2agt.get(trans);
+         $display("program received");
 				 feed_dut(trans);
 				 @(terminated);
 				 halt_dut();
@@ -39,18 +40,20 @@ class agent;
 	 endtask // run
 
 	 task feed_dut(memory_model trans);
-			logic [31:0] boot_rom [$];
       memory_model boot;
-			$readmemh("boot.txt", boot_rom);
-			boot = new(boot_rom, 'h0, 'h100000);
+      $display("loading boot.txt");
+			boot = new("boot.txt", 'h0, 'h100000);
+      $display("sending program to ram");
 			agt2ram.put(trans);
+      $display("sending bootloader to rom");
 			agt2rom.put(boot);
+      $display("sending start command to platform driver");
 			agt2drv.put(start);
 	 endtask // feed_cpu
 
 	 task halt_dut();
 			agt2drv.put(stop);
-			->dumpmem;			
+			#1 -> dumpmem;		
 	 endtask // halt_dut
 	 
 	 
