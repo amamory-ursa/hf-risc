@@ -12,3 +12,8 @@ vcom -93 -explicit ../core_rv32i/peripherals_busmux.vhd
 vlog tb_top.sv
 
 vsim work.tb_top
+
+do wave.do
+
+run 100 ms
+

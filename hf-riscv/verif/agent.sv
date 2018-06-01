@@ -32,9 +32,11 @@ class agent;
 			forever begin
 				 automatic memory_model trans;
 				 gen2agt.get(trans);
-         $display("program received");
+		         $display("program received");
 				 feed_dut(trans);
+				 //$display("AGENT: waiting event");
 				 @(terminated);
+				 //$display("AGENT: event received");
 				 halt_dut();
 			end
 	 endtask // run
@@ -53,7 +55,7 @@ class agent;
 
 	 task halt_dut();
 			agt2drv.put(stop);
-			#1 -> dumpmem;		
+			-> dumpmem;		
 	 endtask // halt_dut
 	 
 	 

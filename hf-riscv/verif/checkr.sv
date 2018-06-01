@@ -16,8 +16,9 @@ class checkr;
    endfunction // new
 
    task run();
+	  //$display("CHECKER: start");
       fork;
-//         mem_dumper;
+         mem_dumper;
          msg_printer;
       join;
    endtask // run

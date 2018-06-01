@@ -20,7 +20,10 @@ class generator;
          ram = new("code.txt", 32'h40000000, 'h100000);
          $display("sending program to agent");
          gen2agent.put(ram);
-         @(terminated);
+   		 //$display("GENERATOR: waiting event");
+		 @(terminated);
+   		 //$display("GENERATOR: event received");
+		 $finish;
       end
    endtask // run
 
