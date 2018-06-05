@@ -4,14 +4,14 @@ ENTRY(_entry)
 
 MEMORY
 {
-rom		: ORIGIN = 0x00000000, LENGTH = 256M	/* ROM area*/
-ram		: ORIGIN = 0x40000000, LENGTH = 256M	/* RAM area. */
-ram_top		: ORIGIN = 0x4ffffc00, LENGTH = 0x400	/* RAM area. 1KB reserved for the bootloader .bss + stack */
+  rom		: ORIGIN = 0x00000000, LENGTH = 1M	/* ROM area*/
+  ram		: ORIGIN = 0x40000000, LENGTH = 1M	/* RAM area. */
+  ram_top		: ORIGIN = 0x4008FC00, LENGTH = 0x400	/* RAM area. 1KB reserved for the bootloader .bss + stack */
 }
 
 /* define a global symbol _stack  */
 
-_stack = 0x6001fffc;
+_stack = 0x4008FFFC;
 
 /* now define the output sections  */
 
