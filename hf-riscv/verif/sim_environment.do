@@ -13,7 +13,5 @@ vlog tb_top.sv
 
 vsim work.tb_top
 
-do wave.do
-
 run 100 ms
 

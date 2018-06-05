@@ -5,8 +5,8 @@
 
 typedef class platform_driver;
 
-virtual class platform_transaction;
-   pure virtual task run(platform_driver cb);
+   virtual class platform_transaction;
+      pure virtual task run(platform_driver cb);
 endclass // platform_transaction
 
 class platform_driver;
