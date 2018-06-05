@@ -1,5 +1,6 @@
 *~
 hf-riscv/verif/work/
+hf-riscv/sim/work/
 *.o
 *.map
 *.elf
@@ -8,5 +9,5 @@ hf-riscv/verif/work/
 *.cnt
 software/*.txt
 *.bin
-*.wlf
+vsim.wlf
 transcript
