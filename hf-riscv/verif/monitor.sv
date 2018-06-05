@@ -2,6 +2,7 @@
  `define MONITOR_SV
 
  `include "hfrv_interface.sv"
+ `include "gpio.sv"
 
 class monitor;
    virtual hfrv_interface.monitor iface;
@@ -17,7 +18,7 @@ class monitor;
    task run();
       fork;
          fake_uart;
-         debug_process;
+		 debug_process;
          termination_monitor; 
       join;
    endtask // run
@@ -38,39 +39,62 @@ class monitor;
         end
    endtask // fake_uart
    
-   // Debug process
-   task debug_process();
-      integer f, line_length;
-      f = $fopen("sv_debug.txt","w");   
-      forever  @(iface.mem)   
-        if (iface.mem.address == 32'hf00000d0)
-          begin     
-             $fwrite(f,"%c",iface.mem.data_write[30:24]);
-             if (iface.mem.data_write[30:24] == 10)
-               line_length = 0;
-             else
-               line_length = line_length + 1;   
-          end 
-      
-        else if (line_length >= 72)
-          begin
-             $fwrite(f,"\n");
-             $fwrite(f,"%c",iface.mem.data_write[30:24]); 
-             line_length = 0;   
-          end
-   endtask
-   //Debug process
+	// Debug process
+	task debug_process();
+	integer f, line_length;
+	f = $fopen("sv_debug.txt","w");		
+	forever  @(iface.mem)		
+		if (iface.mem.address == 32'hf00000d0)
+		begin			
+			$fwrite(f,"%c",iface.mem.data_write[30:24]);
+			if (iface.mem.data_write[30:24] == 10)
+				line_length = 0;
+			else
+				line_length = line_length + 1;		
+		end	
+		
+		else if (line_length >= 72)
+		begin
+			$fwrite(f,"\n");
+			$fwrite(f,"%c",iface.mem.data_write[30:24]);	
+			line_length = 0;		
+		end
+	endtask
+	//Debug process
 
    task termination_monitor();
       forever @(iface.mem)
         if (iface.mem.address == 32'he0000000 && iface.mem.data_we != 4'h0) begin
-           //$display("MONITOR: address == %h",iface.mem.address);            
-           iface.mem.data_read <= {32{1'b0}};
-        //$display("MONITOR: sending event");           
-        ->terminated;
-        //$display("MONITOR: event sended");
-     end
+			//$display("MONITOR: address == %h",iface.mem.address);            
+			iface.mem.data_read <= {32{1'b0}};
+			//$display("MONITOR: sending event");           
+			->terminated;
+        	//$display("MONITOR: event sended");
+        end
    endtask; // termination_monitor
    
 endclass // monitor
+
+class gpio_monitor;
+  virtual hfrv_interface.gpio iface;
+  mailbox mon2ckr;
+  gpio_trans trans;
+
+  function new(virtual hfrv_interface.gpio iface, mailbox mon2ckr);
+    this.iface = iface;
+    this.mon2ckr = mon2ckr;
+  endfunction // new
+
+  task run();
+    forever @(iface.extio_out)
+    begin
+      trans = new;
+      trans.value = iface.extio_out;
+      trans.t_time = $time;
+      trans.d = out;
+      mon2ckr.put(trans);
+    end
+  endtask // run
+
+endclass //extio_monitor
 `endif

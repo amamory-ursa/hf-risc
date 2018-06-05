@@ -2,24 +2,31 @@
  `define CHECKR_SV
 
  `include "memory.sv"
-
+ `include "gpio.sv"
 // place holder checker, needs a proper checker
 class checkr;
    mailbox dut_msg;
    mailbox dut_romdump;
    mailbox dut_ramdump;
 
-   function new(mailbox dut_msg, mailbox dut_romdump, mailbox dut_ramdump);
+   mailbox io_input;
+   mailbox io_output;
+
+   function new(mailbox dut_msg, mailbox dut_romdump, mailbox dut_ramdump, mailbox io_input, mailbox io_output);
       this.dut_msg = dut_msg;
       this.dut_romdump = dut_romdump;
       this.dut_ramdump = dut_ramdump;
+      this.io_input = io_input;
+      this.io_output = io_output;
    endfunction // new
 
    task run();
-      //$display("CHECKER: start");
+	  //$display("CHECKER: start");
       fork;
          mem_dumper;
          msg_printer;
+         input_printer;
+         output_printer;
       join;
    endtask // run
 
@@ -40,9 +47,25 @@ class checkr;
       
       forever begin
          dut_msg.get(line);
-         $display("DUTOUT: %s", line);
+         //$display("DUTOUT: %s", line);
       end   
    endtask // print_msg
+
+   task input_printer();
+      gpio_trans trans;
+      forever begin
+         io_input.get(trans);
+         $display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
+      end  
+   endtask
+
+   task output_printer();
+      gpio_trans trans;
+      forever begin
+         io_output.get(trans);
+         $display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
+      end  
+   endtask
 
    task read_ram(memory_model ram);
       int read_data; // file descriptor
