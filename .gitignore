@@ -11,3 +11,5 @@ software/*.txt
 *.bin
 vsim.wlf
 transcript
+coverage.ucdb
+sv_debug.txt
