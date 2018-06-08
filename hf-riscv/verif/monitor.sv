@@ -4,14 +4,14 @@
  `include "hfrv_interface.sv"
 
 class Monitor_cbs;
-  virtual task mem(virtual hfrv_interface.monitor iface);
+  virtual task mem(virtual hfrv_interface.monitor iface, mailbox msgout);
   endtask
 endclass
 
 class monitor;
    virtual hfrv_interface.monitor iface;
    event   terminated;
-   Monitor_cbs cbsq[$];
+   Monitor_cbs cbs[$];
    mailbox msgout;
 
    function new(virtual hfrv_interface.monitor iface, input event terminated, mailbox msgout);
@@ -30,8 +30,8 @@ class monitor;
 
    task watch_mem();
       forever @(iface.mem) begin
-        foreach (cbsq[i])
-         cbsq[i].mem(this.iface);
+        foreach (cbs[i]) begin
+         cbs[i].mem(this.iface);
         end
       end
    endtask

@@ -17,8 +17,8 @@ module tb_top;
 
    initial begin
       static environment env = new(iface);
-      Fake_uart fake_uart = new;
-      env.monitor.cbs.push_back(fake_uart);
+      static Fake_uart fake_uart = new;
+      env.mon.cbs.push_back(fake_uart);
       env.run();
    end
    
