@@ -3,9 +3,15 @@
 
  `include "hfrv_interface.sv"
 
+class Monitor_cbs;
+  virtual task mem(virtual hfrv_interface.monitor iface);
+  endtask
+endclass
+
 class monitor;
    virtual hfrv_interface.monitor iface;
    event   terminated;
+   Monitor_cbs cbsq[$];
    mailbox msgout;
 
    function new(virtual hfrv_interface.monitor iface, input event terminated, mailbox msgout);
@@ -16,27 +22,19 @@ class monitor;
 
    task run();
       fork;
-         fake_uart;
+         watch_mem;
          debug_process;
          termination_monitor; 
       join;
    endtask // run
 
-   task fake_uart();
-      string line = "";
-      forever @(iface.mem)
-        if(iface.mem.address == 32'hf00000d0) begin
-           automatic byte char = iface.mem.data_write[30:24];
-           iface.mem.data_read <= {32{1'b0}};       
-           if (char != 8'h0A)
-             line = {line, char};
-           
-           if (char == 8'h0A || line.len() == 72) begin
-              msgout.put(line);
-              line = "";
-           end
+   task watch_mem();
+      forever @(iface.mem) begin
+        foreach (cbsq[i])
+         cbsq[i].mem(this.iface);
         end
-   endtask // fake_uart
+      end
+   endtask
    
    // Debug process
    task debug_process();

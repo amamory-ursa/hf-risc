@@ -5,6 +5,7 @@
 
 module tb_top;
 `include "environment.sv"
+`include "callbacks/monitor/fake_uart.sv"
 
    logic clk = 1'b0;
 
@@ -16,6 +17,8 @@ module tb_top;
 
    initial begin
       static environment env = new(iface);
+      Fake_uart fake_uart = new;
+      env.monitor.cbs.push_back(fake_uart);
       env.run();
    end
    
