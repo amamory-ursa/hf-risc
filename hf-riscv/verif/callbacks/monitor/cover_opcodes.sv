@@ -31,26 +31,44 @@ class CoverOpCodes;
 
 endclass
 
-class CoverOpCodes_cbs extends InstrMonitor_cbs;
+class CoverOpCodes_cbs extends Monitor_cbs;
   CoverOpCodes cov;
+  int nErrors;
 
   function new;
     this.cov = new;
   endfunction
-
-  virtual task pre_tx(input Config cfg,
-                      input bit[31:0] instr);
+  
+  virtual task mem(virtual hfrv_interface.monitor iface, mailbox msgout);
+    $display("mem");
+  endtask
+  
+  virtual task data_access();
     Opcode opcode;
+    bit[31:0] instr;
+
+    $display("data_access");
+    $display("opcode, funct3, funct7: %7b %3b %7b",
+      tb_top.dut.cpu.opcode,
+      tb_top.dut.cpu.funct3,
+      tb_top.dut.cpu.funct3);
+    $display("register 1: ", tb_top.dut.cpu.register_bank.registers[1]);
+    $display("address:    %4h", tb_top.dut.cpu.address);
+    $display("inst_in_s:  %32b", tb_top.dut.cpu.inst_in_s);
+    $display("pc:         %32b", tb_top.dut.cpu.pc);
+    
+    $cast(instr,tb_top.dut.cpu.inst_in_s);
+
     assert(instr[1:0]==2'b11) else
     begin
       $display("Error: instr[1:0] != 2'b11 : %2b", instr[1:0]);
-      cfg.nErrors++;
+      this.nErrors++;
     end
     assert($cast(opcode, instr[6:0])) else
     begin
       $display("Error: opcode not expected: %7b", instr[6:0]);
       $display("instr: %32b", instr[31:0]);
-      cfg.nErrors++;
+      this.nErrors++;
     end
     cov.sample(opcode);
   endtask

@@ -6,6 +6,8 @@
 class Monitor_cbs;
   virtual task mem(virtual hfrv_interface.monitor iface, mailbox msgout);
   endtask
+  virtual task data_access();
+  endtask
   virtual task terminated();
   endtask
 endclass
@@ -31,8 +33,17 @@ class monitor;
       fork;
          watch_mem;
          watch_terminated;
+         watch_data_access;
       join;
    endtask // run
+   
+   task watch_data_access();
+      forever @(iface.mem.data_access) begin
+        foreach (cbs[i]) begin
+         cbs[i].data_access();
+        end
+      end
+   endtask
 
    task watch_mem();
       forever @(iface.mem) begin
