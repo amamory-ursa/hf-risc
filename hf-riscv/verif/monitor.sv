@@ -6,6 +6,8 @@
 class Monitor_cbs;
   virtual task mem(virtual hfrv_interface.monitor iface, mailbox msgout);
   endtask
+  virtual task terminated();
+  endtask
 endclass
 
 typedef class Termination_monitor;
@@ -37,6 +39,14 @@ class monitor;
          cbs[i].mem(this.iface, this.msgout);
         end
       end
+   endtask
+   
+   task watch_terminated();
+     forever @(terminated) begin
+       foreach (cbs[i]) begin
+        cbs[i].terminated();
+       end
+     end
    endtask
    
 endclass // monitor
