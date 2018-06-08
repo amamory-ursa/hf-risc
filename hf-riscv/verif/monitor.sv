@@ -30,6 +30,7 @@ class monitor;
    task run();
       fork;
          watch_mem;
+         watch_terminated;
       join;
    endtask // run
 
@@ -42,10 +43,11 @@ class monitor;
    endtask
    
    task watch_terminated();
-     forever @(terminated) begin
+     @(terminated) begin
        foreach (cbs[i]) begin
         cbs[i].terminated();
        end
+       $finish;
      end
    endtask
    

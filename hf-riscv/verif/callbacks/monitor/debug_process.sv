@@ -20,7 +20,4 @@ class Debug_process extends Monitor_cbs;
          line_length = 0;
       end
   endtask
-  virtual task terminated();
-    $display("çalskdjfçalskdjf");
-  endtask
 endclass
