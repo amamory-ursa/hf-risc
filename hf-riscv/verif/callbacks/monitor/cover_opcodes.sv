@@ -38,11 +38,11 @@ class CoverOpCodes_cbs extends Monitor_cbs;
   function new;
     this.cov = new;
   endfunction
-  
-  virtual task mem(virtual hfrv_interface.monitor iface, mailbox msgout);
+
+  virtual task mem(virtual hfrv_interface.monitor iface);
     $display("mem");
   endtask
-  
+
   virtual task data_access();
     Opcode opcode;
     bit[31:0] instr;
@@ -56,7 +56,7 @@ class CoverOpCodes_cbs extends Monitor_cbs;
     $display("address:    %4h", tb_top.dut.cpu.address);
     $display("inst_in_s:  %32b", tb_top.dut.cpu.inst_in_s);
     $display("pc:         %32b", tb_top.dut.cpu.pc);
-    
+
     $cast(instr,tb_top.dut.cpu.inst_in_s);
 
     assert(instr[1:0]==2'b11) else

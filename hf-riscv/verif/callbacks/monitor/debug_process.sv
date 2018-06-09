@@ -3,7 +3,7 @@ class Debug_process extends Monitor_cbs;
   function new(string path);
     f = $fopen(path,"w");
   endfunction
-  virtual task mem(virtual hfrv_interface.monitor iface, mailbox msgout);
+  virtual task mem(virtual hfrv_interface.monitor iface);
     if (iface.mem.address == 32'hf00000d0)
       begin
          $fwrite(f,"%c",iface.mem.data_write[30:24]);
