@@ -29,6 +29,7 @@ class CoverOpCodes_cbs extends Monitor_cbs;
   virtual task data_access();
     Opcode opcode;
     bit[31:0] instr;
+    super.data_access();
 
     $cast(instr,tb_top.dut.cpu.inst_in_s);
 

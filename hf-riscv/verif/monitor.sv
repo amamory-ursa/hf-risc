@@ -76,6 +76,7 @@ class Termination_monitor extends Monitor_cbs;
   endfunction
 
   virtual task mem(virtual hfrv_interface.monitor iface);
+    super.mem(iface);
     if (iface.mem.address == 32'he0000000 && iface.mem.data_we != 4'h0)
     begin
       iface.mem.data_read <= {32{1'b0}};
@@ -95,6 +96,7 @@ class Fake_uart extends Monitor_cbs;
   endfunction
 
   virtual task mem(virtual hfrv_interface.monitor iface);
+    super.mem(iface);
     if(iface.mem.address == 32'hf00000d0) begin
        automatic byte char = iface.mem.data_write[30:24];
        iface.mem.data_read <= {32{1'b0}};
