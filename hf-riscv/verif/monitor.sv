@@ -8,6 +8,8 @@ class Monitor_cbs;
   endtask
   virtual task data_access();
   endtask
+  virtual task instruction(Opcode opcode, Instruction instruction, bit [31:0] instr);
+  endtask
   virtual task terminated();
   endtask
 endclass
@@ -38,6 +40,7 @@ class monitor;
          watch_mem;
          watch_terminated;
          watch_data_access;
+         watch_instruction;
       join;
    endtask // run
 
@@ -45,6 +48,24 @@ class monitor;
       forever @(posedge iface.mem.data_access) begin
         foreach (cbs[i]) begin
          cbs[i].data_access();
+        end
+      end
+   endtask
+
+   task watch_instruction();
+      Opcode opcode;
+      Instruction instruction;
+      bit[31:0] instr;
+
+      forever @(posedge iface.mem.data_access) begin
+        $cast(instr,tb_top.dut.cpu.inst_in_s);
+        if ($cast(opcode, instr[6:0])) begin
+          if ($cast(instruction, instr & OpcodeMask[opcode]))
+          begin
+            foreach (cbs[i]) begin
+             cbs[i].instruction(opcode, instruction, instr);
+            end
+          end
         end
       end
    endtask
