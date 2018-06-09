@@ -13,3 +13,4 @@ vsim.wlf
 transcript
 coverage.ucdb
 sv_debug.txt
+hf-riscv/verif/coverage/
