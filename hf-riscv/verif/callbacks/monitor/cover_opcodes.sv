@@ -45,6 +45,10 @@ class CoverOpCodes_cbs extends Monitor_cbs;
       this.nErrors++;
     end
     cov.sample(opcode);
+  endtask
 
+  virtual task terminated();
+    super.terminated();
+    $display("CoverOpCodes errors: %d", this.nErrors);
   endtask
 endclass

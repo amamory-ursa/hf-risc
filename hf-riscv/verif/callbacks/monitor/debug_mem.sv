@@ -8,7 +8,7 @@ class Debug_mem_cbs extends Monitor_cbs;
     begin
     $display("opcode:     %s", opcode);
     end
-    $display("data_read:  %32b", iface.mem.data_read);
+    // $display("data_read:  %32b", iface.mem.data_read);
     $display("opcode, funct3, funct7: %7b %3b %7b",
       tb_top.dut.cpu.opcode,
       tb_top.dut.cpu.funct3,
