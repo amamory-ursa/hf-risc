@@ -62,6 +62,11 @@ class monitor;
         if ($cast(opcode, instr[6:0])) begin
           if ($cast(instruction, instr & OpcodeMask[opcode]))
           begin
+            // $display("asdf: %b", Instruction[SLLI]);
+            // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
+            // if (instruction === Instruction[SLLI] || instruction === Instruction[SRLI]) begin
+            //   $cast(instruction, instr & OpcodeMask_SR_I);
+            // end
             foreach (cbs[i]) begin
              cbs[i].instruction(opcode, instruction, instr);
             end
