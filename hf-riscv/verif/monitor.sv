@@ -42,7 +42,7 @@ class monitor;
    endtask // run
 
    task watch_data_access();
-      forever @(iface.mem.data_access) begin
+      forever @(posedge iface.mem.data_access) begin
         foreach (cbs[i]) begin
          cbs[i].data_access();
         end
