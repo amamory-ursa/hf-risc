@@ -1,8 +1,10 @@
 class Debug_process extends Monitor_cbs;
   integer f, line_length;
+
   function new(string path);
     f = $fopen(path,"w");
   endfunction
+
   virtual task mem(virtual hfrv_interface.monitor iface);
     if (iface.mem.address == 32'hf00000d0)
       begin

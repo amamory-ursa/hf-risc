@@ -1,4 +1,5 @@
 class Debug_mem_cbs extends Monitor_cbs;
+
   virtual task mem(virtual hfrv_interface.monitor iface);
     Opcode opcode;
     $display("---------------------------------");

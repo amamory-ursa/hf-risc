@@ -1,4 +1,5 @@
 class Debug_data_access_cbs extends Monitor_cbs;
+  
   virtual task data_access();
     Opcode opcode;
     $display("data_access <=================================================");
