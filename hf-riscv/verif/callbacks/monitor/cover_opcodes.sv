@@ -28,6 +28,7 @@ class CoverOpCodes_cbs extends Monitor_cbs;
 
   virtual task data_access();
     Opcode opcode;
+    Instruction instruction;
     bit[31:0] instr;
     super.data_access();
 
@@ -43,6 +44,13 @@ class CoverOpCodes_cbs extends Monitor_cbs;
       $display("Error: opcode not expected: %7b", instr[6:0]);
       $display("instr: %32b", instr[31:0]);
       this.nErrors++;
+    end
+    if ($cast(opcode, instr[6:0])) begin
+      assert($cast(instruction, instr & OpcodeMask[opcode])) else
+      begin
+        $display("Error: intruction not expected: %32b", instr);
+        this.nErrors++;
+      end
     end
     cov.sample(opcode);
   endtask
