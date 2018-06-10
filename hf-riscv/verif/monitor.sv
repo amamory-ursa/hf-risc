@@ -16,12 +16,14 @@ endclass
 
 typedef class Termination_monitor;
 typedef class Fake_uart;
+typedef class Post_instruction_monitor;
 
 class monitor;
    virtual hfrv_interface.monitor iface;
    event   terminated;
    Monitor_cbs cbs[$];
    Termination_monitor termination_monitor;
+   Post_instruction_monitor post_instruction_monitor;
    Fake_uart fake_uart;
    mailbox msgout;
 
@@ -31,8 +33,10 @@ class monitor;
       this.msgout = msgout;
       this.termination_monitor = new(this.terminated);
       this.fake_uart = new(msgout);
+      this.post_instruction_monitor = new(cbs);
       this.cbs.push_back(this.termination_monitor);
       this.cbs.push_back(this.fake_uart);
+      this.cbs.push_back(this.post_instruction_monitor);
    endfunction // new
 
    task run();
@@ -63,7 +67,8 @@ class monitor;
           if ($cast(instruction, instr & OpcodeMask[opcode]))
           begin
             // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
-            if (instruction === SLLI || instruction === SRLI) begin
+            // Because of that, SRAI is always mistaken as SRLI
+            if (instruction === SRLI) begin
               $cast(instruction, instr & OpcodeMask_SR_I);
             end
             foreach (cbs[i]) begin
@@ -92,6 +97,23 @@ class monitor;
    endtask
 
 endclass // monitor
+
+class Post_instruction_monitor extends Monitor_cbs;
+  Monitor_cbs cbs[$];
+  Snapshot pre_snapshot;
+  Snapshot post_snapshot;
+  bit[31:0] previous_instr;
+
+  function new(ref Monitor_cbs cbs[$]);
+    this.cbs = cbs;
+  endfunction
+
+  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] instr);
+    foreach (post_snapshot.registers[i]) begin
+      post_snapshot.registers[i] = tb_top.dut.cpu.register_bank.registers[i];
+    end
+  endtask
+endclass
 
 class Termination_monitor extends Monitor_cbs;
   event terminated;
