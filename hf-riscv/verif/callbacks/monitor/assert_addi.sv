@@ -12,14 +12,15 @@ class Assert_addi_cbs extends Monitor_cbs;
       I_struct decoded = instr;
       bit [31:0] expected;
       bit [31:0] got;
-      expected = pre_snapshot.registers[decoded.rs1] + getImm(instr);
+      bit [31:0] imm = getImm(instr);
+      expected = pre_snapshot.registers[decoded.rs1] + imm;
       got = post_snapshot.registers[decoded.rd];
       assert(got === expected) else
       begin
         $display("ADDI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
         $display("  pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
         $display("  pre_register[rs1] : %d", pre_snapshot.registers[decoded.rs1]);
-        $display("  pre_imm           : %d", getImm(instr));
+        $display("  pre_imm           : %d", imm);
         $display("  post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
         $display("  post_register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
         this.nErrors++;
