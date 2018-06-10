@@ -69,18 +69,24 @@ class monitor;
       Instruction instruction;
       bit[31:0] instr;
 
-      forever @(posedge iface.mem.data_access) begin
-        $cast(instr,tb_top.dut.cpu.inst_in_s);
-        if ($cast(opcode, instr[6:0])) begin
-          if ($cast(instruction, instr & OpcodeMask[opcode]))
-          begin
-            // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
-            // Because of that, SRAI is always mistaken as SRLI
-            if (instruction === SRLI) begin
-              $cast(instruction, instr & OpcodeMask_SR_I);
-            end
-            foreach (cbs[i]) begin
-             cbs[i].instruction(opcode, instruction, instr);
+      forever @(iface.mem) begin
+        if (iface.mem.data_access === 1) begin
+          $display("============================================<<<<<");
+          @(iface.mem);
+        end
+        else begin
+          $cast(instr,tb_top.dut.cpu.inst_in_s);
+          if ($cast(opcode, instr[6:0])) begin
+            if ($cast(instruction, instr & OpcodeMask[opcode]))
+            begin
+              // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
+              // Because of that, SRAI is always mistaken as SRLI
+              if (instruction === SRLI) begin
+                $cast(instruction, instr & OpcodeMask_SR_I);
+              end
+              foreach (cbs[i]) begin
+                cbs[i].instruction(opcode, instruction, instr);
+              end
             end
           end
         end

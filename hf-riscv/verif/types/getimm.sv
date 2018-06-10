@@ -3,35 +3,41 @@ function bit[31:0] getImm(bit[31:0] instr);
   case(OpcodeFormat[instr[6:0]])
     R_type: return result;
     I_type: begin
-      automatic I_struct decoded = instr;
-      result[11:0] = decoded.imm_11_0;
+      result[31:11] = {21{instr[31]}}; //sign extension
+      result[10:5]  = instr[30:25];
+      result[4:1]   = instr[24:21];
+      result[0]     = instr[20];
       return result;
     end
     S_type: begin
-      automatic S_struct decoded = instr;
-      result[11:5] = decoded.imm_11_5;
-      result[4:0] = decoded.imm_4_0;
+      result[31:11] = {21{instr[31]}}; //sign extension
+      result[10:5]  = instr[30:25];
+      result[4:1]   = instr[11:8];
+      result[0]     = instr[7];
       return result;
     end
     B_type: begin
-      automatic B_struct decoded = instr;
-      result[12:12] = decoded.imm_12;
-      result[10:5]  = decoded.imm_10_5;
-      result[4:1]   = decoded.imm_4_1;
-      result[11:11] = decoded.imm_11;
+      result[31:12] = {20{instr[31]}}; //sign extension
+      result[11]    = instr[7];
+      result[10:5]  = instr[30:25];
+      result[4:1]   = instr[11:8];
+      result[0]     = 0;
       return result;
     end
     U_type: begin
-      automatic U_struct decoded = instr;
-      result[31:12] = decoded.imm_31_12;
+      result[31]    = instr[31];
+      result[30:20] = instr[30:20];
+      result[19:12] = instr[19:12];
+      result[11:0]  = 0;
       return result;
     end
     J_type: begin
-      automatic J_struct decoded = instr;
-      result[20:20] = decoded.imm_20;
-      result[10:1]  = decoded.imm_10_1;
-      result[11:11] = decoded.imm_11;
-      result[19:12] = decoded.imm_19_12;
+      result[31:20] = {12{instr[31]}}; //sign extension
+      result[19:12] = instr[19:12];
+      result[11]    = instr[20];
+      result[10:5]  = instr[30:25];
+      result[4:1]   = instr[24:21];
+      result[0]     = 0;
       return result;
     end
     E_type: return result;

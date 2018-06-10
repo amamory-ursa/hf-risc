@@ -18,9 +18,10 @@ class Assert_addi_cbs extends Monitor_cbs;
       assert(got === expected) else
       begin
         $display("ADDI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
+        $display("  difference        : %4h", got - expected);
+        $display("  imm               : %d", imm);
         $display("  pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
         $display("  pre_register[rs1] : %d", pre_snapshot.registers[decoded.rs1]);
-        $display("  pre_imm           : %d", imm);
         $display("  post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
         $display("  post_register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
         this.nErrors++;

@@ -1,6 +1,6 @@
 class Debug_post_instruction_cbs extends Monitor_cbs;
   int nErrors;
-  logic [31:0] [31:0] registers;
+  bit[31:0] imm;
 
   virtual task post_instruction(Opcode opcode,
                            Instruction instruction,
@@ -8,6 +8,7 @@ class Debug_post_instruction_cbs extends Monitor_cbs;
                            Snapshot pre_snapshot,
                            Snapshot post_snapshot);
     super.post_instruction(opcode, instruction, instr, pre_snapshot, post_snapshot);
+    imm = getImm(instr);
     case(OpcodeFormat[opcode])
       R_type: begin
         R_struct decoded = instr;
@@ -18,7 +19,7 @@ class Debug_post_instruction_cbs extends Monitor_cbs;
         $display("POST INSTR I");
         $display("pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
         $display("pre_register[rs1] : %d", pre_snapshot.registers[decoded.rs1]);
-        $display("pre_imm           : %d", getImm(instr));
+        $display("pre_imm           : %d", imm);
         $display("post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
         $display("post_register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
         $display("^=============================");
@@ -35,7 +36,7 @@ class Debug_post_instruction_cbs extends Monitor_cbs;
         $display("POST INSTR U <=========================================");
         $display("instr[31:12]       : %20b", instr[31:12]);
         $display("pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
-        $display("pre_imm           : %d", getImm(instr));
+        $display("pre_imm           : %d", imm);
         $display("post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
         $display("^=============================");
       end

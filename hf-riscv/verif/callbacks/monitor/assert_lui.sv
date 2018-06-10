@@ -18,8 +18,9 @@ class Assert_lui_cbs extends Monitor_cbs;
       assert(got === expected) else
       begin
         $display("LUI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
+        $display("  difference        : %4h", got - expected);
+        $display("  imm               : %d", imm);
         $display("  pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
-        $display("  pre_imm           : %d", imm);
         $display("  post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
         this.nErrors++;
       end
