@@ -8,7 +8,15 @@ class Monitor_cbs;
   endtask
   virtual task data_access();
   endtask
-  virtual task instruction(Opcode opcode, Instruction instruction, bit [31:0] instr);
+  virtual task instruction(Opcode opcode,
+                           Instruction instruction,
+                           bit [31:0] instr);
+  endtask
+  virtual task post_instruction(Opcode opcode,
+                                Instruction instruction,
+                                bit [31:0] instr,
+                                Snapshot pre_snapshot,
+                                Snapshot post_snapshot);
   endtask
   virtual task terminated();
   endtask
@@ -32,8 +40,8 @@ class monitor;
       this.terminated = terminated;
       this.msgout = msgout;
       this.termination_monitor = new(this.terminated);
-      this.fake_uart = new(msgout);
-      this.post_instruction_monitor = new(cbs);
+      this.fake_uart = new(this);
+      this.post_instruction_monitor = new(this);
       this.cbs.push_back(this.termination_monitor);
       this.cbs.push_back(this.fake_uart);
       this.cbs.push_back(this.post_instruction_monitor);
@@ -99,18 +107,33 @@ class monitor;
 endclass // monitor
 
 class Post_instruction_monitor extends Monitor_cbs;
-  Monitor_cbs cbs[$];
+  monitor mon;
   Snapshot pre_snapshot;
   Snapshot post_snapshot;
-  bit[31:0] previous_instr;
+  Opcode last_opcode;
+  Instruction last_instruction;
+  bit[31:0] last_instr = 0;
 
-  function new(ref Monitor_cbs cbs[$]);
-    this.cbs = cbs;
+  function new(monitor mon);
+    this.mon = mon;
   endfunction
 
   virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] instr);
     foreach (post_snapshot.registers[i]) begin
       post_snapshot.registers[i] = tb_top.dut.cpu.register_bank.registers[i];
+    end
+    if (last_instr !== 0) begin
+      foreach (mon.cbs[i]) begin
+        mon.cbs[i].post_instruction(last_opcode, last_instruction, last_instr, pre_snapshot, post_snapshot);
+      end
+    end
+    
+    //prepare next round
+    last_opcode = opcode;
+    last_instruction = instruction;
+    last_instr = instr;
+    foreach (post_snapshot.registers[i]) begin
+      pre_snapshot.registers[i] = post_snapshot.registers[i];
     end
   endtask
 endclass
@@ -135,11 +158,11 @@ endclass
 
 class Fake_uart extends Monitor_cbs;
   string line;
-  mailbox msgout;
+  monitor mon;
 
-  function new(mailbox msgout);
+  function new(monitor mon);
     this.line = "";
-    this.msgout = msgout;
+    this.mon = mon;
   endfunction
 
   virtual task mem(virtual hfrv_interface.monitor iface);
@@ -151,7 +174,7 @@ class Fake_uart extends Monitor_cbs;
          line = {line, char};
 
        if (char == 8'h0A || line.len() == 72) begin
-          this.msgout.put(line);
+          mon.msgout.put(line);
           line = "";
        end
     end

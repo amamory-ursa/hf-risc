@@ -2,30 +2,24 @@ class Assert_addi_cbs extends Monitor_cbs;
   int nErrors;
   logic [31:0] [31:0] registers;
 
-  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] instr);
-    super.instruction(opcode, instruction, instr);
+  virtual task post_instruction(Opcode opcode,
+                           Instruction instruction,
+                           bit[31:0] instr,
+                           Snapshot pre_snapshot,
+                           Snapshot post_snapshot);
+    super.post_instruction(opcode, instruction, instr, pre_snapshot, post_snapshot);
     if (instruction === ADDI)
     begin
-      I format = instr;
-      foreach (registers[i]) begin
-        registers[i] = tb_top.dut.cpu.register_bank.registers[i];
-      end
-      $display("ADDI imm: ", format.imm);
-      $display("ADDI rs1: ", format.rs1);
-      $display("ADDI rd: ", format.rd);
-      $display("register[%d]: %d", format.rs1, tb_top.dut.cpu.register_bank.registers[format.rs1]);
-      $display("register[%d]: %d", format.rd, tb_top.dut.cpu.register_bank.registers[format.rd]);
-      fork
-        begin
-          @(posedge tb_top.iface.mem.data_access)
-          $display("register[%d]=>%d", format.rs1, tb_top.dut.cpu.register_bank.registers[format.rs1]);
-          $display("register[%d]=>%d", format.rd, tb_top.dut.cpu.register_bank.registers[format.rd]);
-        end
-      join_none
-      assert(1 === 0) else
-      begin
-        this.nErrors++;
-      end
+      I_struct decoded = instr;
+      $display("vv=============================");
+      $display("POST ADDI imm: ", decoded.imm);
+      $display("POST ADDI rs1: ", decoded.rs1);
+      $display("POST ADDI rd: ", decoded.rd);
+      $display("POST pre register[rs1]: %d", pre_snapshot.registers[decoded.rs1]);
+      $display("POST pre register[rd] : %d", pre_snapshot.registers[decoded.rd]);
+      $display("POST pos register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
+      $display("POST pos register[rd] : %d", post_snapshot.registers[decoded.rd]);
+      $display("^^=============================");
     end
   endtask
 

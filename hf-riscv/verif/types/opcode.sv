@@ -29,3 +29,17 @@ end
 // Because of that, SRAI is always mistaken as SRLI
 bit[31:0] OpcodeMask_SR_I
                       = 32'b1111111_00000_00000_111_00000_1111111;
+
+InstrType OpcodeFormat[Opcode];
+initial begin
+  OpcodeFormat[OPCD_LUI]   = U_type;
+  OpcodeFormat[OPCD_AUIPC] = U_type;
+  OpcodeFormat[OPCD_JAL]   = J_type;
+  OpcodeFormat[OPCD_JALR]  = I_type;
+  OpcodeFormat[BRANCH]     = B_type;
+  OpcodeFormat[LOAD]       = I_type;
+  OpcodeFormat[STORE]      = S_type;
+  OpcodeFormat[OPP_IMM]    = I_type;
+  OpcodeFormat[OP]         = R_type;
+  OpcodeFormat[SYSTEM]     = R_type;
+end

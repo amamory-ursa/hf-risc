@@ -4,10 +4,10 @@
 `include "dut_top.sv"
 
 module tb_top;
-`include "structs/instructions_formats.sv"
-`include "structs/snapshot.sv"
-`include "enums/opcode.sv"
-`include "enums/instruction.sv"
+`include "types/instructions_formats.sv"
+`include "types/snapshot.sv"
+`include "types/opcode.sv"
+`include "types/instruction.sv"
 `include "environment.sv"
 `include "callbacks/monitor/debug_process.sv"
 `include "callbacks/monitor/cover_opcodes.sv"
