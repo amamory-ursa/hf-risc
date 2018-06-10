@@ -1,5 +1,10 @@
 class Assert_lui_cbs extends Monitor_cbs;
   int nErrors;
+  bit verbose;
+  
+  function new(bit verbose);
+    this.verbose = verbose;
+  endfunction
 
   virtual task post_instruction(Opcode opcode,
                            Instruction instruction,
@@ -17,11 +22,13 @@ class Assert_lui_cbs extends Monitor_cbs;
       got = post_snapshot.registers[decoded.rd];
       assert(got === expected) else
       begin
-        $display("LUI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
-        $display("  difference        : %4h", got - expected);
-        $display("  imm               : %d", imm);
-        $display("  pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
-        $display("  post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
+        if (verbose) begin
+          $display("LUI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
+          $display("  difference        : %4h", got - expected);
+          $display("  imm               : %d", imm);
+          $display("  pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
+          $display("  post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
+        end
         this.nErrors++;
       end
     end

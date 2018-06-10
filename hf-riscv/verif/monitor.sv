@@ -71,7 +71,7 @@ class monitor;
 
       forever @(iface.mem) begin
         if (iface.mem.data_access === 1) begin
-          $display("============================================<<<<<");
+          // $display("============================================<<<<<");
           @(iface.mem);
         end
         else begin
