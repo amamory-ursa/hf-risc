@@ -28,9 +28,6 @@ class Assert_lui_cbs extends Monitor_cbs;
 
   virtual task terminated();
     super.terminated();
-    if (nErrors > 0)
-    begin
-      $display("Assert_lui errors: %d", this.nErrors);
-    end
+    $display("Assert_lui errors: %d", this.nErrors);
   endtask
 endclass

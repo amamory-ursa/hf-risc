@@ -30,9 +30,6 @@ class Assert_addi_cbs extends Monitor_cbs;
 
   virtual task terminated();
     super.terminated();
-    if (nErrors > 0)
-    begin
-      $display("Assert_addi errors: %d", this.nErrors);
-    end
+    $display("Assert_addi errors: %d", this.nErrors);
   endtask
 endclass
