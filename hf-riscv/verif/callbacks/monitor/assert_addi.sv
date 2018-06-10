@@ -11,15 +11,20 @@ class Assert_addi_cbs extends Monitor_cbs;
     if (instruction === ADDI)
     begin
       I_struct decoded = instr;
-      $display("vv=============================");
-      $display("POST ADDI imm: ", decoded.imm);
-      $display("POST ADDI rs1: ", decoded.rs1);
-      $display("POST ADDI rd: ", decoded.rd);
-      $display("POST pre register[rs1]: %d", pre_snapshot.registers[decoded.rs1]);
-      $display("POST pre register[rd] : %d", pre_snapshot.registers[decoded.rd]);
-      $display("POST pos register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
-      $display("POST pos register[rd] : %d", post_snapshot.registers[decoded.rd]);
-      $display("^^=============================");
+      bit [31:0] expected;
+      bit [31:0] got;
+      expected = pre_snapshot.registers[decoded.rs1] + decoded.imm;
+      got = post_snapshot.registers[decoded.rd];
+      assert(got === expected) else
+      begin
+        $display("ADDI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
+        $display("pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
+        $display("pre_register[rs1] : %d", pre_snapshot.registers[decoded.rs1]);
+        $display("pre_imm           : %d", decoded.imm);
+        $display("post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
+        $display("post_register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
+        this.nErrors++;
+      end
     end
   endtask
 
