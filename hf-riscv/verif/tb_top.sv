@@ -8,6 +8,7 @@ module tb_top;
 `include "types/snapshot.sv"
 `include "types/opcode.sv"
 `include "types/instruction.sv"
+`include "types/getimm.sv"
 `include "environment.sv"
 `include "callbacks/monitor/debug_process.sv"
 `include "callbacks/monitor/cover_opcodes.sv"
@@ -42,8 +43,8 @@ module tb_top;
       env.mon.cbs.push_back(assert_addi_cbs);
       // env.mon.cbs.push_back(debug_mem_cbs);
       // env.mon.cbs.push_back(debug_data_access_cbs);
-      // env.mon.cbs.push_back(debug_instruction_cbs);
-      // env.mon.cbs.push_back(debug_post_instruction_cbs);
+      env.mon.cbs.push_back(debug_instruction_cbs);
+      env.mon.cbs.push_back(debug_post_instruction_cbs);
       env.run();
    end
 

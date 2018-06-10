@@ -18,7 +18,7 @@ class Debug_post_instruction_cbs extends Monitor_cbs;
         $display("POST INSTR I");
         $display("pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
         $display("pre_register[rs1] : %d", pre_snapshot.registers[decoded.rs1]);
-        $display("pre_imm           : %d", decoded.imm);
+        $display("pre_imm           : %d", getImm(instr));
         $display("post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
         $display("post_register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
         $display("^=============================");
@@ -31,6 +31,13 @@ class Debug_post_instruction_cbs extends Monitor_cbs;
       end
       U_type: begin
         U_struct decoded = instr;
+        $display("v=============================");
+        $display("POST INSTR U <=========================================");
+        $display("instr[31:12]       : %20b", instr[31:12]);
+        $display("pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
+        $display("pre_imm           : %d", getImm(instr));
+        $display("post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
+        $display("^=============================");
       end
       J_type: begin
         J_struct decoded = instr;
