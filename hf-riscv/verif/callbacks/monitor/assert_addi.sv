@@ -1,5 +1,6 @@
 class Assert_addi_cbs extends Monitor_cbs;
-  int nErrors;
+  int failed;
+  int passed;
   bit verbose;
   
   function new(bit verbose);
@@ -20,7 +21,7 @@ class Assert_addi_cbs extends Monitor_cbs;
       bit [31:0] imm = getImm(instr);
       expected = pre_snapshot.registers[decoded.rs1] + imm;
       got = post_snapshot.registers[decoded.rd];
-      assert(got === expected) else
+      assert(got === expected) this.passed ++; else
       begin
         if (verbose) begin
           $display("ADDI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
@@ -31,13 +32,13 @@ class Assert_addi_cbs extends Monitor_cbs;
           $display("  post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
           $display("  post_register[rs1]: %d", post_snapshot.registers[decoded.rs1]);
         end
-        this.nErrors++;
+        this.failed++;
       end
     end
   endtask
 
   virtual task terminated();
     super.terminated();
-    $display("Assert_addi errors: %d", this.nErrors);
+    $display("Assert_addi passed: %d, failed: %d", this.passed, this.failed);
   endtask
 endclass

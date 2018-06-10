@@ -1,5 +1,6 @@
 class Assert_lui_cbs extends Monitor_cbs;
-  int nErrors;
+  int failed;
+  int passed;
   bit verbose;
   
   function new(bit verbose);
@@ -20,7 +21,7 @@ class Assert_lui_cbs extends Monitor_cbs;
       bit [31:0] imm = getImm(instr);
       expected = imm;
       got = post_snapshot.registers[decoded.rd];
-      assert(got === expected) else
+      assert(got === expected) this.passed++; else
       begin
         if (verbose) begin
           $display("LUI assertion error. Expected: 0x%4h, got: 0x%4h.", expected, got);
@@ -29,13 +30,13 @@ class Assert_lui_cbs extends Monitor_cbs;
           $display("  pre_register[rd]  : %d", pre_snapshot.registers[decoded.rd]);
           $display("  post_register[rd] : %d", post_snapshot.registers[decoded.rd]);
         end
-        this.nErrors++;
+        this.failed++;
       end
     end
   endtask
 
   virtual task terminated();
     super.terminated();
-    $display("Assert_lui errors: %d", this.nErrors);
+    $display("Assert_lui passed: %d, failed: %d", this.passed, this.failed);
   endtask
 endclass
