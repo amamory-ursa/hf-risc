@@ -1,5 +1,5 @@
 class CoverInstructions;
-  Instruction intruction;
+  Instruction instruction;
 
   covergroup Instructions_covergroup;
     coverpoint instruction;
@@ -18,7 +18,7 @@ class CoverInstructions;
 
 endclass
 
-class CoverInstructions extends Monitor_cbs;
+class CoverInstructions_cbs extends Monitor_cbs;
   CoverInstructions cov;
   int nErrors;
 
