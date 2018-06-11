@@ -61,7 +61,6 @@ class environment;
       chk = new(dut_msg, romdump, ramdump, io_driv2ckr, io_mon2ckr);
       agt = new(gen2agt, agt2rom, agt2ram, agt2drv, dump_memory, dut_terminated);
 
-
       iog = new(io_gen2driv);
       iod = new(iface, io_gen2driv, io_driv2ckr);
       iom = new(iface, io_mon2ckr);

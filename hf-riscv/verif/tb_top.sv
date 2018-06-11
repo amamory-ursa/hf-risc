@@ -16,6 +16,8 @@ module tb_top;
 
    initial begin
       static environment env = new(iface);
+      env.iog.filename = "";
+      env.iog.gen_cfg();
       env.run();
    end
    

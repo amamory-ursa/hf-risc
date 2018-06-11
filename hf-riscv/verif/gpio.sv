@@ -12,7 +12,7 @@ class gpio_trans;
 
   constraint time_valid
     {t_time < 100000;   //100us
-     t_time >   5000; } //5us
+     t_time >  20000; } //20us
 
 endclass
 
@@ -32,29 +32,70 @@ endclass
 class gpio_gen;
   rand gpio_cfg cfg;
   rand gpio_trans trans;
+       mailbox gen2driv;
+       string filename;
 
-  mailbox gen2driv;
+  int interval;
+  int value[integer];
 
   function new(mailbox gen2driv);
     this.gen2driv = gen2driv;
     cfg = new;
-  	if( !cfg.randomize() ) $fatal("randomization failed");
   endfunction
 
+  task gen_cfg();
+    if(filename != "") begin
+      int code, i, r;
+      int r_int;
+
+      if(filename != "") begin
+        code = $fopen(filename,"r");
+        if(code) begin
+          cfg = new();
+          r = $fscanf(code,"init_time = %d\n", cfg.init_time);
+          r = $fscanf(code,"interval = %d\n", interval);
+          r = $fscanf(code,"io_num = %d\n", cfg.num_io);
+
+          i = 0;
+          while(!$feof(code)) begin
+            r = $fscanf(code,"%d\n",r_int);
+            value[i] = r_int;
+            i++;
+          end
+          $fclose(code);
+        end
+      end
+    end
+    else
+      if( !cfg.randomize() ) $fatal("randomization failed");
+  endtask
+
   task run();
-  	$display("GPIO: num_io = %d, init_time = %d", cfg.num_io, cfg.init_time);
-  	#cfg.init_time;
+    int i;
+
+    $display("GPIO: num_io = %d, init_time = %d", cfg.num_io, cfg.init_time);
+    #cfg.init_time;
+    trans = new();
+    trans.value = cfg.num_io;
+    trans.d = in;
+    gen2driv.put(trans);
+    i = 0;
     repeat(cfg.num_io) begin
       trans = new();
-      if( !trans.randomize() ) $fatal("randomization failed");
+      if (value.exists(i)) begin
+        trans.value = value[i];
+        trans.t_time = interval;
+      end
+      else
+        if( !trans.randomize() ) $fatal("randomization failed");
       trans.d = in;
+      i++;
       #trans.t_time;
       gen2driv.put(trans);
     end
   endtask
 
 endclass
-
 
 class gpio_drv;
 
