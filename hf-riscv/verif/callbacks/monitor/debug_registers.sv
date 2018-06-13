@@ -1,14 +1,13 @@
 class Debug_registers_cbs extends Monitor_cbs;
 
-  virtual task post_instruction(Opcode opcode,
-                           Instruction instruction,
-                           bit[31:0] base,
-                           Snapshot pre_snapshot,
-                           Snapshot post_snapshot);
-    super.post_instruction(opcode, instruction, base, pre_snapshot, post_snapshot);
-    foreach (pre_snapshot.registers[i])
+  virtual task time_step(int t, ref Timemachine timemachine);
+    Snapshot snap;
+    super.time_step(t, timemachine);
+    snap = timemachine.snapshot[t];
+
+    foreach (snap.registers[i])
     begin
-      $display("register[%d]  : %d", i, pre_snapshot.registers[i]);
+      $display("register[%d]  : %d", i, snap.registers[i]);
     end
   endtask
 endclass
