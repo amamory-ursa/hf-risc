@@ -12,9 +12,10 @@ typedef struct packed{
 
   Opcode opcode;
   Instruction instruction;
-  logic [31:0] imm;
+
   logic [4:0] rd;
   logic [4:0] rs1;
   logic [4:0] rs2;
-
+  logic [31:0] imm;
+  
 } Snapshot;

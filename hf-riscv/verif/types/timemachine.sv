@@ -10,10 +10,11 @@ class Timemachine;
     snap.address = address;
     snap.data_read = data_read;
     snap.data_we = data_we;
+
+    snap.base = getBase(snap);
     foreach (snap.registers[i]) begin
       snap.registers[i] = registers[i];
     end
-    snap.base = getBase(snap);
 
     if ($cast(snap.opcode, snap.base[6:0]));
     begin
@@ -28,6 +29,9 @@ class Timemachine;
             $cast(snap.instruction, snap.base & OpcodeMask_SR_I);
           end
 
+          snap.rd = snap.base[11:7];
+          snap.rs1 = snap.base[19:15];
+          snap.rs2 = snap.base[24:20];
           snap.imm = getImm(snap);
         end
       end
