@@ -4,11 +4,10 @@
 `include "dut_top.sv"
 
 module tb_top;
-`include "types/instructions_formats.sv"
-`include "types/snapshot.sv"
-`include "types/opcode.sv"
+`include "types/instr_types.sv"
 `include "types/instruction.sv"
-`include "types/getimm.sv"
+`include "types/opcode.sv"
+`include "types/snapshot.sv"
 `include "types/timemachine.sv"
 `include "environment.sv"
 // `include "callbacks/monitor/cover_instructions.sv"

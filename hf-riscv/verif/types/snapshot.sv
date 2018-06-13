@@ -1,5 +1,5 @@
 typedef logic [31:0] register;
-typedef struct {
+typedef struct packed{
   bit data_access;
 
   logic [31:0] address;
