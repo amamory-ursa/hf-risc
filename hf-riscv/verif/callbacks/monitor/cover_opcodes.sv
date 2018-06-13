@@ -44,6 +44,10 @@ class CoverOpCodes_cbs extends Monitor_cbs;
     begin
       $display("Error: opcode not expected: %7b", snap.base[6:0]);
       $display("base     : %32b", snap.base);
+      // $display(timemachine.snapshot[t].data_access);
+      // $display(timemachine.snapshot[t-1].data_access);
+      // $display(timemachine.snapshot[t-2].data_access);
+      // $display(timemachine.snapshot[t-3].data_access);
       this.nErrors++;
     end
     if ($cast(opcode, snap.base[6:0])) begin

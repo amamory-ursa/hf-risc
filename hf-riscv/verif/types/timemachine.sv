@@ -28,11 +28,11 @@ class Timemachine;
 
   function bit isInstruction(int timecounter);
     if (snapshot[timecounter].data_access == 1)
-      return 1;
+      return 0;
     if (timecounter > 0)
       if (snapshot[timecounter-1].data_access == 1)
-        return 1;
-    return 0;
+        return 0;
+    return 1;
   endfunction
 
 endclass

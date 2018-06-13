@@ -1,10 +1,8 @@
 class Debug_instruction_cbs extends Monitor_cbs;
-  bit[31:0] imm;
-
-  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] base);
-    super.instruction(opcode, instruction, base);
-    imm = getImm(base);
-    case(OpcodeFormat[opcode])
+  virtual task time_step(int t, Timemachine timemachine);
+    super.time_step(t, timemachine);
+    logic [31:0] base = timemachine.snapshot[t].base;
+    case(OpcodeFormat[timemachine.snapshot[t].opcode])
       R_type: begin
         R_struct decoded = base;
         $display("DBG INSTR: %s, rd: %d, rs1: %d, rs2:%d",
@@ -58,7 +56,7 @@ class Debug_instruction_cbs extends Monitor_cbs;
         $display("DBG INSTR: %s",
           instruction);
       end
-      default: $error("Instruction type not expected for opcode %7b", opcode);
+      default: $error("Instruction type not expected for opcode %7b", base[6:0]);
     endcase
   endtask
 endclass
