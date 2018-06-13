@@ -15,23 +15,20 @@ class Timemachine;
     end
     snap.base = getBase(snap);
 
-    this.snapshot.push_back(snap);
-    timecounter = this.snapshot.size()-1;
-
-    if (this.isInstruction(timecounter))
+    if ($cast(snap.opcode, snap.base[6:0]));
     begin
-      if ($cast(snap.opcode, snap.base[6:0]));
+      if (snap.opcode)
+      if ($cast(snap.instruction, snap.base & OpcodeMask[snap.opcode]));
       begin
-        if (snap.opcode)
-        if ($cast(snap.instruction, snap.base & OpcodeMask[snap.opcode]));
-        begin
-          // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
-          // Because of that, SRAI is always mistaken as SRLI
-          if (snap.instruction === SRLI)
-            $cast(snap.instruction, snap.base & OpcodeMask_SR_I);
-        end
+        // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
+        // Because of that, SRAI is always mistaken as SRLI
+        if (snap.instruction === SRLI)
+          $cast(snap.instruction, snap.base & OpcodeMask_SR_I);
       end
     end
+
+    this.snapshot.push_back(snap);
+    timecounter = this.snapshot.size()-1;
     return timecounter;
   endfunction
 

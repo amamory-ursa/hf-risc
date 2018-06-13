@@ -4,6 +4,7 @@ class Debug_instruction_cbs extends Monitor_cbs;
     super.time_step(t, timemachine);
     snap = timemachine.snapshot[t];
 
+    $display("aslkdjflsakjfd");
     if (!timemachine.isInstruction(t))
       return;
     if (!snap.opcode)
