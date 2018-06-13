@@ -53,18 +53,16 @@ class monitor;
         end
         else
         begin
-          automatic Snapshot snap;
-          automatic int timecounter;
-          snap.data_access = tb_top.dut.cpu.data_access;
-          snap.address = iface.mem.address;
-          snap.data_read = iface.mem.data_read;
-          snap.data_we = iface.mem.data_we;
-          foreach (snap.registers[i]) begin
-            snap.registers[i] = tb_top.dut.cpu.register_bank.registers[i];
+          int timecounter;
+          register [0:31] registers;
+          foreach (registers[i]) begin
+            registers[i] = tb_top.dut.cpu.register_bank.registers[i];
           end
-          this.timemachine.snapshot.push_back(snap);
-          timecounter = timemachine.snapshot.size()-1;
-          $assert(getInstr(snap.data_read) == tb_top.dut.cpu.inst_in_s);
+          timecounter = timemachine.step(iface.mem.data_access,
+                                         iface.mem.address,
+                                         iface.mem.data_read,
+                                         iface.mem.data_we,
+                                         registers);
           foreach (cbs[i]) begin
             cbs[i].time_step(timecounter, timemachine);
           end

@@ -1,12 +1,12 @@
 class Debug_instruction_cbs extends Monitor_cbs;
   bit[31:0] imm;
 
-  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] instr);
-    super.instruction(opcode, instruction, instr);
-    imm = getImm(instr);
+  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] base);
+    super.instruction(opcode, instruction, base);
+    imm = getImm(base);
     case(OpcodeFormat[opcode])
       R_type: begin
-        R_struct decoded = instr;
+        R_struct decoded = base;
         $display("DBG INSTR: %s, rd: %d, rs1: %d, rs2:%d",
           instruction,
           decoded.rd,
@@ -14,7 +14,7 @@ class Debug_instruction_cbs extends Monitor_cbs;
           decoded.rs2);
       end
       I_type: begin
-        I_struct decoded = instr;
+        I_struct decoded = base;
         $display("DBG INSTR: %s, rd[%d]: 0x%4h, rs1[%d]: 0x%4h, imm: %d",
           instruction,
           decoded.rd,
@@ -24,7 +24,7 @@ class Debug_instruction_cbs extends Monitor_cbs;
           imm);
       end
       S_type: begin
-        S_struct decoded = instr;
+        S_struct decoded = base;
         $display("DBG INSTR: %s, rs1: %d, rs2:%d, imm: %d",
           instruction,
           decoded.rs1,
@@ -32,7 +32,7 @@ class Debug_instruction_cbs extends Monitor_cbs;
           imm);
       end
       B_type: begin
-        B_struct decoded = instr;
+        B_struct decoded = base;
         $display("DBG INSTR: %s,rs1: %d, rs2:%d, imm: %d",
           instruction,
           decoded.rs1,
@@ -40,21 +40,21 @@ class Debug_instruction_cbs extends Monitor_cbs;
           imm);
       end
       U_type: begin
-        U_struct decoded = instr;
+        U_struct decoded = base;
         $display("DBG INSTR: %s, rd: %d, imm: %d",
           instruction,
           decoded.rd,
           imm);
       end
       J_type: begin
-        J_struct decoded = instr;
+        J_struct decoded = base;
         $display("DBG INSTR: %s, rd: %d, imm: %d",
           instruction,
           decoded.rd,
           imm);
       end
       E_type: begin
-        E_struct decoded = instr;
+        E_struct decoded = base;
         $display("DBG INSTR: %s",
           instruction);
       end

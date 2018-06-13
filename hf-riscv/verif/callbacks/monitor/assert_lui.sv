@@ -2,23 +2,23 @@ class Assert_lui_cbs extends Monitor_cbs;
   int failed;
   int passed;
   bit verbose;
-  
+
   function new(bit verbose);
     this.verbose = verbose;
   endfunction
 
   virtual task post_instruction(Opcode opcode,
                            Instruction instruction,
-                           bit[31:0] instr,
+                           bit[31:0] base,
                            Snapshot pre_snapshot,
                            Snapshot post_snapshot);
-    super.post_instruction(opcode, instruction, instr, pre_snapshot, post_snapshot);
+    super.post_instruction(opcode, instruction, base, pre_snapshot, post_snapshot);
     if (instruction === LUI)
     begin
-      U_struct decoded = instr;
+      U_struct decoded = base;
       bit [31:0] expected;
       bit [31:0] got;
-      bit [31:0] imm = getImm(instr);
+      bit [31:0] imm = getImm(base);
       expected = imm;
       got = post_snapshot.registers[decoded.rd];
       assert(got === expected) this.passed++; else

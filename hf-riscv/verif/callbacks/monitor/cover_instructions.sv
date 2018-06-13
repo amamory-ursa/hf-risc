@@ -26,8 +26,8 @@ class CoverInstructions_cbs extends Monitor_cbs;
     this.cov = new;
   endfunction
 
-  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] instr);
-    super.instruction(opcode, instruction, instr);
+  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] base);
+    super.instruction(opcode, instruction, base);
     cov.sample(instruction);
   endtask
 

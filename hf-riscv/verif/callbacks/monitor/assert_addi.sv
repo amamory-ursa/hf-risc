@@ -2,23 +2,23 @@ class Assert_addi_cbs extends Monitor_cbs;
   int failed;
   int passed;
   bit verbose;
-  
+
   function new(bit verbose);
     this.verbose = verbose;
   endfunction
 
-  virtual task post_instruction(Opcode opcode,
-                           Instruction instruction,
-                           bit[31:0] instr,
-                           Snapshot pre_snapshot,
-                           Snapshot post_snapshot);
-    super.post_instruction(opcode, instruction, instr, pre_snapshot, post_snapshot);
+  virtual task time_step(int timecounter,
+                         Timemachine timemachine);
+    super.time_step(int timecounter,
+                    Timemachine timemachine);
+    Instruction instruction = getInstruction(timemachine[timecounter]);
+    logic [31:0] base = getInstr(timemachine[timecounter]);
     if (instruction === ADDI)
     begin
-      I_struct decoded = instr;
+      I_struct decoded = base;
       bit [31:0] expected;
       bit [31:0] got;
-      bit [31:0] imm = getImm(instr);
+      bit [31:0] imm = getImm(base);
       expected = pre_snapshot.registers[decoded.rs1] + imm;
       got = post_snapshot.registers[decoded.rd];
       assert(got === expected) this.passed ++; else

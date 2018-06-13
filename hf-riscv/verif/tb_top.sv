@@ -4,14 +4,14 @@
 `include "dut_top.sv"
 
 module tb_top;
-`include "types/instr_types.sv"
+`include "types/base_formats.sv"
 `include "types/instruction.sv"
 `include "types/opcode.sv"
 `include "types/snapshot.sv"
 `include "types/timemachine.sv"
 `include "environment.sv"
 // `include "callbacks/monitor/cover_instructions.sv"
-// `include "callbacks/monitor/cover_opcodes.sv"
+`include "callbacks/monitor/cover_opcodes.sv"
 // `include "callbacks/monitor/assert_addi.sv"
 // `include "callbacks/monitor/assert_lui.sv"
 // `include "callbacks/monitor/debug_instruction.sv"
@@ -30,14 +30,14 @@ module tb_top;
       static bit verbose = 0;
       static environment env = new(iface);
       // automatic CoverInstructions_cbs      cover_instructions_cbs = new;
-      // automatic CoverOpCodes_cbs           cover_opcodes_cbs = new;
+      automatic CoverOpCodes_cbs           cover_opcodes_cbs = new;
       // automatic Assert_addi_cbs            assert_addi_cbs = new(verbose);
       // automatic Assert_lui_cbs             assert_lui_cbs = new(verbose);
       // automatic Debug_instruction_cbs      debug_instruction_cbs = new;
       // automatic Debug_registers_cbs        debug_registers_cbs = new;
       automatic Debug_uart                 debug_uart = new("sv_debug.txt");
       // env.mon.cbs.push_back(cover_instructions_cbs);
-      // env.mon.cbs.push_back(cover_opcodes_cbs);
+      env.mon.cbs.push_back(cover_opcodes_cbs);
       // env.mon.cbs.push_back(assert_addi_cbs);
       // env.mon.cbs.push_back(assert_lui_cbs);
       // env.mon.cbs.push_back(debug_instruction_cbs);

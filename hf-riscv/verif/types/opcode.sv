@@ -1,4 +1,4 @@
-typedef enum bit [6:0] {
+typedef enum logic [6:0] {
   OPCD_LUI   = 7'b01_101_11,
   OPCD_AUIPC = 7'b00_101_11,
   OPCD_JAL   = 7'b11_011_11,
@@ -11,7 +11,7 @@ typedef enum bit [6:0] {
   SYSTEM     = 7'b11_100_11
 }  Opcode;
 
-bit[31:0] OpcodeMask[Opcode];
+logic [31:0] OpcodeMask[Opcode];
 initial begin
   OpcodeMask[OPCD_LUI]   = 32'b0000000_00000_00000_000_00000_1111111;
   OpcodeMask[OPCD_AUIPC] = 32'b0000000_00000_00000_000_00000_1111111;
@@ -27,7 +27,7 @@ end
 
 // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
 // Because of that, SRAI is always mistaken as SRLI
-bit[31:0] OpcodeMask_SR_I
+logic [31:0] OpcodeMask_SR_I
                       = 32'b1111111_00000_00000_111_00000_1111111;
 
 InstrType OpcodeFormat[Opcode];

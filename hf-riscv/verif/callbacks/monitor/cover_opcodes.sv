@@ -26,29 +26,28 @@ class CoverOpCodes_cbs extends Monitor_cbs;
     this.cov = new;
   endfunction
 
-  virtual task data_access();
+  virtual task time_step(int t, ref Timemachine timemachine);
     Opcode opcode;
     Instruction instruction;
-    bit[31:0] instr;
-    super.data_access();
+    Snapshot snap;
+    super.time_step(t, timemachine);
 
-    $cast(instr,tb_top.dut.cpu.inst_in_s);
-
-    assert(instr[1:0]==2'b11) else
+    snap = timemachine[t];
+    assert(snap.base[1:0]==2'b11) else
     begin
-      $display("Error: instr[1:0] != 2'b11 : %2b", instr[1:0]);
+      $display("Error: base[1:0] != 2'b11 : %2b", base[1:0]);
       this.nErrors++;
     end
-    assert($cast(opcode, instr[6:0])) else
+    assert($cast(opcode, base[6:0])) else
     begin
-      $display("Error: opcode not expected: %7b", instr[6:0]);
-      $display("instr: %32b", instr[31:0]);
+      $display("Error: opcode not expected: %7b", base[6:0]);
+      $display("base: %32b", base[31:0]);
       this.nErrors++;
     end
-    if ($cast(opcode, instr[6:0])) begin
-      assert($cast(instruction, instr & OpcodeMask[opcode])) else
+    if ($cast(opcode, base[6:0])) begin
+      assert($cast(base, base & OpcodeMask[opcode])) else
       begin
-        $display("Error: intruction not expected: %32b", instr);
+        $display("Error: intruction not expected: %32b", base);
         this.nErrors++;
       end
     end
