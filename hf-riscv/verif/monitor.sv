@@ -7,8 +7,7 @@ class Monitor_cbs;
   virtual task uart(virtual hfrv_interface.monitor iface);
   endtask
 
-  virtual task time_step(int timecounter,
-                         ref Timemachine timemachine);
+  virtual task time_step(int t, ref Timemachine timemachine);
   endtask
 
   virtual task terminated();

@@ -32,7 +32,7 @@ class CoverOpCodes_cbs extends Monitor_cbs;
     Snapshot snap;
     super.time_step(t, timemachine);
 
-    snap = timemachine[t];
+    snap = timemachine.snapshot[t];
     assert(snap.base[1:0]==2'b11) else
     begin
       $display("Error: base[1:0] != 2'b11 : %2b", base[1:0]);
