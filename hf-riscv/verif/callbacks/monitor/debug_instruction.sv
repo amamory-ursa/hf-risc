@@ -12,7 +12,8 @@ class Debug_instruction_cbs extends Monitor_cbs;
     case(OpcodeFormat[snap.opcode])
       R_type: begin
         R_struct decoded = snap.base;
-        $display("%s, rd: %d, rs1: %d, rs2:%d",
+        $display("%d  %s, rd: %d, rs1: %d, rs2:%d",
+          t,
           snap.instruction,
           decoded.rd,
           decoded.rs1,
@@ -20,7 +21,8 @@ class Debug_instruction_cbs extends Monitor_cbs;
       end
       I_type: begin
         I_struct decoded = snap.base;
-        $display("%s, rd: %d, rs1: %d, imm: %d",
+        $display("%d  %s, rd: %d, rs1: %d, imm: %d",
+          t,
           snap.instruction,
           decoded.rd,
           decoded.rs1,
@@ -28,7 +30,8 @@ class Debug_instruction_cbs extends Monitor_cbs;
       end
       S_type: begin
         S_struct decoded = snap.base;
-        $display("%s, rs1: %d, rs2: %d, imm: %d",
+        $display("%d  %s, rs1: %d, rs2: %d, imm: %d",
+          t,
           snap.instruction,
           decoded.rs1,
           decoded.rs2,
@@ -36,7 +39,8 @@ class Debug_instruction_cbs extends Monitor_cbs;
       end
       B_type: begin
         B_struct decoded = snap.base;
-        $display("%s, rs1: %d, rs2: %d, imm: %d",
+        $display("%d  %s, rs1: %d, rs2: %d, imm: %d",
+          t,
           snap.instruction,
           decoded.rs1,
           decoded.rs2,
@@ -44,21 +48,24 @@ class Debug_instruction_cbs extends Monitor_cbs;
       end
       U_type: begin
         U_struct decoded = snap.base;
-        $display("%s, rd: %d, imm: %d",
+        $display("%d  %s, rd: %d, imm: %d",
+          t,
           snap.instruction,
           decoded.rd,
           snap.imm);
       end
       J_type: begin
         J_struct decoded = snap.base;
-        $display("%s, rd: %d, imm: %d",
+        $display("%d  %s, rd: %d, imm: %d",
+          t,
           snap.instruction,
           decoded.rd,
           snap.imm);
       end
       E_type: begin
         E_struct decoded = snap.base;
-        $display("%s",
+        $display("%d  %s",
+          t,
           snap.instruction);
       end
       default: $error("Instruction type not expected for opcode %7b", snap.base[6:0]);

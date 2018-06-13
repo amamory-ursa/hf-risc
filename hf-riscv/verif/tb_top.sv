@@ -27,7 +27,7 @@ module tb_top;
    dut_top dut (.*);
 
    initial begin
-      static bit verbose = 0;
+      static bit verbose = 1;
       static environment env = new(iface);
       automatic CoverInstructions_cbs      cover_instructions_cbs = new;
       automatic CoverOpCodes_cbs           cover_opcodes_cbs = new;
