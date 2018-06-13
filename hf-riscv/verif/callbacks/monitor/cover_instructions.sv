@@ -26,9 +26,9 @@ class CoverInstructions_cbs extends Monitor_cbs;
     this.cov = new;
   endfunction
 
-  virtual task instruction(Opcode opcode, Instruction instruction, bit[31:0] base);
-    super.instruction(opcode, instruction, base);
-    cov.sample(instruction);
+  virtual task time_step(int t, ref Timemachine timemachine);
+    super.instruction(t, timemachine);
+    cov.sample(timemachine.snapshot[t].instruction);
   endtask
 
   virtual task terminated();

@@ -24,6 +24,7 @@ class Timemachine;
         // Because of that, SRAI is always mistaken as SRLI
         if (snap.instruction === SRLI)
           $cast(snap.instruction, snap.base & OpcodeMask_SR_I);
+        snap.imm = getImm(snap);
       end
     end
 
@@ -43,28 +44,6 @@ class Timemachine;
 
 endclass
 
-// function Instruction getInstruction(Snapshot snap);
-//   automatic Opcode opcode = getOpcode(snap);
-//   automatic Instruction instruction;
-//   automatic logic [31:0] base = getBase(snap);
-//
-//   assert($cast(instruction, base & OpcodeMask[opcode]));
-//   // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
-//   // Because of that, SRAI is always mistaken as SRLI
-//   if (instruction === SRLI) begin
-//     $cast(instruction, base & OpcodeMask_SR_I);
-//   end
-//   return instruction;
-//
-// endfunction
-
-// function Opcode getOpcode(Snapshot snap);
-//   automatic Opcode result;
-//   automatic logic [31:0] base = getBase(snap);
-//   $cast(result, base[6:0]);
-//   return result;
-// endfunction
-
 function logic [31:0] getBase(Snapshot snap);
   logic [31:0] result;
   result[31:24] = snap.data_read[7:0];
@@ -76,7 +55,7 @@ endfunction
 
 function logic [31:0] getImm(Snapshot snap);
   automatic logic [31:0] result = 0;
-  automatic logic [31:0] base = getBase(snap);
+  automatic logic [31:0] base = snap.base;
   case(OpcodeFormat[base[6:0]])
     R_type: return result;
     I_type: begin
