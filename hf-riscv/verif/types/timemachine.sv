@@ -10,26 +10,31 @@ class Timemachine;
     return 0;
   endfunction
 
-  // function Opcode getOpcode(int timecounter);
-  //   logic [31:0] instr = toInstr()
-  //   $cast(instr,tb_top.dut.cpu.inst_in_s);
-  //   if ($cast(opcode, instr[6:0])) begin
-  //     if ($cast(instruction, instr & OpcodeMask[opcode]))
-  //     begin
-  //       // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
-  //       // Because of that, SRAI is always mistaken as SRLI
-  //       if (instruction === SRLI) begin
-  //         $cast(instruction, instr & OpcodeMask_SR_I);
-  //       end
-  //       foreach (cbs[i]) begin
-  //         cbs[i].instruction(opcode, instruction, instr);
-  //       end
-  //     end
-  //   end
-  // endfunction
 endclass
 
-function logic [31:0] toInstr(Snapshot snap);
+function Instruction getInstruction(Snapshot snap);
+  automatic Opcode opcode = getOpcode(snap);
+  automatic Instruction instruction;
+  automatic logic [31:0] instr = getInstr(snap);
+
+  $cast(instruction, instr & OpcodeMask[opcode]);
+  // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
+  // Because of that, SRAI is always mistaken as SRLI
+  if (instruction === SRLI) begin
+    $cast(instruction, instr & OpcodeMask_SR_I);
+  end
+  return instruction;
+
+endfunction
+
+function Opcode getOpcode(Snapshot snap);
+  automatic Opcode result;
+  automatic logic [31:0] instr = getInstr(snap);
+  $cast(result, instr[6:0]);
+  return result;
+endfunction
+
+function logic [31:0] getInstr(Snapshot snap);
   logic [31:0] result;
   result = {<<4{snap.data_read}};
   return result;
@@ -37,7 +42,7 @@ endfunction
 
 function logic [31:0] getImm(Snapshot snap);
   automatic logic [31:0] result = 0;
-  automatic logic [31:0] instr = toInstr(snap);
+  automatic logic [31:0] instr = getInstr(snap);
   case(OpcodeFormat[instr[6:0]])
     R_type: return result;
     I_type: begin

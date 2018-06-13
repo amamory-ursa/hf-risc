@@ -64,9 +64,7 @@ class monitor;
           end
           this.timemachine.snapshot.push_back(snap);
           timecounter = timemachine.snapshot.size()-1;
-          $display("test: %d, %d", timecounter, timemachine.isInstruction(timecounter));
-          $assert(toInstr(snap.data_read) == tb_top.dut.cpu.inst_in_s);
-          // $display("%32b %32b",toInstr(snap.data_read), tb_top.dut.cpu.inst_in_s);
+          $assert(getInstr(snap.data_read) == tb_top.dut.cpu.inst_in_s);
           foreach (cbs[i]) begin
             cbs[i].time_step(timecounter, timemachine);
           end
