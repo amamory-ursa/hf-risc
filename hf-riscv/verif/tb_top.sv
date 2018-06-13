@@ -15,6 +15,7 @@ module tb_top;
 `include "callbacks/monitor/assert_addi.sv"
 // `include "callbacks/monitor/assert_lui.sv"
 `include "callbacks/monitor/debug_instruction.sv"
+`include "callbacks/monitor/debug_address.sv"
 `include "callbacks/monitor/debug_registers.sv"
 `include "callbacks/monitor/debug_uart.sv"
 
@@ -34,6 +35,7 @@ module tb_top;
       automatic Assert_addi_cbs            assert_addi_cbs = new(verbose);
       // automatic Assert_lui_cbs             assert_lui_cbs = new(verbose);
       automatic Debug_instruction_cbs      debug_instruction_cbs = new;
+      automatic Debug_address_cbs          debug_address_cbs = new;
       automatic Debug_registers_cbs        debug_registers_cbs = new;
       automatic Debug_uart                 debug_uart = new("sv_debug.txt");
       env.mon.cbs.push_back(cover_instructions_cbs);
@@ -41,6 +43,7 @@ module tb_top;
       env.mon.cbs.push_back(assert_addi_cbs);
       // env.mon.cbs.push_back(assert_lui_cbs);
       env.mon.cbs.push_back(debug_instruction_cbs);
+      env.mon.cbs.push_back(debug_address_cbs);
       env.mon.cbs.push_back(debug_registers_cbs);
       env.mon.cbs.push_back(debug_uart);
       env.run();
