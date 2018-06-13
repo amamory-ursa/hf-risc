@@ -1,62 +1,67 @@
 class Debug_instruction_cbs extends Monitor_cbs;
-  virtual task time_step(int t, Timemachine timemachine);
+  virtual task time_step(int t, ref Timemachine timemachine);
+    Snapshot snap;
     super.time_step(t, timemachine);
-    logic [31:0] base = timemachine.snapshot[t].base;
-    case(OpcodeFormat[timemachine.snapshot[t].opcode])
+    snap = timemachine.snapshot[t];
+
+    if (!timemachine.isInstruction(t))
+      return;
+    if (!snap.opcode)
+      return;
+
+    case(OpcodeFormat[snap.opcode])
       R_type: begin
-        R_struct decoded = base;
-        $display("DBG INSTR: %s, rd: %d, rs1: %d, rs2:%d",
-          instruction,
+        R_struct decoded = snap.base;
+        $display("%s, rd: %d, rs1: %d, rs2:%d",
+          snap.instruction,
           decoded.rd,
           decoded.rs1,
           decoded.rs2);
       end
       I_type: begin
-        I_struct decoded = base;
-        $display("DBG INSTR: %s, rd[%d]: 0x%4h, rs1[%d]: 0x%4h, imm: %d",
-          instruction,
+        I_struct decoded = snap.base;
+        $display("%s, rd: %d, rs1: %d, imm: %d",
+          snap.instruction,
           decoded.rd,
-          tb_top.dut.cpu.register_bank.registers[decoded.rd],
           decoded.rs1,
-          tb_top.dut.cpu.register_bank.registers[decoded.rs1],
-          imm);
+          snap.imm);
       end
       S_type: begin
-        S_struct decoded = base;
-        $display("DBG INSTR: %s, rs1: %d, rs2:%d, imm: %d",
-          instruction,
+        S_struct decoded = snap.base;
+        $display("%s, rs1: %d, rs2: %d, imm: %d",
+          snap.instruction,
           decoded.rs1,
           decoded.rs2,
-          imm);
+          snap.imm);
       end
       B_type: begin
-        B_struct decoded = base;
-        $display("DBG INSTR: %s,rs1: %d, rs2:%d, imm: %d",
-          instruction,
+        B_struct decoded = snap.base;
+        $display("%s, rs1: %d, rs2: %d, imm: %d",
+          snap.instruction,
           decoded.rs1,
           decoded.rs2,
-          imm);
+          snap.imm);
       end
       U_type: begin
-        U_struct decoded = base;
-        $display("DBG INSTR: %s, rd: %d, imm: %d",
-          instruction,
+        U_struct decoded = snap.base;
+        $display("%s, rd: %d, imm: %d",
+          snap.instruction,
           decoded.rd,
-          imm);
+          snap.imm);
       end
       J_type: begin
-        J_struct decoded = base;
-        $display("DBG INSTR: %s, rd: %d, imm: %d",
-          instruction,
+        J_struct decoded = snap.base;
+        $display("%s, rd: %d, imm: %d",
+          snap.instruction,
           decoded.rd,
-          imm);
+          snap.imm);
       end
       E_type: begin
-        E_struct decoded = base;
-        $display("DBG INSTR: %s",
-          instruction);
+        E_struct decoded = snap.base;
+        $display("%s",
+          snap.instruction);
       end
-      default: $error("Instruction type not expected for opcode %7b", base[6:0]);
+      default: $error("Instruction type not expected for opcode %7b", snap.base[6:0]);
     endcase
   endtask
 endclass

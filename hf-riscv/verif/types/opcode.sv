@@ -1,4 +1,4 @@
-typedef enum logic [6:0] {
+typedef enum bit [6:0] {
   OPCD_LUI   = 7'b01_101_11,
   OPCD_AUIPC = 7'b00_101_11,
   OPCD_JAL   = 7'b11_011_11,
