@@ -43,8 +43,9 @@ class CoverOpCodes_cbs extends Monitor_cbs;
     assert($cast(opcode, snap.base[6:0])) else
     begin
       $display("Error: opcode not expected: %7b", snap.base[6:0]);
-      $display("base: %32b", snap.base);
+      $display("base     : %32b", snap.base);
       $display("data_read: %32b", snap.data_read);
+      $display("inst_in_s: %32b", tb_top.dut.cpu.inst_in_s);
       this.nErrors++;
     end
     if ($cast(opcode, snap.base[6:0])) begin
