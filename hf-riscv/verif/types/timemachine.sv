@@ -20,15 +20,15 @@ class Timemachine;
 
     if (this.isInstruction(timecounter))
     begin
-      if ($cast(snap.opcode, base[6:0]));
+      if ($cast(snap.opcode, snap.base[6:0]));
       begin
-        if($cast(snap.instruction, base & OpcodeMask[opcode]));
+        if (snap.opcode)
+        if ($cast(snap.instruction, snap.base & OpcodeMask[snap.opcode]));
         begin
           // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
           // Because of that, SRAI is always mistaken as SRLI
-          if (snap.instruction === SRLI) begin
-            $cast(snap.instruction, base & OpcodeMask_SR_I);
-          end
+          if (snap.instruction === SRLI)
+            $cast(snap.instruction, snap.base & OpcodeMask_SR_I);
         end
       end
     end
