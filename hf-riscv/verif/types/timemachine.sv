@@ -14,7 +14,7 @@ class Timemachine;
       snap.registers[i] = registers[i];
     end
     snap.base = getBase(snap);
-    
+
     this.snapshot.push_back(snap);
     timecounter = this.snapshot.size()-1;
 
@@ -61,7 +61,10 @@ endfunction
 
 function logic [31:0] getBase(Snapshot snap);
   logic [31:0] result;
-  result = {<<4{snap.data_read}};
+  result[31:24] = snap.data_read[7:0];
+  result[23:16] = snap.data_read[15:8];
+  result[15:8]  = snap.data_read[23:16];
+  result[7:0]   = snap.data_read[31:24];
   return result;
 endfunction
 
