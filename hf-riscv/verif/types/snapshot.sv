@@ -1,4 +1,10 @@
+typedef logic [31:0] register;
 typedef struct {
-  bit [31:0] [31:0] registers;
-  bit [31:0] pc;
+  bit data_access;
+
+  logic [31:0] address;
+  logic [31:0] data_read;
+  logic [3:0]  data_we;
+
+  register [0:31] registers;
 } Snapshot;
