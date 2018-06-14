@@ -10,15 +10,15 @@ class Save_registers_cbs extends Monitor_cbs;
     super.time_step(t, timemachine);
     snap = timemachine.snapshot[t];
 
-    fwrite(f, "%d,%d", t, snap.address);
+    $fwrite(f, "%d,%d", t, snap.address);
     foreach (snap.registers[i]) begin
-      fwrite(f, "%d,", snap.registers[i]);
+      $fwrite(f, "%d,", snap.registers[i]);
     end
     $fwrite(f,"\n");
   endtask
 
-  virtual task terminate();
-    super.terminate();
+  virtual task terminated();
+    super.terminated();
     $fclose(f);
   endtask
 endclass

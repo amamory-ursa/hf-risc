@@ -38,7 +38,7 @@ module tb_top;
       automatic Debug_instruction_cbs      debug_instruction_cbs = new;
       automatic Debug_address_cbs          debug_address_cbs = new;
       automatic Debug_registers_cbs        debug_registers_cbs = new;
-      automatic Save_registers_cbs         save_registers_cbs = new;
+      automatic Save_registers_cbs         save_registers_cbs = new("registers.csv");
       automatic Debug_uart                 debug_uart = new("sv_debug.txt");
       env.mon.cbs.push_back(cover_instructions_cbs);
       env.mon.cbs.push_back(cover_opcodes_cbs);
