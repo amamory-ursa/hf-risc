@@ -1,6 +1,7 @@
 class Timemachine;
   Snapshot snapshot[$];
-
+  
+  // builds a new snapshot and pushes into snapshot[$]
   function int step(logic data_access,
                     logic [31:0] address, data_read, data_we,
                     register [0:31] registers);
