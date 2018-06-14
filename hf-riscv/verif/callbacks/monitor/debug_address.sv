@@ -6,6 +6,6 @@ class Debug_address_cbs extends Monitor_cbs;
     super.time_step(t, timemachine);
     snap = timemachine.snapshot[t];
 
-    $display("address: %8h", snap.address);
+    $display("address: %8h %d", snap.address, snap.address);
   endtask
 endclass

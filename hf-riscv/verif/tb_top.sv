@@ -17,7 +17,7 @@ module tb_top;
 `include "callbacks/monitor/debug_instruction.sv"
 `include "callbacks/monitor/debug_address.sv"
 `include "callbacks/monitor/debug_registers.sv"
-`include "callbacks/monitor/save_registers.sv"
+`include "callbacks/monitor/save_history.sv"
 `include "callbacks/monitor/debug_uart.sv"
 
    logic clk = 1'b0;
@@ -38,7 +38,7 @@ module tb_top;
       automatic Debug_instruction_cbs      debug_instruction_cbs = new;
       automatic Debug_address_cbs          debug_address_cbs = new;
       automatic Debug_registers_cbs        debug_registers_cbs = new;
-      automatic Save_registers_cbs         save_registers_cbs = new("registers.csv");
+      automatic Save_history_cbs           save_history_cbs = new("history.csv");
       automatic Debug_uart                 debug_uart = new("sv_debug.txt");
       env.mon.cbs.push_back(cover_instructions_cbs);
       env.mon.cbs.push_back(cover_opcodes_cbs);
@@ -46,8 +46,8 @@ module tb_top;
       // env.mon.cbs.push_back(assert_lui_cbs);
       env.mon.cbs.push_back(debug_instruction_cbs);
       env.mon.cbs.push_back(debug_address_cbs);
-      env.mon.cbs.push_back(debug_registers_cbs);
-      env.mon.cbs.push_back(save_registers_cbs);
+      // env.mon.cbs.push_back(debug_registers_cbs);
+      env.mon.cbs.push_back(save_history_cbs);
       env.mon.cbs.push_back(debug_uart);
       env.run();
    end
