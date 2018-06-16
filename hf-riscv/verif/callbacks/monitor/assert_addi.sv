@@ -11,12 +11,12 @@ class Assert_addi_cbs extends Monitor_cbs;
     Snapshot past;
     Snapshot now;
     Snapshot temp;
-    int steps = 2;
+    int steps = 1;
     super.time_step(t, timemachine);
     now = timemachine.snapshot[t];
     past = timemachine.snapshot[t-steps];
 
-    if (timemachine.isInstruction(t-steps) && past.instruction === ADDI)
+    if ((!past.skip) && past.instruction === ADDI)
     begin
       I_struct decoded = past.base;
       logic [31:0] expected;

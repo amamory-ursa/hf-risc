@@ -4,11 +4,9 @@ class Debug_instruction_cbs extends Monitor_cbs;
     super.time_step(t, timemachine);
     snap = timemachine.snapshot[t];
 
-    if (!timemachine.isInstruction(t))
-      return;
     if (!snap.opcode)
       return;
-
+      
     case(OpcodeFormat[snap.opcode])
       R_type: begin
         R_struct decoded = snap.base;

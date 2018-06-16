@@ -32,28 +32,24 @@ class CoverOpCodes_cbs extends Monitor_cbs;
     Snapshot snap;
     super.time_step(t, timemachine);
 
-    if (!timemachine.isInstruction(t))
-      return;
     snap = timemachine.snapshot[t];
+    if (snap.skip || t == 0)
+      return;
     assert(snap.base[1:0]==2'b11) else
     begin
-      $display("Error: base[1:0] != 2'b11 : %2b", snap.base[1:0]);
+      $display("t:%1d Error: base[1:0] != 2'b11 : %2b", t, snap.base[1:0]);
       this.nErrors++;
     end
     assert($cast(opcode, snap.base[6:0])) else
     begin
-      $display("Error: opcode not expected: %7b", snap.base[6:0]);
+      $display("t:%1d Error: opcode not expected: %7b", t, snap.base[6:0]);
       $display("base     : %32b", snap.base);
-      // $display(timemachine.snapshot[t].data_access);
-      // $display(timemachine.snapshot[t-1].data_access);
-      // $display(timemachine.snapshot[t-2].data_access);
-      // $display(timemachine.snapshot[t-3].data_access);
       this.nErrors++;
     end
     if ($cast(opcode, snap.base[6:0])) begin
       assert($cast(snap.base, snap.base & OpcodeMask[opcode])) else
       begin
-        $display("Error: intruction not expected: %32b", snap.base);
+        $display("t:%1d Error: intruction not expected: %32b", t, snap.base);
         this.nErrors++;
       end
     end

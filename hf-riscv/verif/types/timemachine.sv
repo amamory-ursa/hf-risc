@@ -1,22 +1,32 @@
+typedef struct packed {
+  bit jumped;
+  logic [31:0] to;
+} jumpStruct;
+
 class Timemachine;
   Snapshot snapshot[$];
   
   // builds a new snapshot and pushes into snapshot[$]
   function int step(logic data_access,
                     logic [31:0] address, data_read, data_we,
+                    pc,
                     register [0:31] registers);
     automatic Snapshot snap;
     automatic int timecounter;
+    automatic jumpStruct jump;
+    timecounter = this.snapshot.size(); //next == size
     snap.data_access = data_access;
     snap.address = address;
     snap.data_read = data_read;
     snap.data_we = data_we;
+    
+    snap.pc = pc;
 
     snap.base = getBase(snap);
     foreach (snap.registers[i]) begin
       snap.registers[i] = registers[i];
     end
-
+    
     if ($cast(snap.opcode, snap.base[6:0]));
     begin
       if (snap.opcode)
@@ -38,21 +48,104 @@ class Timemachine;
       end
     end
 
+    if (isDataAccess(timecounter))
+      snap.skip = 1;
+
+    jump = isJumped(timecounter);
+    if (jump.jumped)
+      if (jump.to != snap.pc)
+        snap.skip = 1;
+    
     this.snapshot.push_back(snap);
-    timecounter = this.snapshot.size()-1;
     return timecounter;
   endfunction
 
-  function bit isInstruction(int timecounter);
-    if (snapshot[timecounter].data_access == 1)
-      return 0;
+  function bit isDataAccess(int timecounter);
+    // check t-1
     if (timecounter > 0)
       if (snapshot[timecounter-1].data_access == 1)
-        return 0;
-    return 1;
+        return 1;
+    // check t-2
+    if (timecounter > 1)
+      if (snapshot[timecounter-2].data_access == 1)
+        return 1;
+    return 0;
   endfunction
 
+  function jumpStruct isJumped(int timecounter);
+    jumpStruct j = 0;
+    for (int i=1; i<3; i++)
+    begin
+      if (timecounter < i) // program starting
+        return 0;
+      j = checkJump(snapshot[timecounter-i]);
+      if (j.to != snapshot[timecounter-i].pc+4) // ignore jump to pc+4
+        if (j.jumped == 1)
+          return j;
+    end
+    return 0;
+  endfunction
 endclass
+
+function jumpStruct checkJump(Snapshot snap);
+  automatic jumpStruct result = 0; //didn't jump
+  if (snap.skip == 1) //ignore skiped instructions
+    return result;
+  case(snap.instruction)
+    JAL:begin
+      result.jumped = 1;
+      result.to = snap.imm;
+    end
+    JALR:begin
+      result.jumped = 1;
+      result.to = snap.registers[snap.rs1] + signed'(snap.imm);
+      result.to[0] = 0;
+    end
+    BEQ:begin
+      if (snap.registers[snap.rs1] === snap.registers[snap.rs2])
+      begin
+        result.jumped = 1;
+        result.to = snap.pc + signed'(snap.imm);
+      end
+    end
+    BNE:begin
+      if (snap.registers[snap.rs1] !== snap.registers[snap.rs2])
+      begin
+        result.jumped = 1;
+        result.to = snap.pc + signed'(snap.imm);
+      end
+    end
+    BLT:begin
+      if (signed'(snap.registers[snap.rs1]) < signed'(snap.registers[snap.rs2]))
+      begin
+        result.jumped = 1;
+        result.to = snap.pc + signed'(snap.imm);
+      end
+    end
+    BGE:begin
+      if (signed'(snap.registers[snap.rs1]) >= signed'(snap.registers[snap.rs2]))
+      begin
+        result.jumped = 1;
+        result.to = snap.pc + signed'(snap.imm);
+      end
+    end
+    BLTU:begin
+      if (snap.registers[snap.rs1] < snap.registers[snap.rs2])
+      begin
+        result.jumped = 1;
+        result.to = snap.pc + signed'(snap.imm);
+      end
+    end
+    BGEU:begin
+      if (snap.registers[snap.rs1] >= snap.registers[snap.rs2])
+      begin
+        result.jumped = 1;
+        result.to = snap.pc + signed'(snap.imm);
+      end
+    end
+  endcase
+  return result;
+endfunction
 
 function logic [31:0] getBase(Snapshot snap);
   logic [31:0] result;

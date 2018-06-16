@@ -6,12 +6,15 @@ typedef struct packed{
   logic [31:0] address;
   logic [31:0] data_read;
   logic [3:0]  data_we;
+  
+  logic [31:0] pc;
 
   logic [31:0] base;
   register [0:31] registers;
 
   Opcode opcode;
   Instruction instruction;
+  bit skip;
 
   logic [4:0] rd;
   logic [4:0] rs1;

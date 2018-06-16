@@ -57,10 +57,11 @@ class monitor;
           foreach (registers[i]) begin
             registers[i] = tb_top.dut.cpu.register_bank.registers[i];
           end
-          timecounter = timemachine.step(iface.mem.data_access,
-                                         iface.mem.address,
+          timecounter = timemachine.step(tb_top.dut.cpu.data_access,//iface.mem.data_access seems to be 1 instruction late
+                                         iface.mem.address,//iface.mem.address seems to be pc+4, but seems to match dut.cpu.pc_last.
                                          iface.mem.data_read,
                                          iface.mem.data_we,
+                                         tb_top.dut.cpu.pc_last2, //this should match pc of instruction at the end of pipeline
                                          registers);
           foreach (cbs[i]) begin
             cbs[i].time_step(timecounter, timemachine);
