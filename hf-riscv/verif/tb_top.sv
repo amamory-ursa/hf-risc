@@ -44,7 +44,7 @@ module tb_top;
       env.mon.cbs.push_back(cover_opcodes_cbs);
       env.mon.cbs.push_back(assert_addi_cbs);
       // env.mon.cbs.push_back(assert_lui_cbs);
-      // env.mon.cbs.push_back(debug_instruction_cbs);
+      env.mon.cbs.push_back(debug_instruction_cbs);
       // env.mon.cbs.push_back(debug_address_cbs);
       // env.mon.cbs.push_back(debug_registers_cbs);
       env.mon.cbs.push_back(save_history_cbs);
