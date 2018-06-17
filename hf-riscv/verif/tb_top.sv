@@ -38,6 +38,7 @@ module tb_top;
       automatic Debug_registers_cbs        debug_registers_cbs = new;
       automatic Save_history_cbs           save_history_cbs = new("history.csv");
       automatic Debug_uart                 debug_uart = new("sv_debug.txt");
+      env.gen.path = "code.txt";
       env.mon.cbs.push_back(cover_instructions_cbs);
       env.mon.cbs.push_back(cover_opcodes_cbs);
       env.mon.cbs.push_back(assert_addi_cbs);
