@@ -10,15 +10,15 @@ module tb_top;
 `include "types/snapshot.sv"
 `include "types/timemachine.sv"
 `include "environment.sv"
-`include "callbacks/monitor/cover_instructions.sv"
-`include "callbacks/monitor/cover_opcodes.sv"
-`include "callbacks/monitor/assert_addi.sv"
-// `include "callbacks/monitor/assert_lui.sv"
-`include "callbacks/monitor/debug_instruction.sv"
-`include "callbacks/monitor/debug_address.sv"
-`include "callbacks/monitor/debug_registers.sv"
-`include "callbacks/monitor/save_history.sv"
-`include "callbacks/monitor/debug_uart.sv"
+`include "callbacks/cover_instructions.sv"
+`include "callbacks/cover_opcodes.sv"
+`include "callbacks/assert_addi.sv"
+`include "callbacks/assert_lui.sv"
+`include "callbacks/debug_instruction.sv"
+`include "callbacks/debug_address.sv"
+`include "callbacks/debug_registers.sv"
+`include "callbacks/save_history.sv"
+`include "callbacks/debug_uart.sv"
 
    logic clk = 1'b0;
 
@@ -34,7 +34,7 @@ module tb_top;
       automatic CoverInstructions_cbs      cover_instructions_cbs = new;
       automatic CoverOpCodes_cbs           cover_opcodes_cbs = new;
       automatic Assert_addi_cbs            assert_addi_cbs = new(verbose);
-      // automatic Assert_lui_cbs             assert_lui_cbs = new(verbose);
+      automatic Assert_lui_cbs             assert_lui_cbs = new(verbose);
       automatic Debug_instruction_cbs      debug_instruction_cbs = new;
       automatic Debug_address_cbs          debug_address_cbs = new;
       automatic Debug_registers_cbs        debug_registers_cbs = new;
@@ -43,7 +43,7 @@ module tb_top;
       env.mon.cbs.push_back(cover_instructions_cbs);
       env.mon.cbs.push_back(cover_opcodes_cbs);
       env.mon.cbs.push_back(assert_addi_cbs);
-      // env.mon.cbs.push_back(assert_lui_cbs);
+      env.mon.cbs.push_back(assert_lui_cbs);
       env.mon.cbs.push_back(debug_instruction_cbs);
       // env.mon.cbs.push_back(debug_address_cbs);
       // env.mon.cbs.push_back(debug_registers_cbs);
