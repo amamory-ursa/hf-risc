@@ -3,9 +3,7 @@ typedef logic [31:0] register;
 typedef struct packed{
 
   logic data_access;
-  logic [31:0] address;
   logic [31:0] data_read;
-  logic [3:0]  data_we;
   
   logic [31:0] pc;
 

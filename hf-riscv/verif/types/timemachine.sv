@@ -8,17 +8,14 @@ class Timemachine;
   
   // builds a new snapshot and pushes into snapshot[$]
   function int step(logic data_access,
-                    logic [31:0] address, data_read, data_we,
-                    pc,
+                    logic [31:0] data_read, pc,
                     register [0:31] registers);
     automatic Snapshot snap;
     automatic int timecounter;
     automatic jumpStruct jump;
     timecounter = this.snapshot.size(); //next == size
     snap.data_access = data_access;
-    snap.address = address;
     snap.data_read = data_read;
-    snap.data_we = data_we;
     
     snap.pc = pc;
 
