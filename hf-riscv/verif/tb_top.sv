@@ -47,6 +47,8 @@ module tb_top;
       // env.mon.cbs.push_back(debug_registers_cbs);
       env.mon.cbs.push_back(save_history_cbs);
       env.mon.cbs.push_back(debug_uart);
+      env.iog.filename = "";
+      env.iog.gen_cfg();
       env.run();
    end
 

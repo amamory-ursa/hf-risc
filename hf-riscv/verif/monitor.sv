@@ -2,6 +2,7 @@
  `define MONITOR_SV
 
  `include "hfrv_interface.sv"
+ `include "gpio.sv"
 
 class Monitor_cbs;
   virtual task uart(virtual hfrv_interface.monitor iface);
@@ -91,6 +92,28 @@ class Fake_uart extends Monitor_cbs;
     if (char == 8'h0A || line.len() >= 72) begin
       mon.msgout.put(line);
       line = "";
+    end
+  endtask
+endclass
+
+class gpio_monitor;
+  virtual hfrv_interface.gpio iface;
+  mailbox mon2ckr;
+  gpio_trans trans;
+
+  function new(virtual hfrv_interface.gpio iface, mailbox mon2ckr);
+    this.iface = iface;
+    this.mon2ckr = mon2ckr;
+  endfunction // new
+
+  task run();
+    forever @(iface.extio_out)
+    begin
+      trans = new;
+      trans.value = iface.extio_out;
+      trans.t_time = $time;
+      trans.d = out;
+      mon2ckr.put(trans);
     end
   endtask
 endclass
