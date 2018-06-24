@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <svdpi.h>
-//#include <vc_hdrs.h>
 
 #define MEM_SIZE			0x00100000
 #define SRAM_BASE			0x40000000
@@ -34,6 +32,10 @@
 #define ntohl(A) ( ((A)>>24) | (((A)&0xff0000)>>8) | (((A)&0xff00)<<8) | ((A)<<24) )
 #define htonl(A) ntohl(A)
 
+#define min(A, B) ((A) < (B) ? (A) : (B))
+#define max(A, B) ((A) > (B) ? (A) : (B))
+
+int8_t sram[MEM_SIZE];
 
 typedef struct {
 	int32_t r[32];
@@ -43,61 +45,24 @@ typedef struct {
 	uint64_t cycles;
 } state;
 
+state context;
 
-int flag_endof;
-int8_t sram[MEM_SIZE];
-unsigned long sram_out2[MEM_SIZE/4];
-int Total_cycles;
-unsigned long pc_max[100000000];
+// Interface with simulator
+extern void terminate(int errcode);
+extern void log_branch(uint32_t pc);
+extern void log_reg(uint8_t reg, uint32_t content);
+extern void log_mwrite32(uint32_t addr, uint32_t content);
+extern void log_mwrite16(uint32_t addr, uint16_t content);
+extern void log_mwrite8(uint32_t addr, uint8_t content);
+extern void log_uart(uint8_t c);
 
-
-int pc_cnt;
-
-
-
-FILE *fptr;
-int32_t log_enabled = 0;
-
-extern void export_sram(int32_t *OUT);
-extern void get_pc(int32_t *OUT);
-extern void get_cycles(int32_t *OUT);
-
-
-
-void export_mem(int size) {
-unsigned int j;
-
-		
-	   for (j=0;j<size; j++){
-		   sram_out2[j] = (unsigned int)sram[j*4];
-		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+1]);
-		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+2]);
-		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+3]);
-		   //printf("SRAM_OUT:%08x -- %02x %02x %02x %02x\n", sram_out2[j],(unsigned char)sram[j*4],(unsigned char)sram[j*4+1],(unsigned char)sram[j*4+2],(unsigned char)sram[j*4+3]);
-	   }
-		
-
-
-export_sram(sram_out2);
+void dump_sram(uint32_t *dst, int size) {
+  memcpy(dst, context.mem, min(size, MEM_SIZE));
 }
 
-void send_cycles(){
-	get_cycles(Total_cycles);
-}
-
-void send_pc(){
-	unsigned long pc_out[Total_cycles];
-	int i;
-		for (i=0; i<= Total_cycles; i++){
-		pc_out[i] = pc_max[i];
-		}
-get_pc(pc_out);
-
-}
-
-
-void dumpregs(state *s){
+void dumpregs(){
 	int32_t i;
+  state *s = &context;
 	
 	for (i = 0; i < 32; i+=4){
 		printf("\nr%02d [%08x] r%02d [%08x] r%02d [%08x] r%02d [%08x]", \
@@ -106,15 +71,17 @@ void dumpregs(state *s){
 	printf("\n");
 }
 
-void bp(state *s, uint32_t ir){
+void bp(uint32_t ir){
+  state *s = &context;
 	printf("\npc: %08x, ir: %08x", s->pc, ir);
-	dumpregs(s);
-	getchar();
+	dumpregs();
 }
 
-static int32_t mem_fetch(state *s, uint32_t address){
+static int32_t mem_fetch(uint32_t address){
 	uint32_t value=0;
 	uint32_t *ptr;
+
+  state *s = &context;
 
 	ptr = (uint32_t *)(s->mem + (address % MEM_SIZE));
 	value = *ptr;
@@ -122,9 +89,11 @@ static int32_t mem_fetch(state *s, uint32_t address){
 	return(value);
 }
 
-static int32_t mem_read(state *s, int32_t size, uint32_t address){
+static int32_t mem_read(int32_t size, uint32_t address){
 	uint32_t value=0;
 	uint32_t *ptr;
+
+  state *s = &context;
 
 	switch(address){
 		case IRQ_VECTOR:	return s->vector;
@@ -145,8 +114,8 @@ static int32_t mem_read(state *s, int32_t size, uint32_t address){
 		case 4:
 			if(address & 3){
 				printf("\nunaligned access (load word) pc=0x%x addr=0x%x", s->pc, address);
-				dumpregs(s);
-				exit(1);
+				dumpregs();
+				terminate(1);
 			}else{
 				value = *(int32_t *)ptr;
 			}
@@ -154,8 +123,8 @@ static int32_t mem_read(state *s, int32_t size, uint32_t address){
 		case 2:
 			if(address & 1){
 				printf("\nunaligned access (load halfword) pc=0x%x addr=0x%x", s->pc, address);
-				dumpregs(s);
-				exit(1);
+				dumpregs();
+				terminate(1);
 			}else{
 				value = *(int16_t *)ptr;
 			}
@@ -170,10 +139,11 @@ static int32_t mem_read(state *s, int32_t size, uint32_t address){
 	return(value);
 }
 
-static void mem_write(state *s, int32_t size, uint32_t address, uint32_t value){
-	int cnt;
+static void mem_write(int32_t size, uint32_t address, uint32_t value){
 	uint32_t i;
-	uint32_t *ptr;
+	void *ptr;
+
+  state *s = &context;
 
 	switch(address){
 		case IRQ_VECTOR:	s->vector = value; return;
@@ -186,62 +156,60 @@ static void mem_write(state *s, int32_t size, uint32_t address, uint32_t value){
 		case COMPARE2:		s->compare2 = value; s->cause &= 0xffdf; return;
 		case EXIT_TRAP:
 			fflush(stdout);
-				if (log_enabled)
-				fclose(fptr);
-			Total_cycles = s->cycles;
 			printf("\nend of simulation - %ld cycles.\n", s->cycles);
-			
-
-			flag_endof = 1;
-			return;
-			//exit(0);
+			terminate(0);
 		case DEBUG_ADDR:
-			if (log_enabled)
-				fprintf(fptr, "%c", (int8_t)(value & 0xff));
-			return;
 		case UART_WRITE:
-			fprintf(stdout, "%c", (int8_t)(value & 0xff));
+			log_uart((uint8_t)(value & 0xef));
 			return;
 		case UART_DIVISOR:
 			return;
 	}
 
-	ptr = (uint32_t *)(s->mem + (address % MEM_SIZE));
+  address %= MEM_SIZE;
+
+	ptr = s->mem + address;
 	
 	switch(size){
 		case 4:
 			if(address & 3){
 				printf("\nunaligned access (store word) pc=0x%x addr=0x%x", s->pc, address);
-				dumpregs(s);
-				exit(1);
+				dumpregs();
+				terminate(1);
 			}else{
 				*(int32_t *)ptr = value;
+        log_mwrite32(address, value);
 			}
 			break;
 		case 2:
 			if(address & 1){
 				printf("\nunaligned access (store halfword) pc=0x%x addr=0x%x", s->pc, address);
-				dumpregs(s);
-				exit(1);
+				dumpregs();
+				terminate(1);
 			}else{
 				*(int16_t *)ptr = (uint16_t)value;
+        log_mwrite16(address, (uint16_t)value);
 			}
 			break;
 		case 1:
 			*(int8_t *)ptr = (uint8_t)value;
+      log_mwrite8(address, (uint8_t)value);
 			break;
 		default:
 			printf("\nerror");
 	}
 }
 
-void cycle(state *s){
+void cycle(){
 	uint32_t inst, i;
 	uint32_t opcode, rd, rs1, rs2, funct3, funct7, imm_i, imm_s, imm_sb, imm_u, imm_uj;
+  uint32_t prev_rd;
+
+  state *s = &context;
+  
 	int32_t *r = s->r;
 	uint32_t *u = (uint32_t *)s->r;
 	uint32_t ptr_l, ptr_s;
-
 	
 	if (s->status && (s->cause & s->mask)){
 		s->epc = s->pc_next;
@@ -252,8 +220,7 @@ void cycle(state *s){
 			s->status_dly[i] = 0;
 	}
 
-	inst = mem_fetch(s, s->pc);
-
+	inst = mem_fetch(s->pc);
 
 	opcode = inst & 0x7f;
 	rd = (inst >> 7) & 0x1f;
@@ -276,6 +243,8 @@ void cycle(state *s){
 	ptr_s = r[rs1] + (int32_t)imm_s;
 	r[0] = 0;
 
+  prev_rd = r[rd];
+
 	switch(opcode){
 		case 0x37: r[rd] = imm_u; break;										/* LUI */
 		case 0x17: r[rd] = s->pc + imm_u; break;									/* AUIPC */
@@ -294,19 +263,19 @@ void cycle(state *s){
 			break;
 		case 0x3:
 			switch(funct3){
-				case 0x0: r[rd] = (int8_t)mem_read(s,1,ptr_l); break;						/* LB */
-				case 0x1: r[rd] = (int16_t)mem_read(s,2,ptr_l); break;						/* LH */
-				case 0x2: r[rd] = mem_read(s,4,ptr_l); break;							/* LW */
-				case 0x4: r[rd] = (uint8_t)mem_read(s,1,ptr_l); break;						/* LBU */
-				case 0x5: r[rd] = (uint16_t)mem_read(s,2,ptr_l); break;						/* LHU */
+				case 0x0: r[rd] = (int8_t)mem_read(1,ptr_l); break;						/* LB */
+				case 0x1: r[rd] = (int16_t)mem_read(2,ptr_l); break;						/* LH */
+				case 0x2: r[rd] = mem_read(4,ptr_l); break;							/* LW */
+				case 0x4: r[rd] = (uint8_t)mem_read(1,ptr_l); break;						/* LBU */
+				case 0x5: r[rd] = (uint16_t)mem_read(2,ptr_l); break;						/* LHU */
 				default: goto fail;
 			}
 			break;
 		case 0x23:
 			switch(funct3){
-				case 0x0: mem_write(s,1,ptr_s,r[rs2]); break;							/* SB */
-				case 0x1: mem_write(s,2,ptr_s,r[rs2]); break;							/* SH */
-				case 0x2: mem_write(s,4,ptr_s,r[rs2]); break;							/* SW */
+				case 0x0: mem_write(1,ptr_s,r[rs2]); break;							/* SB */
+				case 0x1: mem_write(2,ptr_s,r[rs2]); break;							/* SH */
+				case 0x2: mem_write(4,ptr_s,r[rs2]); break;							/* SW */
 				default: goto fail;
 			}
 			break;
@@ -356,9 +325,12 @@ void cycle(state *s){
 			break;
 		default: goto fail;
 	}
-	
-	pc_max[pc_cnt] = s->pc;
-	pc_cnt++;
+
+  if(r[rd] != prev_rd)
+    log_reg(rd, r[rd]);
+
+  if (s->pc_next != s->pc + 4)
+    log_branch(s->pc_next);
 	
 	s->pc = s->pc_next;
 	s->pc_next = s->pc_next + 4;
@@ -378,51 +350,18 @@ void cycle(state *s){
 	return;
 fail:
 	printf("\ninvalid opcode (pc=0x%x opcode=0x%x)", s->pc, inst);
-	exit(0);
+	terminate(1);
 }
 
-
-
-//int main(int argc, char *argv[]){
-//int run(char *str){	
-int run(int8_t *mem, int size){		
-	printf("\nStart C!\n");
-	state context;
+uint32_t setup (uint32_t *src, uint32_t size){
 	state *s;
-	//FILE *in;
-	int bytes, i;
+  int i;
 
+  size = min(size, MEM_SIZE);
 
 	s = &context;
 	memset(s, 0, sizeof(state));
-	memset(sram, 0xff, sizeof(MEM_SIZE));
-	
-	if (size > MEM_SIZE){
-		printf("\nERROR: too big !!!.\n");
-		return(0);
-	}
-	
-	memcpy(sram, mem, size);
-	
-	//for(i=0; i<20; i++){
-    //printf("\nContent:%hhx", sram[i]);
-    //}
-	
-	//printf("\nFLAG 4!\n");
-		
-/*
-	in = fopen(str, "rb");
-	if (in == 0){
-		printf("\nerror opening binary file.\n");
-		return 1;
-	}
-	bytes = fread(&sram, 1, MEM_SIZE, in);
-	fclose(in);
-	if (bytes == 0){
-		printf("\nerror reading binary file.\n");
-		return 1;
-	}
-*/
+	bzero(sram, sizeof(MEM_SIZE));
 
 	s->pc = SRAM_BASE;
 	s->pc_next = s->pc + 4;
@@ -439,18 +378,8 @@ int run(int8_t *mem, int size){
 	s->compare2 = 0;
 	s->cycles = 0;
 
-	for(;;){
-		
-		cycle(s);
-		if (flag_endof == 1){
-		break;
-		}
-	}
-	
-	
+  memcpy(sram, src, size);
 
-
-	return(0);
+  return size;
 }
-
 
