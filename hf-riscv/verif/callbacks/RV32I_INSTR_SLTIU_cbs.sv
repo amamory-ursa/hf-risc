@@ -1,4 +1,4 @@
-class Assert_lui_cbs extends Monitor_cbs;
+class RV32I_INSTR_SLTIU_cbs extends Monitor_cbs;
   int failed;
   int passed;
   bit verbose;
@@ -14,11 +14,14 @@ class Assert_lui_cbs extends Monitor_cbs;
     now = timemachine.snapshot[t];
     past = timemachine.snapshot[t-1];
 
-    if ((!past.skip) && past.instruction === LUI)
+    if ((!past.skip) && past.instruction === SLTIU)
     begin
       logic [31:0] expected;
       logic [31:0] got;
-      expected = past.imm;
+      if (past.registers[past.rs1] < past.imm)
+        expected = 1;
+      else
+        expected = 0;
       got = now.registers[past.rd];
       assert(got === expected) this.passed++; else
       begin
@@ -33,6 +36,6 @@ class Assert_lui_cbs extends Monitor_cbs;
 
   virtual task terminated();
     super.terminated();
-    $display("Assert_lui passed: %d, failed: %d", this.passed, this.failed);
+    $display("RV32I_INSTR_SLTIU\tpassed: %d, failed: %d", this.passed, this.failed);
   endtask
 endclass

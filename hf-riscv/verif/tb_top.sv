@@ -12,8 +12,13 @@ module tb_top;
 `include "environment.sv"
 `include "callbacks/cover_instructions.sv"
 `include "callbacks/cover_opcodes.sv"
-`include "callbacks/assert_addi.sv"
-`include "callbacks/assert_lui.sv"
+`include "callbacks/RV32I_INSTR_ADDI_cbs.sv"
+`include "callbacks/RV32I_INSTR_ANDI_cbs.sv"
+`include "callbacks/RV32I_INSTR_LUI_cbs.sv"
+`include "callbacks/RV32I_INSTR_ORI_cbs.sv"
+`include "callbacks/RV32I_INSTR_SLTI_cbs.sv"
+`include "callbacks/RV32I_INSTR_SLTIU_cbs.sv"
+`include "callbacks/RV32I_INSTR_XORI_cbs.sv"
 `include "callbacks/debug_instruction.sv"
 `include "callbacks/debug_registers.sv"
 `include "callbacks/save_history.sv"
@@ -32,8 +37,13 @@ module tb_top;
       static environment env = new(iface);
       automatic CoverInstructions_cbs      cover_instructions_cbs = new;
       automatic CoverOpCodes_cbs           cover_opcodes_cbs = new;
-      automatic Assert_addi_cbs            assert_addi_cbs = new(verbose);
-      automatic Assert_lui_cbs             assert_lui_cbs = new(verbose);
+      automatic RV32I_INSTR_ADDI_cbs       obj_RV32I_INSTR_ADDI_cbs = new(verbose);
+      automatic RV32I_INSTR_ANDI_cbs       obj_RV32I_INSTR_ANDI_cbs = new(verbose);
+      automatic RV32I_INSTR_LUI_cbs        obj_RV32I_INSTR_LUI_cbs = new(verbose);
+      automatic RV32I_INSTR_ORI_cbs        obj_RV32I_INSTR_ORI_cbs = new(verbose);
+      automatic RV32I_INSTR_SLTI_cbs       obj_RV32I_INSTR_SLTI_cbs = new(verbose);
+      automatic RV32I_INSTR_SLTIU_cbs      obj_RV32I_INSTR_SLTIU_cbs = new(verbose);
+      automatic RV32I_INSTR_XORI_cbs       obj_RV32I_INSTR_XORI_cbs = new(verbose);
       automatic Debug_instruction_cbs      debug_instruction_cbs = new;
       automatic Debug_registers_cbs        debug_registers_cbs = new;
       automatic Save_history_cbs           save_history_cbs = new("history.csv");
@@ -41,8 +51,13 @@ module tb_top;
       env.gen.path = "code.txt";
       env.mon.cbs.push_back(cover_instructions_cbs);
       env.mon.cbs.push_back(cover_opcodes_cbs);
-      env.mon.cbs.push_back(assert_addi_cbs);
-      env.mon.cbs.push_back(assert_lui_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_ADDI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_ANDI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_LUI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_ORI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_SLTI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_SLTIU_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_XORI_cbs);
       // env.mon.cbs.push_back(debug_instruction_cbs);
       // env.mon.cbs.push_back(debug_registers_cbs);
       env.mon.cbs.push_back(save_history_cbs);
