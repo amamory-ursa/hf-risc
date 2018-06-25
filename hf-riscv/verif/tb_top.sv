@@ -18,6 +18,8 @@ module tb_top;
 `include "callbacks/RV32I_INSTR_ORI_cbs.sv"
 `include "callbacks/RV32I_INSTR_SLTI_cbs.sv"
 `include "callbacks/RV32I_INSTR_SLLI_cbs.sv"
+`include "callbacks/RV32I_INSTR_SRLI_cbs.sv"
+`include "callbacks/RV32I_INSTR_SRAI_cbs.sv"
 `include "callbacks/RV32I_INSTR_SLTIU_cbs.sv"
 `include "callbacks/RV32I_INSTR_XORI_cbs.sv"
 `include "callbacks/debug_instruction.sv"
@@ -44,6 +46,8 @@ module tb_top;
       automatic RV32I_INSTR_ORI_cbs        obj_RV32I_INSTR_ORI_cbs = new(verbose);
       automatic RV32I_INSTR_SLTI_cbs       obj_RV32I_INSTR_SLTI_cbs = new(verbose);
       automatic RV32I_INSTR_SLLI_cbs       obj_RV32I_INSTR_SLLI_cbs = new(verbose);
+      automatic RV32I_INSTR_SRLI_cbs       obj_RV32I_INSTR_SRLI_cbs = new(verbose);
+      automatic RV32I_INSTR_SRAI_cbs       obj_RV32I_INSTR_SRAI_cbs = new(verbose);
       automatic RV32I_INSTR_SLTIU_cbs      obj_RV32I_INSTR_SLTIU_cbs = new(verbose);
       automatic RV32I_INSTR_XORI_cbs       obj_RV32I_INSTR_XORI_cbs = new(verbose);
       automatic Debug_instruction_cbs      debug_instruction_cbs = new;
@@ -59,6 +63,8 @@ module tb_top;
       env.mon.cbs.push_back(obj_RV32I_INSTR_ORI_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_SLTI_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_SLLI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_SRLI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_SRAI_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_SLTIU_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_XORI_cbs);
       // env.mon.cbs.push_back(debug_instruction_cbs);
