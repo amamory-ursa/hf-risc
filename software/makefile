@@ -20,7 +20,7 @@ READ_mips = mips-elf-readelf
 OBJ_mips = mips-elf-objcopy
 SIZE_mips = mips-elf-size
 
-GCC_riscv = riscv32-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -O2 -c -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -I ./include -DCPU_SPEED=${F_CLK} -DLITTLE_ENDIAN $(CFLAGS_STRIP) #-DDEBUG_PORT #-ffixed-s10 -ffixed-s11 -mrvc -fPIC -DDEBUG_PORT
+GCC_riscv = riscv32-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -O2 -c -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -I ./include -DCPU_SPEED=${F_CLK} -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DDEBUG_PORT #-ffixed-s10 -ffixed-s11 -mrvc -fPIC -DDEBUG_PORT
 AS_riscv = riscv32-unknown-elf-as -march=rv32i -mabi=ilp32 #-fPIC
 LD_riscv = riscv32-unknown-elf-ld -melf32lriscv $(LDFLAGS_STRIP)
 DUMP_riscv = riscv32-unknown-elf-objdump -Mno-aliases
@@ -152,6 +152,10 @@ hanoi: crt
 
 hello: crt
 	$(GCC_$(ARCH)) -o hello.o app/hello.c
+	@$(MAKE) --no-print-directory link
+
+extio_test: crt
+	$(GCC_$(ARCH)) -o interrupt_test.o app/extio_test.c
 	@$(MAKE) --no-print-directory link
 
 interrupt_test: crt
