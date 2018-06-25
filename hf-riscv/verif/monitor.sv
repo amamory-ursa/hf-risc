@@ -45,10 +45,10 @@ class monitor;
         if (iface.mem.address == 32'he0000000 && iface.mem.data_we != 4'h0)
         begin
           iface.mem.data_read <= {32{1'b0}};
-          ->terminated;
           foreach (cbs[i]) begin
             cbs[i].terminated();
           end
+          ->terminated;
           $finish;
         end
         else
