@@ -13,6 +13,7 @@ module tb_top;
 `include "callbacks/cover_instructions.sv"
 `include "callbacks/cover_opcodes.sv"
 `include "callbacks/RV32I_INSTR_ADDI_cbs.sv"
+`include "callbacks/RV32I_INSTR_ADD_cbs.sv"
 `include "callbacks/RV32I_INSTR_ANDI_cbs.sv"
 `include "callbacks/RV32I_INSTR_LUI_cbs.sv"
 `include "callbacks/RV32I_INSTR_AUIPC_cbs.sv"
@@ -42,6 +43,7 @@ module tb_top;
       automatic CoverInstructions_cbs      cover_instructions_cbs = new;
       automatic CoverOpCodes_cbs           cover_opcodes_cbs = new;
       automatic RV32I_INSTR_ADDI_cbs       obj_RV32I_INSTR_ADDI_cbs = new(verbose);
+      automatic RV32I_INSTR_ADD_cbs       obj_RV32I_INSTR_ADD_cbs = new(verbose);
       automatic RV32I_INSTR_ANDI_cbs       obj_RV32I_INSTR_ANDI_cbs = new(verbose);
       automatic RV32I_INSTR_LUI_cbs        obj_RV32I_INSTR_LUI_cbs = new(verbose);
       automatic RV32I_INSTR_AUIPC_cbs      obj_RV32I_INSTR_AUIPC_cbs = new(verbose);
@@ -60,6 +62,7 @@ module tb_top;
       env.mon.cbs.push_back(cover_instructions_cbs);
       env.mon.cbs.push_back(cover_opcodes_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_ADDI_cbs);
+      env.mon.cbs.push_back(obj_RV32I_INSTR_ADD_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_ANDI_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_LUI_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_AUIPC_cbs);
