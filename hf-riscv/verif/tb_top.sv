@@ -13,7 +13,8 @@ module tb_top;
 
    hfrv_interface iface(.*);
    dut_top dut (.*);
-
+   //scoreboard scb();
+	
    initial begin
       static environment env = new(iface);
       env.run();

@@ -66,7 +66,7 @@ class monitor;
         if (iface.mem.address == 32'he0000000 && iface.mem.data_we != 4'h0) begin
            //$display("MONITOR: address == %h",iface.mem.address);            
            iface.mem.data_read <= {32{1'b0}};
-        //$display("MONITOR: sending event");           
+        $display("MONITOR: sending event");           
         ->terminated;
         //$display("MONITOR: event sended");
      end

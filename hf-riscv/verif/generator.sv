@@ -8,11 +8,14 @@ class generator;
    memory_model ram;    
    mailbox      gen2agent;  // Mailbox to driver for cells
    event        terminated;  // Event from monitor when terminated program execution
-   
+   event end_chkr;
+     
    function new(input mailbox gen2agent,
-                input event terminated);
+                input event terminated,
+                input event end_chkr);
       this.gen2agent = gen2agent;
       this.terminated = terminated;
+      this.end_chkr = end_chkr;
    endfunction : new
 
    task run();
@@ -20,9 +23,8 @@ class generator;
          ram = new("code.txt", 32'h40000000, 'h100000);
          $display("sending program to agent");
          gen2agent.put(ram);
-         //$display("GENERATOR: waiting event");
          @(terminated);
-         //$display("GENERATOR: event received");
+         @(end_chkr);
          $finish;
       end
    endtask // run
