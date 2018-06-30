@@ -3,33 +3,49 @@ typedef struct packed {
   logic [31:0] to;
 } jumpStruct;
 
+
+// This class is just a shell to Snapshot snapshot[$],
+//   so it can be passed around as a reference.
+//   It also has the step method, that fills the snapshot.
+//   Normally, step() would be a constructor in snapshot.sv, but
+//   some we must look back in time to fill some fields.
+//   The rest of the code are auxiliary functions to fill them.
 class Timemachine;
+  // Each snaphot has info on instruction, pc and registers bank at a point in time
   Snapshot snapshot[$];
-  
+
   // builds a new snapshot and pushes into snapshot[$]
-  function int step(logic data_access,
-                    logic [31:0] data_read, pc,
+  function int step(logic data_access,          // data_access -> flag to load,store
+                    logic [31:0] data_read, pc, // data_read -> logic [31:0] instr
                     register [0:31] registers);
     automatic Snapshot snap;
     automatic int timecounter;
-    automatic jumpStruct jump;
+    automatic jumpStruct jump; // jump.to, jump.jumped
     timecounter = this.snapshot.size(); //next == size
+
+    // start filling snap fields
+
     snap.data_access = data_access;
     snap.data_read = data_read;
-    
     snap.pc = pc;
 
+    // base reorders data_read (also called instr): base[31:24] = data_read[7:0] etc
     snap.base = getBase(snap);
+
+    // fills snap.registers
     foreach (snap.registers[i]) begin
       snap.registers[i] = registers[i];
     end
-    
+
+    // tries to fill snap.opcode
     if ($cast(snap.opcode, snap.base[6:0]));
     begin
       if (snap.opcode)
       begin
+        // tries to fill snap.instruction
         if ($cast(snap.instruction, snap.base & OpcodeMask[snap.opcode]));
         begin
+          // Special case
           // SLLI, SRLI and SRAI mix OPP_IMM and OP: OPP_IMM OPCODE with OP mask.
           // Because of that, SRAI is always mistaken as SRLI
           if (snap.instruction === SRLI)
@@ -37,6 +53,8 @@ class Timemachine;
             $cast(snap.instruction, snap.base & OpcodeMask_SR_I);
           end
 
+          // if we could identify snap.opcode and snap.instruction
+          //   then we fill rd, rs1, rs2 and imm
           snap.rd = snap.base[11:7];
           snap.rs1 = snap.base[19:15];
           snap.rs2 = snap.base[24:20];
@@ -45,18 +63,30 @@ class Timemachine;
       end
     end
 
+    // snap.skip indicates current instruction should be disconsidered
+    //   this happens when any of 2 previous instructions were a data_access, like load and store
     if (isDataAccess(timecounter))
       snap.skip = 1;
 
+
+    // if there was a jump or a branch in pipeline, and if that
+    //   jump or branch was followed,
+    //   then we should disconsider the current instruction too
     jump = isJumped(timecounter);
-    if (jump.jumped)
-      if (jump.to != snap.pc)
+    if (jump.jumped) // a jump occurred
+      if (jump.to != snap.pc) // the jump was not to current address
         snap.skip = 1;
-    
+
+    // snap is filled, push it to the snaphots queue
     this.snapshot.push_back(snap);
+
+    // timecounter is the current point in time
     return timecounter;
   endfunction
 
+  // look back in time 2 steps
+  //   there was a data_access (load,store)?
+  //   if so we should disconsider current snap
   function bit isDataAccess(int timecounter);
     // check t-1
     if (timecounter > 0)
@@ -69,14 +99,20 @@ class Timemachine;
     return 0;
   endfunction
 
+  // look back in time 3 steps
+  //   check for jumps and branches
+  //   if found
+  //     return a struct that indicates:
+  //     jump.jumped: there was a jump
+  //     jump.to    : destination address
   function jumpStruct isJumped(int timecounter);
     jumpStruct j = 0;
     for (int i=1; i<3; i++)
     begin
-      if (timecounter < i) // program starting
+      if (timecounter < i) // program starting, we can't look to times less than 0
         return 0;
-      j = checkJump(snapshot[timecounter-i]);
-      if (j.to != snapshot[timecounter-i].pc+4) // ignore jump to pc+4
+      j = checkJump(snapshot[timecounter-i]);   // fills the jump struct
+      if (j.to != snapshot[timecounter-i].pc+4) // ignore jump to pc+4 (which would be silly, by the way)
         if (j.jumped == 1)
           return j;
     end
@@ -84,6 +120,11 @@ class Timemachine;
   endfunction
 endclass
 
+// check if the instruction at snap was a jump
+//   if so, where to?
+//     return a struct that indicates:
+//     jump.jumped: there was a jump
+//     jump.to    : destination address
 function jumpStruct checkJump(Snapshot snap);
   automatic jumpStruct result = 0; //didn't jump
   if (snap.skip == 1) //ignore skiped instructions
@@ -144,6 +185,8 @@ function jumpStruct checkJump(Snapshot snap);
   return result;
 endfunction
 
+
+// reorder data_read, it comes with different endianess from code.txt
 function logic [31:0] getBase(Snapshot snap);
   logic [31:0] result;
   result[31:24] = snap.data_read[7:0];
@@ -153,6 +196,9 @@ function logic [31:0] getBase(Snapshot snap);
   return result;
 endfunction
 
+// Uses opcode (base[6:0]) do figure instruction format
+//   from that, read imm fields, put it in correct order
+//   and fill 0 bits and sign extension bits
 function logic [31:0] getImm(Snapshot snap);
   automatic logic [31:0] result = 0;
   automatic logic [31:0] base = snap.base;
