@@ -8,9 +8,14 @@ class Monitor_cbs;
   virtual task uart(virtual hfrv_interface.monitor iface);
   endtask
 
+  // called at each clock step.
+  //   t=timecounter (current step)
+  //   timemachine is a ref to an instance of Timemachine (timemachine.sv)
+  //   timemachine has a queue (expandable array) of snaphots (snapshot.sv)
   virtual task time_step(int t, ref Timemachine timemachine);
   endtask
 
+  // called when execution of code.txt ends
   virtual task terminated();
   endtask
 endclass
@@ -45,25 +50,25 @@ class monitor;
         if (iface.mem.address == 32'he0000000 && iface.mem.data_we != 4'h0)
         begin
           iface.mem.data_read <= {32{1'b0}};
-          ->terminated;
           foreach (cbs[i]) begin
             cbs[i].terminated();
           end
+          ->terminated;
           $finish;
         end
         else
         begin
           int timecounter;
           register [0:31] registers;
-          foreach (registers[i]) begin
+          foreach (registers[i]) begin // copies register bank
             registers[i] = tb_top.dut.cpu.register_bank.registers[i];
           end
-          timecounter = timemachine.step(tb_top.dut.cpu.data_access,//iface.mem.data_access seems to be 1 instruction late
-                                        //  iface.mem.address,//iface.mem.address seems to be pc+4, but seems to match dut.cpu.pc_last.
-                                         iface.mem.data_read,
-                                         tb_top.dut.cpu.pc_last2, //this should match pc of iface.mem.data_read
-                                         registers);
-          foreach (cbs[i]) begin
+          // timemachine.step fills a new instance of snaphot and adds it to the snaphots queue
+          timecounter = timemachine.step(tb_top.dut.cpu.data_access, // flag -> load, store
+                                         tb_top.dut.cpu.data_in,     // 32 bit instr
+                                         tb_top.dut.cpu.pc_last2,    // pc (last2 should match current pipeline phase)
+                                         registers);                 // array of 32 registers, 32 bit each
+          foreach (cbs[i]) begin // call callbacks that use snapshots, like assertions callbacks
             cbs[i].time_step(timecounter, timemachine);
           end
         end

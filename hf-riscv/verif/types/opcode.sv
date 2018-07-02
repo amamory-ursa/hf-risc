@@ -11,6 +11,15 @@ typedef enum bit [6:0] {
   SYSTEM     = 7'b11_100_11
 }  Opcode;
 
+// OpcodeMask is used to figure out the current instruction.
+//   Bits marked as 1 are the bits that distinguish an instruction.
+//   To do that, you can use a cast:
+//     Opcode opcode;
+//     Instruction instruction
+//     logic [31:0] instr;
+//     $cast(opcode, instr[6:0]) // fills opcode
+//     $cast(instruction, instr & OpcodeMask[opcode])) // fills instruction
+//   This is used in timemachine.sv to fill snap.instruction
 logic [31:0] OpcodeMask[Opcode];
 initial begin
   OpcodeMask[OPCD_LUI]   = 32'b0000000_00000_00000_000_00000_1111111;
@@ -30,9 +39,10 @@ end
 logic [31:0] OpcodeMask_SR_I
                       = 32'b1111111_00000_00000_111_00000_1111111;
 
+//used to get imm, rd, rs1 and rs2
 InstrType OpcodeFormat[Opcode];
 initial begin
-  OpcodeFormat[OPCD_LUI]   = U_type;
+  OpcodeFormat[OPCD_LUI]   = U_type; //U_type and others are defined at base_formats.sv
   OpcodeFormat[OPCD_AUIPC] = U_type;
   OpcodeFormat[OPCD_JAL]   = J_type;
   OpcodeFormat[OPCD_JALR]  = I_type;
