@@ -77,6 +77,9 @@ module tb_top;
       automatic Save_history_cbs           save_history_cbs = new("history.csv");
       automatic Debug_uart                 debug_uart = new("sv_debug.txt");
       env.gen.path = "code.txt";
+      // env.mon.cbs is a queue of callbacks.
+      //   Each callback should extend Monitor_cbs (at monitor.sv)
+      //   and override at least one of its functions: uart, time_step, terminated
       env.mon.cbs.push_back(cover_instructions_cbs);
       env.mon.cbs.push_back(cover_opcodes_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_ADDI_cbs);
@@ -100,10 +103,10 @@ module tb_top;
       env.mon.cbs.push_back(obj_RV32I_INSTR_SLL_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_SRL_cbs);
       env.mon.cbs.push_back(obj_RV32I_INSTR_SRA_cbs);
-      // env.mon.cbs.push_back(debug_instruction_cbs);
-      // env.mon.cbs.push_back(debug_registers_cbs);
-      env.mon.cbs.push_back(save_history_cbs);
-      env.mon.cbs.push_back(debug_uart);
+      // env.mon.cbs.push_back(debug_instruction_cbs); // prints instructions to stdout
+      // env.mon.cbs.push_back(debug_registers_cbs);   // prints registers to stdout
+      env.mon.cbs.push_back(save_history_cbs); // save history in 'history.csv'
+      env.mon.cbs.push_back(debug_uart); // save uart to file
       env.iog.filename = "";
       env.iog.gen_cfg();
       env.run();
