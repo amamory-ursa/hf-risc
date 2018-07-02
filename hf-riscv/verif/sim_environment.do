@@ -1,6 +1,3 @@
-set StdArithNoWarnings 0
-set NumericStdNoWarnings 0
-
 vlib work
 vcom -93 -explicit ../core_rv32i/bshifter.vhd
 vcom -93 -explicit ../core_rv32i/alu.vhd
@@ -13,5 +10,9 @@ vlog tb_top.sv
 
 vsim work.tb_top
 
-run 100 ms
+set StdArithNoWarnings 1
+set NumericStdNoWarnings 1
 
+coverage save -onexit coverage.ucdb
+
+run -all
