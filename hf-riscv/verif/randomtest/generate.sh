@@ -14,6 +14,7 @@ directory=$PWD
 #copy makefile into every directory
 for d in */ ; do
 	cp build.sh $d/build.sh
+	cp run.sh $d/run.sh
 done
 
 #call individual builds

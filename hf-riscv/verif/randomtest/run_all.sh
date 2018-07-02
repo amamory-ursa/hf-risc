@@ -1,7 +1,9 @@
 #!/bin/bash
 
+#generate random tests
+bash generate.sh
 
-source generate.sh .
+cd apps
 
 directory=$PWD
 args=""
@@ -16,3 +18,5 @@ done
 cd $directory
 vcover merge total_coverage.ucdb $args
 
+#cleanup
+bash cleanup.sh
