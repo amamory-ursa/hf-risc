@@ -9,15 +9,22 @@ rm -rf work
 
 #setup apps
 cd apps
-
 directory=$PWD
 
+#copy makefile into every directory
 for d in */ ; do
-    echo "compiling $d"
-	
-	cd $directory/apps
-#    mv $d $d/$d
+	cp build.sh $d/build.sh
 done
 
+#call individual builds
+for d in */ ; do
+	cd $d
+	bash build.sh	
+	cd ..
+done
 
-#assemble @TODO
+#back to main directory
+cd ..
+
+#run the stuff
+bash apps/run_all.sh/

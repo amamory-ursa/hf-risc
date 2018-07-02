@@ -23,12 +23,13 @@ typedef enum {
   //RTYPE
   ADD  = 100, SUB = 101, SLL = 102, SLT = 103,
   SLTU = 104, XOR = 105, SRL = 106, SRA = 107,
-  SLLI = 108, SRLI = 109, SRAI = 110,
 
   //ITYPE
   LB = 200, LH = 201, LW = 202, LBU = 203, LHU = 204,
   ADDI = 205, SLTI = 206, SLTIU = 207, XORI = 208,
-  ORI = 209, ANDI = 210,
+  ORI = 209, ANDI = 210,  
+  
+  SLLI = 211, SRLI = 212, SRAI = 213,
 
   //UTYPE
   LUI = 300, AUIPC = 301,
