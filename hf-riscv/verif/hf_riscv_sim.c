@@ -77,6 +77,18 @@ void bp(uint32_t ir){
 	dumpregs();
 }
 
+void set_io(int pin, int val) {
+  pin &= 0x7;
+  
+  if (val) {
+    context.cause |= 1 << (pin + 16);
+    context.cause &= ~(1 << (pin + 24));
+  } else {
+    context.cause &= ~(1 << (pin + 16));
+    context.cause |= 1 << (pin + 24);
+  }
+}
+
 static int32_t mem_fetch(uint32_t address){
 	uint32_t value=0;
 	uint32_t *ptr;
@@ -104,7 +116,7 @@ static int32_t mem_read(int32_t size, uint32_t address){
 		case COUNTER:		return s->counter;
 		case COMPARE:		return s->compare;
 		case COMPARE2:		return s->compare2;
-		case UART_READ:		return getchar();
+  case UART_READ:		return getchar(); // TODO UART_IN
 		case UART_DIVISOR:	return 0;
 	}
 
@@ -361,13 +373,13 @@ uint32_t setup (uint32_t *src, uint32_t size){
 
 	s = &context;
 	memset(s, 0, sizeof(state));
-	bzero(sram, sizeof(MEM_SIZE));
+	bzero(sram, MEM_SIZE);
 
 	s->pc = SRAM_BASE;
 	s->pc_next = s->pc + 4;
 	s->mem = &sram[0];
 	s->vector = 0;
-	s->cause = 0;
+	s->cause = 0xFF000000;
 	s->mask = 0;
 	s->status = 0;
 	for (i = 0; i < 4; i++)

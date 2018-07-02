@@ -19,6 +19,7 @@ module scoreboard
    import "DPI-C" context function int setup (input int unsigned src[], input int size);
    import "DPI-C" context task void cycle();
    import "DPI-C" context task void dump_sram(output int unsigned dst[], input int size);
+   import "DPI-C" context task void set_io(input int pin, input int val);
    
    export "DPI-C" taks terminate;   
    export "DPI-C" task log_branch;
@@ -101,7 +102,7 @@ module scoreboard
       for (i = 0 ; i < 0x40000 ; i++)
         mem_dump[i] = read_write(mem.base + i, 0, 0);
 
-      setup(mem_dump[i], 0x40000);
+      setup(mem_dump, 0x100000);
       fork;
          run_loop;
          @terminated;
