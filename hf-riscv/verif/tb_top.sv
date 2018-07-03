@@ -43,12 +43,14 @@ module tb_top;
    // clock generator
    always #5 clk = ~clk;
 
+   // interface instances clock
    hfrv_interface iface(.*);
+   // dut instances iface
    dut_top dut (.*);
 
    initial begin
       static bit verbose = 1;
-      static environment env = new(iface);
+      static environment env = new(iface); /*
       automatic CoverInstructions_cbs      cover_instructions_cbs = new;
       automatic CoverOpCodes_cbs           cover_opcodes_cbs = new;
       automatic RV32I_INSTR_ADDI_cbs       obj_RV32I_INSTR_ADDI_cbs = new(verbose);
@@ -106,7 +108,7 @@ module tb_top;
       // env.mon.cbs.push_back(debug_instruction_cbs); // prints instructions to stdout
       // env.mon.cbs.push_back(debug_registers_cbs);   // prints registers to stdout
       env.mon.cbs.push_back(save_history_cbs); // save history in 'history.csv'
-      env.mon.cbs.push_back(debug_uart); // save uart to file
+      env.mon.cbs.push_back(debug_uart); // save uart to file */
       env.iog.filename = "";
       env.iog.gen_cfg();
       env.run();

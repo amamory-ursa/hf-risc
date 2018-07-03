@@ -6,6 +6,7 @@ vcom -93 -explicit ../../../core_rv32i/uart.vhd
 vcom -93 -explicit ../../../core_rv32i/control.vhd
 vcom -93 -explicit ../../../core_rv32i/datapath.vhd
 vcom -93 -explicit ../../../core_rv32i/peripherals_busmux.vhd
+vlog ../../hf_riscv_sim.c
 vlog ../../tb_top.sv
 
 vsim work.tb_top

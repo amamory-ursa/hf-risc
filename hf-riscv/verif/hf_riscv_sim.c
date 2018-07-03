@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "scoreboard.h"
 
 #define MEM_SIZE			0x00100000
 #define SRAM_BASE			0x40000000
@@ -35,7 +36,8 @@
 #define min(A, B) ((A) < (B) ? (A) : (B))
 #define max(A, B) ((A) > (B) ? (A) : (B))
 
-int8_t sram[MEM_SIZE];
+static int8_t sram[MEM_SIZE];
+static int gen_trace;
 
 typedef struct {
 	int32_t r[32];
@@ -45,19 +47,15 @@ typedef struct {
 	uint64_t cycles;
 } state;
 
-state context;
+static state context;
 
-// Interface with simulator
-extern void terminate(int errcode);
-extern void log_branch(uint32_t pc);
-extern void log_reg(uint8_t reg, uint32_t content);
-extern void log_mwrite32(uint32_t addr, uint32_t content);
-extern void log_mwrite16(uint32_t addr, uint16_t content);
-extern void log_mwrite8(uint32_t addr, uint8_t content);
-extern void log_uart(uint8_t c);
-
-void dump_sram(uint32_t *dst, int size) {
+DPI_LINK_DECL DPI_DLLESPEC
+int
+dump_sram (unsigned int* dst,
+           int size) {
   memcpy(dst, context.mem, min(size, MEM_SIZE));
+
+  return 0;
 }
 
 void dumpregs(){
@@ -77,7 +75,8 @@ void bp(uint32_t ir){
 	dumpregs();
 }
 
-void set_io(int pin, int val) {
+DPI_LINK_DECL DPI_DLLESPEC
+int set_io(int pin, int val) {
   pin &= 0x7;
   
   if (val) {
@@ -87,6 +86,8 @@ void set_io(int pin, int val) {
     context.cause &= ~(1 << (pin + 16));
     context.cause |= 1 << (pin + 24);
   }
+
+  return 0;
 }
 
 static int32_t mem_fetch(uint32_t address){
@@ -190,7 +191,6 @@ static void mem_write(int32_t size, uint32_t address, uint32_t value){
 				terminate(1);
 			}else{
 				*(int32_t *)ptr = value;
-        log_mwrite32(address, value);
 			}
 			break;
 		case 2:
@@ -200,22 +200,21 @@ static void mem_write(int32_t size, uint32_t address, uint32_t value){
 				terminate(1);
 			}else{
 				*(int16_t *)ptr = (uint16_t)value;
-        log_mwrite16(address, (uint16_t)value);
 			}
 			break;
 		case 1:
 			*(int8_t *)ptr = (uint8_t)value;
-      log_mwrite8(address, (uint8_t)value);
 			break;
 		default:
 			printf("\nerror");
 	}
 }
 
-void cycle(){
+DPI_LINK_DECL DPI_DLLESPEC
+int
+cycle(scoreboard_snapshot_t* trace) {
 	uint32_t inst, i;
 	uint32_t opcode, rd, rs1, rs2, funct3, funct7, imm_i, imm_s, imm_sb, imm_u, imm_uj;
-  uint32_t prev_rd;
 
   state *s = &context;
   
@@ -254,8 +253,6 @@ void cycle(){
 	ptr_l = r[rs1] + (int32_t)imm_i;
 	ptr_s = r[rs1] + (int32_t)imm_s;
 	r[0] = 0;
-
-  prev_rd = r[rd];
 
 	switch(opcode){
 		case 0x37: r[rd] = imm_u; break;										/* LUI */
@@ -337,12 +334,6 @@ void cycle(){
 			break;
 		default: goto fail;
 	}
-
-  if(r[rd] != prev_rd)
-    log_reg(rd, r[rd]);
-
-  if (s->pc_next != s->pc + 4)
-    log_branch(s->pc_next);
 	
 	s->pc = s->pc_next;
 	s->pc_next = s->pc_next + 4;
@@ -358,19 +349,35 @@ void cycle(){
 	if (s->counter & 0x10000) s->cause |= 0x4; else s->cause &= 0xfffb;			/*IRQ_COUNTER2*/
 	if (!(s->counter & 0x40000)) s->cause |= 0x2; else s->cause &= 0xfffd;			/*IRQ_COUNTER_NOT*/
 	if (s->counter & 0x40000) s->cause |= 0x1; else s->cause &= 0xfffe;			/*IRQ_COUNTER*/
-	
-	return;
+
+  if(gen_trace) {
+    memcpy(trace->reg_bank, r, 32*sizeof(int));
+    trace->cycle = s->cycles;
+    trace->pc = s->pc;
+    trace->pc_next = s->pc_next;
+    trace->opcode = opcode;
+    trace->cause = s->cause;
+    trace->mask = s->mask;
+    trace->epc = s->epc;
+    trace->status = s->status;
+  }
+  
+	return 0;
 fail:
 	printf("\ninvalid opcode (pc=0x%x opcode=0x%x)", s->pc, inst);
 	terminate(1);
 }
 
-uint32_t setup (uint32_t *src, uint32_t size){
+DPI_LINK_DECL DPI_DLLESPEC
+int setup(const unsigned int* src,
+          int size, int debug) {
 	state *s;
   int i;
 
+  gen_trace = debug;
+  
   size = min(size, MEM_SIZE);
-
+  
 	s = &context;
 	memset(s, 0, sizeof(state));
 	bzero(sram, MEM_SIZE);

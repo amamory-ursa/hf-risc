@@ -3,7 +3,7 @@
 
  `include "memory.sv"
  `include "gpio.sv"
-// place holder checker, needs a proper checker
+
 class checkr;
    mailbox dut_msg;
    mailbox dut_romdump;
@@ -12,12 +12,25 @@ class checkr;
    mailbox io_input;
    mailbox io_output;
 
-   function new(mailbox dut_msg, mailbox dut_romdump, mailbox dut_ramdump, mailbox io_input, mailbox io_output);
+   mailbox sb_msg;
+   mailbox sb_ramdump;
+
+   function new
+     (mailbox dut_msg,
+      mailbox dut_romdump,
+      mailbox dut_ramdump,
+      mailbox io_input,
+      mailbox io_output,
+      mailbox sb_msg,
+      mailbox sb_ramdump);
+      
       this.dut_msg = dut_msg;
       this.dut_romdump = dut_romdump;
       this.dut_ramdump = dut_ramdump;
       this.io_input = io_input;
       this.io_output = io_output;
+      this.sb_msg = sb_msg;
+      this.sb_ramdump = sb_ramdump;
    endfunction // new
 
    task run();
@@ -31,24 +44,45 @@ class checkr;
    endtask // run
 
    task mem_dumper();
-      automatic memory_model ram;
-      automatic memory_model rom;
+      automatic memory_model dut_ram;
+      automatic memory_model dut_rom;
+      static int unsigned sb_ram ['h40000];
 
+      automatic int unsigned addr;
+      automatic int unsigned dut_data;
+      automatic int unsigned sb_data;
       forever begin
-         dut_ramdump.get(ram);
-         dut_romdump.get(rom);
-
+         dut_romdump.get(dut_rom);
+         dut_ramdump.get(dut_ram);
+         sb_ramdump.get(sb_ram);
          $display("Ram dump received");
+         for (int i = 0 ; i < 'h40000 ; i++) begin
+            addr = dut_ram.base + i;
+            dut_data = dut_ram.read_write(addr, 32'h0, 4'h0);
+            sb_data = sb_ram[i];
+            
+            if(dut_data != sb_data)
+              $display("Memory mismatch at %x: DUT(%x), SB(%x)", addr, dut_data, sb_data);
+         end
+         
       end      
    endtask // mem_dumper
 
    task msg_printer();
-      automatic string line;
+      automatic string dut_line;
+      automatic string sb_line;
+
+      fork
+         forever begin
+            dut_msg.get(dut_line);
+            $display("DUTOUT: %s", dut_line);
+         end
+         forever begin
+            dut_msg.get(sb_line);
+            $display("SBOUT: %s", sb_line);
+         end
+      join;
       
-      forever begin
-         dut_msg.get(line);
-         $display("DUTOUT: %s", line);
-      end   
    endtask // print_msg
 
    task input_printer();

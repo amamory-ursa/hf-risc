@@ -10,14 +10,23 @@ class agent;
    mailbox agt2rom;
    mailbox agt2ram;
    mailbox agt2drv;
+   mailbox agt2sb;
    event   dumpmem;
    event   terminated;
    
    stop_cpu stop;
    start_cpu start;
    
-   function new (mailbox gen2agt, mailbox agt2rom, mailbox agt2ram, mailbox agt2drv,
-                 input event dumpmem, input event terminated);
+   function new
+     (mailbox     gen2agt,
+      mailbox     agt2rom,
+      mailbox     agt2ram,
+      mailbox     agt2drv,
+      mailbox     agt2sb,
+      input event dumpmem,
+      input event terminated);
+
+      this.agt2sb = agt2sb;
       this.gen2agt = gen2agt;
       this.agt2ram = agt2ram;
       this.agt2rom = agt2rom;
@@ -34,6 +43,8 @@ class agent;
          gen2agt.get(trans);
          $display("program received");
          feed_dut(trans);
+         // feed scoreboard
+         agt2sb.put(trans);
          //$display("AGENT: waiting event");
          @(terminated);
          //$display("AGENT: event received");
@@ -55,7 +66,7 @@ class agent;
 
    task halt_dut();
       agt2drv.put(stop);
-      -> dumpmem;   
+      -> dumpmem; 
    endtask // halt_dut
    
    

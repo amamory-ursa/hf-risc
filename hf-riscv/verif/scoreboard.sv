@@ -1,112 +1,117 @@
-`include "memory.sv"
+`ifndef SCOREBOARD_SV
+ `define SCOREBOARD_SV
 
-typedef enum {rw, mw8, mw16, mw32, br} trace_type_t;
+ `include "memory.sv"
 
 typedef struct {
-   trace_type_t op;
-   int         unsigned addr;
-   int         unsigned content;
-} tracer_t;
+   int         cycle;
+   int         pc;
+   int         pc_next;
+   int         opcode;
+   int         cause;
+   int         mask;
+   int         epc;
+   int         status;
+   int         reg_bank [0:31];
+} scoreboard_snapshot_t;
 
-module scoreboard
-  (mailbox mem_in,
-   mailbox io_in,
-   mailbox mem_out,
-   mailbox msg_out,
-   mailbox tracer_out,
-   event terminated);
+import "DPI-C" context function int setup (input int unsigned src['h40000], input int size, input int debug);
+import "DPI-C" context task cycle(output scoreboard_snapshot_t trace);
+import "DPI-C" context task dump_sram (output int unsigned dst['h40000], input int size);
+import "DPI-C" context task set_io(input int pin, input int val);
 
-   import "DPI-C" context function int setup (input int unsigned src[], input int size);
-   import "DPI-C" context task void cycle();
-   import "DPI-C" context task void dump_sram(output int unsigned dst[], input int size);
-   import "DPI-C" context task void set_io(input int pin, input int val);
+export "DPI-C" task log_uart;
+export "DPI-C" task terminate;   
+
+mailbox     sb_mem_out;
+mailbox     sb_msg_out;
+event       sb_terminated;
+
+task log_uart(byte unsigned c);
+   static string line = "";
+   if (c != 8'h0A)
+     line = {line, c};
    
-   export "DPI-C" taks terminate;   
-   export "DPI-C" task log_branch;
-   export "DPI-C" task log_reg;
-   export "DPI-C" task log_mwrite32;
-   export "DPI-C" task log_mwrite16;
-   export "DPI-C" task log_mwrite8;
-   export "DPI-C" task log_uart;
+   if (c == 8'h0A || line.len() == 72) begin
+      sb_msg_out.put(line);
+      line = "";
+   end
+endtask; // log_uart
 
-   task terminate(int errcode);
-      int unsigned mem_dump [0x40000];
-      dump_sram(mem_dump, 0x40000);
-      mem_out.put(mem_dump);
+task terminate(int errcode);
+   static int unsigned mem_dump ['h40000];
+   dump_sram(mem_dump, 'h40000);
+   sb_mem_out.put(mem_dump);
+   $display("Scoreboard terminated with status %d", errcode);
+   -> sb_terminated;
+endtask // terminate
+
+ `timescale 1ns/1ps
+
+class scoreboard;
+
+   mailbox     io_in;
+   mailbox     io_out;
+   mailbox     mem_in;
+   mailbox     tracer_out;
+   int         debug;
+
+   function new
+     (mailbox      mem_in,
+      mailbox      mem_out,
+      mailbox      msg_out,
+      mailbox      tracer_out,
+      output event terminated,
+      input int    debug = 0);
       
-      -> terminated;
-   endtask // terminate
-
-   string line = "";
-
-   task log_branch(int unsigned pc);
-      tracer_t trace;
-      trace.op = br;
-      trace.addr = pc;
-      tracer_out.put(trace);
-   endtask; // log_branch
-
-   task log_reg(byte addr, int unsigned content);
-      tracer_t trace;
-      trace.op = rw;
-      trace.addr = addr;
-      trace.content = content;
-      tracer_out.put(trace);
-   endtask // log_reg
-
-   task log_mwrite32(int unsigned addr, int unsigned content);
-      tracer_t trace;
-      trace.op = mw32;
-      trace.addr = addr;
-      trace.content = content;
-      tracer_out.put(trace);
-   endtask; // log_mwrite32
-
-   task log_mwrite16(int unsigned addr, int unsigned content);
-      tracer_t trace;
-      trace.op = mw16;
-      trace.addr = addr;
-      trace.content = content;
-      tracer_out.put(trace);
-   endtask; // log_mwrite16
-
-   task log_mwrite8(int unsigned addr, int unsigned content);
-      tracer_t trace;
-      trace.op = mw8;
-      trace.addr = addr;
-      trace.content = content;
-      tracer_out.put(trace);
-   endtask; // log_mwrite8
-
-   task log_uart(byte unsigned char);
-      if (char != 8'h0A)
-        line = {line, char};
+      this.mem_in = mem_in;
+      sb_mem_out = mem_out;
+      sb_msg_out = msg_out;
+      this.tracer_out = tracer_out;
+      terminated = sb_terminated;
+      this.debug = debug;
       
-      if (char == 8'h0A || line.len() == 72) begin
-         msg_out.put(line);
-         line = "";
-      end
-   endtask; // log_uart
+   endfunction;
 
    task run_loop();
-      forever #5
-        cycle;
+      automatic scoreboard_snapshot_t trace;
+      $display("Starting scoreboard run_loop");
+      forever #1 begin
+         cycle(trace);
+         
+         if (debug)
+           tracer_out.put(trace);
+         
+         if(sb_terminated.triggered)
+           break;
+      end
    endtask; // run_loop
 
-   forever begin
-      int unsigned mem_dump [0x40000];
-      int i;
-      memory_model mem;
-      mem_in.get(mem);
-      
-      for (i = 0 ; i < 0x40000 ; i++)
-        mem_dump[i] = read_write(mem.base + i, 0, 0);
+   task run();
+      forever begin
+         static int unsigned mem_dump ['h40000];
+         int i;
+         memory_model mem;
 
-      setup(mem_dump, 0x100000);
-      fork;
+         $display("Scoreboard waiting for memory");
+         
+         mem_in.get(mem);
+
+         $display("Scoreboard received memory");
+         
+         for (i = 0 ; i < mem.length ; i++)
+           mem_dump[i] = mem.read_write(mem.base + i, 0, 0);
+
+         $display("Scoreboard dumped memory to vector");
+         
+         assert(setup(mem_dump, 'h100000, debug));
+
+         $display("Scoreboard setup C code");
+         
          run_loop;
-         @terminated;
-      join_any;
-   end
+      end // forever begin
+   endtask; // run
+   
+endclass // scoreboard
 
-endmodule; // scoreboard
+`endif //  `ifndef SCOREBOARD_SV
