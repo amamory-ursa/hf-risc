@@ -21,14 +21,14 @@ class environment;
    mailbox ramdump;
    mailbox romdump;
    mailbox dut_msg;
-   mailbox agt2scb;
-   mailbox scb2chk;
+   mailbox agt2scb; // Comunication between agent and scoreboard modules
+   mailbox scb2chk; // Comunication between scoreboard and checker modules
    
    event   dump_memory;
    event   dut_terminated;
-   event   start_scb;
-   event   end_scb;
-   event   end_chkr;
+   event   start_scb; // Event to start scoreboard
+   event   end_scb; // Event to finish scoreboard
+   event   end_chkr; // Event to finish scoreboard
 
    mailbox io_gen2driv;
    mailbox io_driv2ckr;
@@ -89,7 +89,6 @@ class environment;
          mon.run;
          chk.run;
          scb.run_scoreboard;
-
          iog.run;
          iod.run;
          iom.run;

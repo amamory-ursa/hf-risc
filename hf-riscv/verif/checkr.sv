@@ -33,7 +33,6 @@ class checkr;
    endfunction // new
 
    task run();
-	  //$display("CHECKER: start");
 
       fork;
          mem_dumper;
@@ -43,6 +42,7 @@ class checkr;
       join;
    endtask // run
 
+   // Task used to compare the scoreboard memory and the DUT memory
    task mem_dumper();
       automatic memory_model ram;
       automatic memory_model rom;
@@ -52,48 +52,36 @@ class checkr;
 
       forever begin
       	
-         $display("CHECKER: Start");
          @(end_scb);
          @(end_dut);
-         
-         $display("CHECKER: Events recived");
-         
+                  
          dut_ramdump.get(ram);
          dut_romdump.get(rom); 
-		 scb2chk.get(scb_mem);
-		 $display("Ram dump received");
-		 
+		 scb2chk.get(scb_mem);		 
 		   
       inst_add = ram.base;
       last_add = (ram.length/32);
       equal = 0;
       i = 0;
-      
-      $display("Sc:%d", $size(scb_mem));
-      $display("RAM:%d", ram.length);
-      
+            
       while(last_add) 
       begin
          read_data = ram.read_write(inst_add,0,0); //reading the RAM
-         //$display("%h: %h",inst_add,scb_mem[i]);
-         //$display("%h: %h",inst_add,read_data);
-         //$display(" ");
          inst_add = inst_add + 4;
          last_add = last_add -1;
                   
+         // Comparison word by word of scoreboard and DUT memories
          if ((read_data == scb_mem[i]))
          begin
-			//$display("equal = %d", equal);
-			//equal = equal - 1;
+			equal = equal + 1;
 		 end
 		 else
 		 begin
-			  $display("%h: %h",inst_add,scb_mem[i]);
-			  $display("%h: %h",inst_add,read_data);
+			$display("%h: %h",inst_add,scb_mem[i]);
+			$display("%h: %h",inst_add,read_data);
 		 end;
 		
 		 i = i + 1;
-         equal = equal + 1;
 			
 	   end 
 		 
@@ -101,7 +89,6 @@ class checkr;
 			 begin
 				$display("Memories are equals!");
 				->end_chkr;
-				//$finish();
 			 end
 		 else
 			 begin

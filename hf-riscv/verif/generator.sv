@@ -22,16 +22,15 @@ class generator;
    task run();
       begin
          ram = new(path, 32'h40000000, 'h100000);
-         $display("sending program to agent");
          gen2agent.put(ram);
-         @(terminated);
+         // Waiting DUT to finish
+         //@(terminated);
+         // Waiting Checker module to finish
          @(end_chkr);
+         // Finishing simulation
          $finish;
-         //$display("GENERATOR: event received");
-         //  $finish; //moved to monitor
       end
    endtask // run
-
 
 endclass : generator
 

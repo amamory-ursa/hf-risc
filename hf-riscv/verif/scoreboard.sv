@@ -10,10 +10,6 @@ export "DPI-C" function export_sram;
 
 reg[31:0] Mem_from_C[`N_LINES];
 
-
-
-
-
 //--------------------RETREIVE-FROM-C-FUNCTIONS-------------------------
 
 //---Pull-Memory------------------------
@@ -21,7 +17,6 @@ reg[31:0] Mem_from_C[`N_LINES];
 function void export_sram(input reg[31:0] _sram[`N_LINES]);
         for (int h=0;h<`N_LINES; h++)begin
 			Mem_from_C[h] = _sram[h];
-			//$display("[%d] = %h", h, Mem_from_C[h]);
         end
 endfunction
 
@@ -51,13 +46,9 @@ class scoreboard;
 		begin
 			automatic memory_model scb_mem;
 			automatic memory_model chk_mem;
-			
-			$display("Waiting start scoreboard!!");
-			
+						
 			wait(start_scb.triggered);
-			
-			$display("Scoreboard Initialized!!");
-			
+					
 			  if(agt2scb)
 				agt2scb.get(scb_mem);
 			  else
@@ -67,6 +58,7 @@ class scoreboard;
 			last_add = scb_mem.base + scb_mem.length;	
 			j=0;
 			
+			// Converting 32 bits to byte
 			while(inst_add < last_add) begin
 				aux = scb_mem.read_write(inst_add,0,0); //reading the RA
 				for (k=0;k<4; k++) begin
@@ -77,14 +69,15 @@ class scoreboard;
 				inst_add = inst_add + 4;
 			end 
 			
+			// Sending memory to C simulator
 			run(Mem_byte,`N_LINES);
 			
+			// Retreiving memory from C simulator
 			export_mem(`N_LINES);	
-						
-			scb2chk.put(Mem_from_C);
-						
-			$display("\nScoreboard Sent Mailboxes!!");
 			
+			// Sending scoreboard memory to Checker module			
+			scb2chk.put(Mem_from_C);
+									
 			->end_scb;
 			
 		end

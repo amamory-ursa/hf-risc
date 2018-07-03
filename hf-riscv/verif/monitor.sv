@@ -54,7 +54,6 @@ class monitor;
             cbs[i].terminated();
           end
           ->terminated;
-          $finish;
         end
         else
         begin

@@ -28,7 +28,6 @@ class platform_driver;
       #10;
       forever begin
          gen2drv.get(cmd);
-         $display("platform driver received cmd");
          cmd.run(this);
       end
    endtask; // run
@@ -37,14 +36,12 @@ endclass; // platform_driver
 
 class start_cpu extends platform_transaction;
    virtual task run(platform_driver cb);
-      $display("starting cpu");
       cb.iface.reset = 0;
    endtask; // run
 endclass // start_cpu
 
 class stop_cpu extends platform_transaction;
    virtual task run(platform_driver cb);
-      $display("stoping cpu");
       cb.iface.reset = 1;
       #10;
    endtask; // run

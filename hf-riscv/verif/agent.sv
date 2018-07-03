@@ -40,24 +40,17 @@ class agent;
          gen2agt.get(trans);
          agt2scb.put(trans);
          ->start_scb;
-         $display("program received");
          feed_dut(trans);
-         //$display("AGENT: waiting event");
          @(terminated);
-         $display("AGENT: event received");
          halt_dut();
       end
    endtask // run
 
    task feed_dut(memory_model trans);
       memory_model boot;
-      $display("loading boot.txt");
       boot = new("boot.txt", 'h0, 'h100000);
-      $display("sending program to ram");
       agt2ram.put(trans);
-      $display("sending bootloader to rom");
       agt2rom.put(boot);
-      $display("sending start command to platform driver");
       agt2drv.put(start);
    endtask // feed_cpu
 

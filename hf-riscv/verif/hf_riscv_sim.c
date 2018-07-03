@@ -9,7 +9,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <svdpi.h>
-//#include <vc_hdrs.h>
 
 #define MEM_SIZE			0x00100000
 #define SRAM_BASE			0x40000000
@@ -43,8 +42,6 @@ typedef struct {
 	uint64_t cycles;
 } state;
 
-
-
 int flag_endof = 0;
 int8_t sram[MEM_SIZE*4];
 unsigned long sram_out2[MEM_SIZE];
@@ -55,27 +52,20 @@ int32_t log_enabled = 0;
 
 extern void export_sram(int32_t *OUT);
 
-
-
-
+// Funtion to send the simulator memory to the systemVerilog Scoreaboard module 
 void export_mem(int size) {
 unsigned int j;
 
-		
+	   // Converting bytes to 32 bits
 	   for (j=0;j<size; j++){
 		   sram_out2[j] = (unsigned int)sram[j*4];
 		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+1]);
 		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+2]);
 		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+3]);
-		   //printf("%d - SRAM_OUT:%08x -- %02x %02x %02x %02x\n", j, sram_out2[j],(unsigned char)sram[j*4],(unsigned char)sram[j*4+1],(unsigned char)sram[j*4+2],(unsigned char)sram[j*4+3]);
 		   }
-		   
-		   //printf("FLAG!!!!");
 		
 export_sram(sram_out2);
 }
-
-
 
 void dumpregs(state *s){
 	int32_t i;
@@ -361,13 +351,10 @@ fail:
 	return 1;
 }
 
-//int main(int argc, char *argv[]){
-//int run(char *str){	
 int run(int8_t *mem, int size){		
-	printf("\nStart C!\n");
+
 	state context;
 	state *s;
-	//FILE *in;
 	int bytes, i;
 
 
@@ -382,26 +369,6 @@ int run(int8_t *mem, int size){
 	
 	memcpy(sram, mem, size);
 	
-	//for(i=0; i<20; i++){
-    //printf("\nContent:%hhx", sram[i]);
-    //}
-	
-	//printf("\nFLAG 4!\n");
-		
-/*
-	in = fopen(str, "rb");
-	if (in == 0){
-		printf("\nerror opening binary file.\n");
-		return 1;
-	}
-	bytes = fread(&sram, 1, MEM_SIZE, in);
-	fclose(in);
-	if (bytes == 0){
-		printf("\nerror reading binary file.\n");
-		return 1;
-	}
-*/
-
 	s->pc = SRAM_BASE;
 	s->pc_next = s->pc + 4;
 	s->mem = &sram[0];
@@ -419,6 +386,7 @@ int run(int8_t *mem, int size){
 	
 	while(1){
 		cycle(s);
+		// Waiting end of simulation
 		if (flag_endof == 1){
 			break;
 		}
