@@ -126,7 +126,7 @@ static int32_t mem_read(int32_t size, uint32_t address){
 	switch(size){
 		case 4:
 			if(address & 3){
-				printf("\nunaligned access (load word) pc=0x%x addr=0x%x", s->pc, address);
+				printf("unaligned access (load word) pc=0x%x addr=0x%x\n", s->pc, address);
 				dumpregs();
 				terminate(1);
 			}else{
@@ -135,7 +135,7 @@ static int32_t mem_read(int32_t size, uint32_t address){
 			break;
 		case 2:
 			if(address & 1){
-				printf("\nunaligned access (load halfword) pc=0x%x addr=0x%x", s->pc, address);
+				printf("unaligned access (load halfword) pc=0x%x addr=0x%x\n", s->pc, address);
 				dumpregs();
 				terminate(1);
 			}else{
@@ -146,7 +146,7 @@ static int32_t mem_read(int32_t size, uint32_t address){
 			value = *(int8_t *)ptr;
 			break;
 		default:
-			printf("\nerror");
+			printf("error\n");
 	}
 
 	return(value);
@@ -169,7 +169,7 @@ static void mem_write(int32_t size, uint32_t address, uint32_t value){
 		case COMPARE2:		s->compare2 = value; s->cause &= 0xffdf; return;
 		case EXIT_TRAP:
 			fflush(stdout);
-			printf("\nend of simulation - %ld cycles.\n", s->cycles);
+			printf("end of simulation - %ld cycles.\n", s->cycles);
 			terminate(0);
 		case DEBUG_ADDR:
 		case UART_WRITE:
@@ -186,7 +186,7 @@ static void mem_write(int32_t size, uint32_t address, uint32_t value){
 	switch(size){
 		case 4:
 			if(address & 3){
-				printf("\nunaligned access (store word) pc=0x%x addr=0x%x", s->pc, address);
+				printf("unaligned access (store word) pc=0x%x addr=0x%x", s->pc, address);
 				dumpregs();
 				terminate(1);
 			}else{
@@ -195,7 +195,7 @@ static void mem_write(int32_t size, uint32_t address, uint32_t value){
 			break;
 		case 2:
 			if(address & 1){
-				printf("\nunaligned access (store halfword) pc=0x%x addr=0x%x", s->pc, address);
+				printf("unaligned access (store halfword) pc=0x%x addr=0x%x", s->pc, address);
 				dumpregs();
 				terminate(1);
 			}else{
@@ -206,7 +206,7 @@ static void mem_write(int32_t size, uint32_t address, uint32_t value){
 			*(int8_t *)ptr = (uint8_t)value;
 			break;
 		default:
-			printf("\nerror");
+			printf("error");
 	}
 }
 
@@ -364,7 +364,7 @@ cycle(scoreboard_snapshot_t* trace) {
   
 	return 0;
 fail:
-	printf("\ninvalid opcode (pc=0x%x opcode=0x%x)", s->pc, inst);
+	printf("invalid opcode (pc=0x%x opcode=0x%x)\n", s->pc, inst);
 	terminate(1);
 }
 
