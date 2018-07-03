@@ -5,18 +5,22 @@
  
  `define N_LINES 1048576/32
 
+ `include "gpio.sv"
+
 // place holder checker, needs a proper checker
 class checkr;
    mailbox dut_msg;
    mailbox dut_romdump;
    mailbox dut_ramdump;
    mailbox scb2chk;
+   mailbox io_input;
+   mailbox io_output;
    
    event end_scb;
    event end_dut;
    event end_chkr;
 
-   function new(mailbox dut_msg, mailbox dut_romdump, mailbox dut_ramdump, mailbox scb2chk, input event end_scb, input event end_dut, input event end_chkr);
+   function new(mailbox dut_msg, mailbox dut_romdump, mailbox dut_ramdump, mailbox scb2chk, input event end_scb, input event end_dut, input event end_chkr, mailbox io_input, mailbox io_output);
       this.dut_msg = dut_msg;
       this.dut_romdump = dut_romdump;
       this.dut_ramdump = dut_ramdump;
@@ -24,12 +28,18 @@ class checkr;
       this.end_scb = end_scb;
       this.end_dut = end_dut;
       this.end_chkr = end_chkr;
+      this.io_input = io_input;
+      this.io_output = io_output;
    endfunction // new
 
    task run();
+	  //$display("CHECKER: start");
+
       fork;
          mem_dumper;
          msg_printer;
+         input_printer;
+         output_printer;
       join;
    endtask // run
 
@@ -110,6 +120,22 @@ class checkr;
          $display("DUTOUT: %s", line);
       end   
    endtask // print_msg
+
+   task input_printer();
+      gpio_trans trans;
+      forever begin
+         io_input.get(trans);
+         //$display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
+      end  
+   endtask
+
+   task output_printer();
+      gpio_trans trans;
+      forever begin
+         io_output.get(trans);
+         //$display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
+      end  
+   endtask
 
    task read_ram(memory_model ram);
       int read_data; // file descriptor

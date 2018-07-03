@@ -9,6 +9,8 @@
  `include "monitor.sv"
  `include "checkr.sv"
  `include "scoreboard.sv"
+ `include "gpio.sv"
+
 
 class environment;
    virtual hfrv_interface iface;
@@ -28,6 +30,10 @@ class environment;
    event   end_scb;
    event   end_chkr;
 
+   mailbox io_gen2driv;
+   mailbox io_driv2ckr;
+   mailbox io_mon2ckr;
+
    platform_driver drv;
    memory_driver   ram;
    memory_driver   rom;
@@ -37,6 +43,10 @@ class environment;
    checkr          chk;
    scoreboard      scb;
   
+   gpio_gen        iog;
+   gpio_drv        iod;
+   gpio_monitor    iom;
+
    function new (virtual hfrv_interface iface);
       this.iface = iface;
       gen2agt = new();
@@ -49,6 +59,13 @@ class environment;
       dut_msg = new();
       scb2chk = new();
       gen = new(gen2agt, dut_terminated, end_chkr);
+
+      io_gen2driv = new();
+      io_driv2ckr = new();
+      io_mon2ckr = new();
+      
+      
+      gen = new(gen2agt, dut_terminated);
       ram = new(iface, agt2ram, ramdump, dump_memory);
       rom = new(iface, agt2rom, romdump, dump_memory);
       drv = new(iface, agt2drv);
@@ -56,6 +73,12 @@ class environment;
       chk = new(dut_msg, romdump, ramdump, scb2chk, end_scb, dut_terminated, end_chkr);
       agt = new(gen2agt, agt2rom, agt2ram, agt2drv, agt2scb, dump_memory, dut_terminated, start_scb);
       scb = new(agt2scb,scb2chk,start_scb,end_scb);
+      chk = new(dut_msg, romdump, ramdump, io_driv2ckr, io_mon2ckr);
+      agt = new(gen2agt, agt2rom, agt2ram, agt2drv, dump_memory, dut_terminated);
+
+      iog = new(io_gen2driv);
+      iod = new(iface, io_gen2driv, io_driv2ckr);
+      iom = new(iface, io_mon2ckr);
    endfunction // new
 
    task run();
@@ -68,6 +91,10 @@ class environment;
          mon.run;
          chk.run;
          scb.run_scoreboard;
+
+         iog.run;
+         iod.run;
+         iom.run;
       join;
    endtask // run
    
