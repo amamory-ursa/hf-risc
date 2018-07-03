@@ -1,6 +1,12 @@
 *~
-hf-riscv/verif/work/
 hf-riscv/sim/work/
+hf-riscv/verif/work/
+hf-riscv/verif/log.txt
+hf-riscv/verif/sv_debug.txt
+hf-riscv/verif/vish_stacktrace.vstf
+hf-riscv/verif/transcript
+hf-riscv/verif/vsim.wlf
+hf-riscv/verif/*~
 *.o
 *.map
 *.elf
