@@ -57,18 +57,21 @@ class monitor;
         end
         else
         begin
-          int timecounter;
-          register [0:31] registers;
-          foreach (registers[i]) begin // copies register bank
-            registers[i] = tb_top.dut.cpu.register_bank.registers[i];
-          end
-          // timemachine.step fills a new instance of snaphot and adds it to the snaphots queue
-          timecounter = timemachine.step(tb_top.dut.cpu.data_access, // flag -> load, store
-                                         tb_top.dut.cpu.data_in,     // 32 bit instr
-                                         tb_top.dut.cpu.pc_last2,    // pc (last2 should match current pipeline phase)
-                                         registers);                 // array of 32 registers, 32 bit each
-          foreach (cbs[i]) begin // call callbacks that use snapshots, like assertions callbacks
-            cbs[i].time_step(timecounter, timemachine);
+          if (!tb_top.dut.cpu.reset)
+          begin
+            int timecounter;
+            register [0:31] registers;
+            foreach (registers[i]) begin // copies register bank
+              registers[i] = tb_top.dut.cpu.register_bank.registers[i];
+            end
+            // timemachine.step fills a new instance of snaphot and adds it to the snaphots queue
+            timecounter = timemachine.step(tb_top.dut.cpu.data_access, // flag -> load, store
+                                           tb_top.dut.cpu.data_in,     // 32 bit instr
+                                           tb_top.dut.cpu.pc_last2,    // pc (last2 should match current pipeline phase)
+                                           registers);                 // array of 32 registers, 32 bit each
+            foreach (cbs[i]) begin // call callbacks that use snapshots, like assertions callbacks
+              cbs[i].time_step(timecounter, timemachine);
+            end
           end
         end
       end
