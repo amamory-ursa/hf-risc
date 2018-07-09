@@ -33,6 +33,6 @@ class CoverInstructions_cbs extends Monitor_cbs;
 
   virtual task terminated();
     super.terminated();
-    $display("CoverInstructions errors: %d", this.nErrors);
+    $display("CoverInstructions errors:                          %d", this.nErrors);
   endtask
 endclass

@@ -74,8 +74,7 @@ class Timemachine;
     //   then we should disconsider the current instruction too
     jump = isJumped(timecounter);
     if (jump.jumped) // a jump occurred
-      if (jump.to != snap.pc) // the jump was not to current address
-        snap.skip = 1;
+      snap.skip = 1;
 
     // snap is filled, push it to the snaphots queue
     this.snapshot.push_back(snap);
@@ -89,13 +88,17 @@ class Timemachine;
   //   if so we should disconsider current snap
   function bit isDataAccess(int timecounter);
     // check t-1
-    if (timecounter > 0)
-      if (snapshot[timecounter-1].data_access == 1)
+    if (timecounter > 0 && snapshot[timecounter-1].skip == 0)
+      if (snapshot[timecounter-1].opcode == LOAD || snapshot[timecounter-1].opcode == STORE)
         return 1;
     // check t-2
-    if (timecounter > 1)
-      if (snapshot[timecounter-2].data_access == 1)
-        return 1;
+    if (timecounter > 1 && snapshot[timecounter-2].skip == 0)
+      if (snapshot[timecounter-2].opcode == LOAD || snapshot[timecounter-2].opcode == STORE)
+        // ugly hack: sometimes STORE skips 1 step, sometimes 2
+        //   comparing [t-1].pc and [t-2].pc seems to differ both cases,
+        //   but it's a strange thing to rely on
+        if (snapshot[timecounter-1].pc == snapshot[timecounter-2].pc)
+          return 1;
     return 0;
   endfunction
 
@@ -107,7 +110,7 @@ class Timemachine;
   //     jump.to    : destination address
   function jumpStruct isJumped(int timecounter);
     jumpStruct j = 0;
-    for (int i=1; i<3; i++)
+    for (int i=1; i<3; i++) //checks t-1 and t-2
     begin
       if (timecounter < i) // program starting, we can't look to times less than 0
         return 0;
