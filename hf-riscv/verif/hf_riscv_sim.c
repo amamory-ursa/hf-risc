@@ -26,7 +26,7 @@
 #define DEBUG_ADDR			0xf00000d0
 #define UART_WRITE			0xf00000e0
 #define UART_READ			0xf00000e0
-#define UART_DIVISOR			0xf00000f0
+#define UART_DIVISOR		0xf00000f0
 
 #define ntohs(A) ( ((A)>>8) | (((A)&0xff)<<8) )
 #define htons(A) ntohs(A)
@@ -45,26 +45,34 @@ typedef struct {
 int flag_endof = 0;
 int8_t sram[MEM_SIZE*4];
 unsigned long sram_out2[MEM_SIZE];
+uint32_t io_out[512];
+int io_out_index;
 
 
 FILE *fptr;
 int32_t log_enabled = 0;
 
 extern void export_sram(int32_t *OUT);
+extern void export_io(int32_t *OUT);
 
 // Funtion to send the simulator memory to the systemVerilog Scoreaboard module 
 void export_mem(int size) {
-unsigned int j;
+	unsigned int j;
 
-	   // Converting bytes to 32 bits
-	   for (j=0;j<size; j++){
-		   sram_out2[j] = (unsigned int)sram[j*4];
-		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+1]);
-		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+2]);
-		   sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+3]);
-		   }
+	// Converting bytes to 32 bits
+	for (j=0;j<size; j++){
+		sram_out2[j] = (unsigned int)sram[j*4];
+		sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+1]);
+		sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+2]);
+		sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+3]);
+	}
 		
-export_sram(sram_out2);
+	export_sram(sram_out2);
+}
+
+void export_io_c(int size) {
+	unsigned int j;
+	export_io(io_out);
 }
 
 void dumpregs(state *s){
@@ -106,6 +114,7 @@ static int32_t mem_read(state *s, int32_t size, uint32_t address){
 		case COUNTER:		return s->counter;
 		case COMPARE:		return s->compare;
 		case COMPARE2:		return s->compare2;
+		case EXTIO_IN:		return (s->cause & 0xff0000)>>16;
 		case UART_READ:		return getchar();
 		case UART_DIVISOR:	return 0;
 	}
@@ -175,6 +184,12 @@ static void mem_write(state *s, int32_t size, uint32_t address, uint32_t value){
 			return;
 		case UART_DIVISOR:
 			return;
+		case EXTIO_OUT:
+			if (io_out[io_out_index-2] != value){
+				io_out[io_out_index++] = value;
+				io_out[io_out_index++] = s->cycles * 10;
+			}
+			return;
 	}
 
 	ptr = (uint32_t *)(s->mem + (address % MEM_SIZE));
@@ -213,17 +228,19 @@ void cycle(state *s){
 	uint32_t *u = (uint32_t *)s->r;
 	uint32_t ptr_l, ptr_s;
 
-	
+	//interrupção
 	if (s->status && (s->cause & s->mask)){
+		printf("Interupcao: s->cause = %x, s->mask = %x, s->pc = %x, s->vector = %x\n", s->cause, s->mask, s->pc, s->vector);
 		s->epc = s->pc_next;
 		s->pc = s->vector;
 		s->pc_next = s->vector + 4;
 		s->status = 0;
 		for (i = 0; i < 4; i++)
 			s->status_dly[i] = 0;
+		inst = mem_fetch(s, s->pc);
 	}
-
-	inst = mem_fetch(s, s->pc);
+	else
+		inst = mem_fetch(s, s->pc);
 
 
 	opcode = inst & 0x7f;
@@ -338,11 +355,11 @@ void cycle(state *s){
 	s->cycles++;
 	s->counter++;
 	if ((s->compare2 & 0xffffff) == (s->counter & 0xffffff)) s->cause |= 0x20;		/*IRQ_COMPARE2*/
-	if (s->compare == s->counter) s->cause |= 0x10;						/*IRQ_COMPARE*/
-	if (!(s->counter & 0x10000)) s->cause |= 0x8; else s->cause &= 0xfff7;			/*IRQ_COUNTER2_NOT*/
-	if (s->counter & 0x10000) s->cause |= 0x4; else s->cause &= 0xfffb;			/*IRQ_COUNTER2*/
-	if (!(s->counter & 0x40000)) s->cause |= 0x2; else s->cause &= 0xfffd;			/*IRQ_COUNTER_NOT*/
-	if (s->counter & 0x40000) s->cause |= 0x1; else s->cause &= 0xfffe;			/*IRQ_COUNTER*/
+	if (s->compare == s->counter) s->cause |= 0x10;									/*IRQ_COMPARE*/
+	if (!(s->counter & 0x10000)) s->cause |= 0x8; else s->cause &= 0xfffffff7;		/*IRQ_COUNTER2_NOT*/
+	if (s->counter & 0x10000) s->cause |= 0x4; else s->cause &= 0xfffffffb;			/*IRQ_COUNTER2*/
+	if (!(s->counter & 0x40000)) s->cause |= 0x2; else s->cause &= 0xfffffffd;		/*IRQ_COUNTER_NOT*/
+	if (s->counter & 0x40000) s->cause |= 0x1; else s->cause &= 0xfffffffe;			/*IRQ_COUNTER*/
 	
 	return;
 fail:
@@ -351,11 +368,12 @@ fail:
 	return 1;
 }
 
-int run(int8_t *mem, int size){		
+int run(int8_t *mem, uint32_t *io, int size, int io_size){
 
 	state context;
 	state *s;
 	int bytes, i;
+	int sim_time, io_time, io_index, io_num;
 
 
 	s = &context;
@@ -384,7 +402,21 @@ int run(int8_t *mem, int size){
 	s->compare2 = 0;
 	s->cycles = 0;
 	
+	io_index = 0;
+	io_num = io[0];
+	io_time = io[1];
+	io_out_index = 0;
 	while(1){
+		sim_time = s->cycles * 10;
+
+		if (io_time <= sim_time && io_index/2 <= io_num){
+			s->cause &= 0x0000ffff;
+			s->cause |= io[io_index]<<16;
+			s->cause |= ~io[io_index]<<24;
+			io_index = io_index + 2;
+			io_time += io[io_index+1];
+		}
+
 		cycle(s);
 		// Waiting end of simulation
 		if (flag_endof == 1){

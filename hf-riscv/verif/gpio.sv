@@ -33,13 +33,15 @@ class gpio_gen;
   rand gpio_cfg cfg;
   rand gpio_trans trans;
        mailbox gen2driv;
+       mailbox gen2scb;
        string filename;
 
   int interval;
   int value[integer];
 
-  function new(mailbox gen2driv);
+  function new(mailbox gen2driv, mailbox gen2scb);
     this.gen2driv = gen2driv;
+    this.gen2scb = gen2scb;
     cfg = new;
   endfunction
 
@@ -74,11 +76,13 @@ class gpio_gen;
     int i;
 
     $display("GPIO: num_io = %d, init_time = %d", cfg.num_io, cfg.init_time);
-    #cfg.init_time;
+    //#cfg.init_time;
     trans = new();
     trans.value = cfg.num_io;
     trans.d = in;
+    trans.t_time = cfg.init_time;
     gen2driv.put(trans);
+    gen2scb.put(trans);
     i = 0;
     repeat(cfg.num_io) begin
       trans = new();
@@ -90,8 +94,9 @@ class gpio_gen;
         if( !trans.randomize() ) $fatal("randomization failed");
       trans.d = in;
       i++;
-      #trans.t_time;
+      //#trans.t_time;
       gen2driv.put(trans);
+      gen2scb.put(trans);
     end
   endtask
 
@@ -115,9 +120,9 @@ class gpio_drv;
     forever begin
       gpio_trans trans;
       gen2driv.get(trans);
+      #trans.t_time;
       gpio.extio_in = trans.value;
       trans.t_time = $time;
-      driv2ckr.put(trans);
     end
   endtask
 

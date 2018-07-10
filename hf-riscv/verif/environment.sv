@@ -31,6 +31,7 @@ class environment;
    event   end_chkr; // Event to finish scoreboard
 
    mailbox io_gen2driv;
+   mailbox io_gen2scb;
    mailbox io_driv2ckr;
    mailbox io_mon2ckr;
 
@@ -61,6 +62,7 @@ class environment;
       gen = new(gen2agt, dut_terminated, end_chkr);
 
       io_gen2driv = new();
+      io_gen2scb = new();
       io_driv2ckr = new();
       io_mon2ckr = new();
       
@@ -71,10 +73,10 @@ class environment;
       drv = new(iface, agt2drv);
       mon = new(iface, dut_terminated, dut_msg);
       chk = new(dut_msg, romdump, ramdump, scb2chk, end_scb, dut_terminated, end_chkr, io_driv2ckr, io_mon2ckr);
-      scb = new(agt2scb,scb2chk,start_scb,end_scb);    
+      scb = new(agt2scb, scb2chk, io_gen2scb, start_scb, end_scb);    
       agt = new(gen2agt, agt2rom, agt2ram, agt2drv, agt2scb, dump_memory, dut_terminated, start_scb);
 
-      iog = new(io_gen2driv);
+      iog = new(io_gen2driv, io_gen2scb);
       iod = new(iface, io_gen2driv, io_driv2ckr);
       iom = new(iface, io_mon2ckr);
    endfunction // new

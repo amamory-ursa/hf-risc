@@ -4,6 +4,7 @@
  `include "memory.sv"
  
  `define N_LINES 1048576/32
+ `define N_IO 512
 
  `include "gpio.sv"
 
@@ -37,8 +38,7 @@ class checkr;
       fork;
          mem_dumper;
          msg_printer;
-         input_printer;
-         output_printer;
+         //output_printer;
       join;
    endtask // run
 
@@ -46,57 +46,82 @@ class checkr;
    task mem_dumper();
       automatic memory_model ram;
       automatic memory_model rom;
-	  reg [31:0] scb_mem [`N_LINES];
-	  int read_data, i, equal; // file descriptor
-	  logic [31:0] inst_add, last_add; 
+      reg [31:0] scb_mem [`N_LINES];
+      bit [31:0] scb_io [`N_IO];
+      int read_data, i, equal; // file descriptor
+      logic [31:0] inst_add, last_add;
+      gpio_trans trans;
+      int num_io, io_err;
 
-      forever begin
+      begin
       	
          @(end_scb);
          @(end_dut);
                   
          dut_ramdump.get(ram);
          dut_romdump.get(rom); 
-		 scb2chk.get(scb_mem);		 
+         scb2chk.get(scb_mem);
+         scb2chk.get(scb_io);
 		   
-      inst_add = ram.base;
-      last_add = (ram.length/32);
-      equal = 0;
-      i = 0;
+         inst_add = ram.base;
+         last_add = (ram.length/32);
+         equal = 0;
+         i = 0;
             
-      while(last_add) 
-      begin
-         read_data = ram.read_write(inst_add,0,0); //reading the RAM
-         inst_add = inst_add + 4;
-         last_add = last_add -1;
-                  
-         // Comparison word by word of scoreboard and DUT memories
-         if ((read_data == scb_mem[i]))
+         while(last_add) 
          begin
-			equal = equal + 1;
-		 end
-		 else
-		 begin
-			$display("%h: %h",inst_add,scb_mem[i]);
-			$display("%h: %h",inst_add,read_data);
-		 end;
-		
-		 i = i + 1;
-			
-	   end 
-		 
-		 if (equal == i)
-			 begin
-				$display("Memories are equals!");
-				->end_chkr;
-			 end
-		 else
-			 begin
-				$display("Memories are NOT equals!");
-				->end_chkr;
-			 end
-         
-      end      
+            read_data = ram.read_write(inst_add,0,0); //reading the RAM
+            inst_add = inst_add + 4;
+            last_add = last_add -1;
+                     
+            // Comparison word by word of scoreboard and DUT memories
+            if ((read_data == scb_mem[i]))
+            begin
+      			equal = equal + 1;
+      		end
+            else
+      		begin
+      			$display("%h: %h",inst_add,scb_mem[i]);
+      			$display("%h: %h",inst_add,read_data);
+      		end;
+   		
+            i = i + 1;
+   			
+   	   end
+
+   		if (equal == i)
+   			$display("Memories are equals!");
+   		else
+   			$display("Memories are NOT equals!");
+
+
+         i = 0;
+         io_output.try_get(trans);
+         io_err = 0;
+         while (io_output.try_get(trans)) begin
+            if (scb_io[i*2] != trans.value) begin
+               $display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
+               $display("SCB: Value = %h, time = %10d", scb_io[i*2], scb_io[i*2+1]);
+               io_err++;
+            end
+            i++;
+         end
+
+         $display("IO verification errors: %d", io_err);
+
+
+         //if (io_output.try_get(trans)) begin
+            /*io_output.get(trans);
+            num_io = trans.value;
+            for (i = 0; i < num_io; i++) begin
+               //if (scb_io[i*2] == trans.value)
+               $display("transaction value = %d, scoreboard value = %d", trans.value, scb_io[i*2]);
+               $display("transaction time = %d, scoreboard time = %d", trans.t_time, scb_io[i*2+1]);
+               io_output.get(trans);
+            end*/
+         //end
+         ->end_chkr;
+      end
    endtask // mem_dumper
 
    task msg_printer();
@@ -108,19 +133,11 @@ class checkr;
       end   
    endtask // print_msg
 
-   task input_printer();
-      gpio_trans trans;
-      forever begin
-         io_input.get(trans);
-         //$display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
-      end  
-   endtask
-
    task output_printer();
       gpio_trans trans;
       forever begin
          io_output.get(trans);
-         //$display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
+         $display("GPIO: Value = %h, time = %10d, Direction = %s", trans.value, trans.t_time, trans.d);
       end  
    endtask
 
