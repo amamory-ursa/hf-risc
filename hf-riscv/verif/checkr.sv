@@ -14,6 +14,7 @@ class checkr;
 
    mailbox sb_msg;
    mailbox sb_ramdump;
+   mailbox sb_trace;
 
    function new
      (mailbox dut_msg,
@@ -22,7 +23,8 @@ class checkr;
       mailbox io_input,
       mailbox io_output,
       mailbox sb_msg,
-      mailbox sb_ramdump);
+      mailbox sb_ramdump,
+      mailbox sb_trace);
       
       this.dut_msg = dut_msg;
       this.dut_romdump = dut_romdump;
@@ -31,6 +33,7 @@ class checkr;
       this.io_output = io_output;
       this.sb_msg = sb_msg;
       this.sb_ramdump = sb_ramdump;
+      this.sb_trace;
    endfunction // new
 
    task run();
