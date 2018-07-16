@@ -19,15 +19,50 @@ The following image shows the *architecture of the testbench* and its main modul
 ### Verification at the End of Program Execution
 
 To run the verification at the End of Program Execution, follow the next steps:
-1. Go to the verification directory: <br />
+1. Go to the software directory: <br />
    ```
-   cd hf-riscv/verif/
+   cd software/
    ```
-2. Load the Modelsim tool: <br /> 
+2. Compile the application: <br />
+   ```
+   make clean <app>
+   ```
+   - The <app> parameter can assume the following values:
+      - coremark
+      - core_test
+      - euler
+      - exp_io
+      - fib
+      - hanoi
+      - hello
+      - interrupt_test
+      - newton
+      - pi
+      - sort
+      - test64
+      - test_crc
+      - test_fp
+      - test_trig
+      - test_spi
+      - xtea	
+      - xtea_hw
+      - xtea_hw_vec
+      - aes_tiny
+      - aes_lite
+      - test
+3. Copy the code.txt file to the verification directory: <br />
+   ```
+   cp code.txt ../hf-riscv/verif/
+   ```  
+4. Go to the verification directory: <br />
+   ```
+   cd ../hf-riscv/verif/
+   ```
+5. Load the Modelsim tool: <br /> 
    ```
    module load modelsim
    ```
-3. Run the simulation: <br />
+6. Run the simulation: <br />
    - To run with graphic interface: <br />
       ```
       vsim -do sim_environment.do
