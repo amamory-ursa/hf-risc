@@ -21,20 +21,20 @@ The following image shows the *architecture of the testbench* and its main modul
 To run the verification at the End of Program Execution, follow the next steps:
 1. Go to the verification dir: <br />
    ```
-   **cd hf-riscv/verif/**
+   cd hf-riscv/verif/
    ```
 2. Load the Modelsim tool: <br /> 
    ```
-   **module load modelsim**
+   module load modelsim
    ```
 3. Run the simulation: <br />
    - To run with graphic interface: <br />
       ```
-      **vsim -do sim_environment.do**
+      vsim -do sim_environment.do
       ```
    - To run without graphic interface: <br />
       ```
-      **vsim -c -do sim_environment.do**
+      vsim -c -do sim_environment.do
       ```    
 ---
 ### Verification Instruction by Instruction
