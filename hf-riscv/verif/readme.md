@@ -112,3 +112,13 @@ To run the verification with Merged Coverage, follow the next steps:
    ```
    ./run_all.sh
    ```
+4. Generate the HTML coverage file: <br /> 
+   ```
+   cd apps/
+   vcover report -html -htmldir coverage -verbose -threshL 50 -threshH 90 total_coverage.ucdb
+   ```
+5. Open the HTML coverage file: <br /> 
+   ```
+   cd coverage/
+   firefox covsummary.html &
+   ```
