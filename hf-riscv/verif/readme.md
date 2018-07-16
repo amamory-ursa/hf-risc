@@ -27,7 +27,7 @@ To run the verification at the End of Program Execution, follow the next steps:
    ```
    make clean <app>
    ```
-   - The <app> parameter can assume the following values:
+   - The `<app>` parameter can assume the following values:
       - coremark
       - core_test
       - euler
