@@ -1,4 +1,5 @@
 vlib work
+vlog ../../hf_riscv_sim.c
 vcom -93 -explicit ../../../core_rv32i/bshifter.vhd
 vcom -93 -explicit ../../../core_rv32i/alu.vhd
 vcom -93 -explicit ../../../core_rv32i/reg_bank.vhd
