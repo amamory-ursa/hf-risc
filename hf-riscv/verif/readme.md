@@ -19,7 +19,7 @@ The following image shows the *architecture of the testbench* and its main modul
 ### Verification at the End of Program Execution
 
 To run the verification at the End of Program Execution, follow the next steps:
-1. Go to the verification dir: <br />
+1. Go to the verification directory: <br />
    ```
    cd hf-riscv/verif/
    ```
