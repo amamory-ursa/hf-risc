@@ -19,6 +19,7 @@ class RV32I_INSTR_ORI_cbs extends Monitor_cbs;
       logic [31:0] expected;
       logic [31:0] got;
       expected = past.registers[past.rs1] | past.imm;
+      if (past.rd == 0) expected = 0;
       got = now.registers[past.rd];
       assert(got === expected) this.passed++; else
       begin

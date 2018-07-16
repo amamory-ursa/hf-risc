@@ -58,6 +58,6 @@ class CoverOpCodes_cbs extends Monitor_cbs;
 
   virtual task terminated();
     super.terminated();
-    $display("CoverOpCodes errors: %d", this.nErrors);
+    $display("CoverOpCodes errors:                               %d", this.nErrors);
   endtask
 endclass

@@ -22,6 +22,7 @@ class RV32I_INSTR_SLTI_cbs extends Monitor_cbs;
         expected = 1;
       else
         expected = 0;
+      if (past.rd == 0) expected = 0;
       got = now.registers[past.rd];
       assert(got === expected) this.passed++; else
       begin
