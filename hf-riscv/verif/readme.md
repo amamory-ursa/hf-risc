@@ -11,7 +11,7 @@ metrics are extracted and there is a script to merge the functional coverage dat
 The directory *randomtest* includes pre-processing scripts to randomly generate Assembly code. These codes are simulated and 
 functional coverage metrics are generated into the database. 
 
-The following image shows the *architecture of the testbench* and its main modules.
+The following image shows the *architecture of the testbench* and its main modules. The dashed arrows represent events and the normal arrows represent mailboxes.
 
 ![tb](tb.png)
 
