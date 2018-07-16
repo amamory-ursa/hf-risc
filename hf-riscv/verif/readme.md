@@ -72,7 +72,34 @@ To run the verification at the End of Program Execution, follow the next steps:
       vsim -c -do sim_environment.do
       ```    
 ---
-### Verification Instruction by Instruction
+### Verification with Merged Coverage
 
-how to run it
+To run the verification with Merged Coverage, follow the next steps:
+1. Go to the test cases directory: <br />
+   ```
+   cd hf-riscv/verif/testcases/
+   ```
+2. Load the Modelsim tool: <br /> 
+   ```
+   module load modelsim
+   ```
+3. Execute the Merged Coverage script: <br /> 
+   ```
+   ./run_all.sh
+   ```
+---
+### Verification with Random Applications
 
+To run the verification with Merged Coverage, follow the next steps:
+1. Go to the random test directory: <br />
+   ```
+   cd hf-riscv/verif/randomtest/
+   ```
+2. Load the Modelsim tool: <br /> 
+   ```
+   module load modelsim
+   ```
+3. Execute the Merged Coverage script: <br /> 
+   ```
+   ./run_all.sh
+   ```
