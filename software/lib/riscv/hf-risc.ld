@@ -15,7 +15,7 @@ _stack = 0x4008FFFC;
 
 /* now define the output sections  */
 
-SECTIONS 
+SECTIONS
 {
 	. = 0;
 
@@ -45,7 +45,7 @@ SECTIONS
 		_gp = . + 0x800;
 		*(.sdata)
 		*(.sdata.*)
-		. = ALIGN(16); 
+		. = ALIGN(16);
 	} > ram
 
 	_edata = .;
@@ -53,9 +53,9 @@ SECTIONS
 	.bss :
 	{
 		_bss_start = .;
-		*(.sbss) 
-		*(.sbss.*) 
-		*(.bss) 
+		*(.sbss)
+		*(.sbss.*)
+		*(.bss)
 		*(.bss.*)
 		. = ALIGN(4);
 		_bss_end = . ;

@@ -12,7 +12,6 @@ LDFLAGS_STRIP = --gc-sections
 
 CFLAGS_NO_HW_MULDIV = -mnohwmult -mnohwdiv -ffixed-lo -ffixed-hi
 GCC_mips = mips-elf-gcc -Wall -O2 -c -mips2 -mno-branch-likely -mpatfree -mfix-r4000 -mno-check-zero-division -msoft-float -ffreestanding -nostdlib -fomit-frame-pointer -G 0 -I ./include -DCPU_SPEED=${F_CLK} -DBIG_ENDIAN $(CFLAGS_NO_HW_MULDIV) $(CFLAGS_STRIP) #-DDEBUG_PORT
-
 AS_mips = mips-elf-as -mips1 -msoft-float
 LD_mips = mips-elf-ld -mips1 $(LDFLAGS_STRIP)
 DUMP_mips = mips-elf-objdump
@@ -42,6 +41,7 @@ debug: serial
 crt:
 	$(AS_$(ARCH)) -o crt0.o lib/$(ARCH)/crt0.s
 	$(GCC_$(ARCH)) -o libc.o lib/libc.c
+	$(GCC_$(ARCH)) -o interrupt.o lib/interrupt.c
 	$(GCC_$(ARCH)) -o math.o lib/math.c
 
 link:	
@@ -127,7 +127,7 @@ core_test: crt
 euler: crt
 	$(GCC_$(ARCH)) -o euler.o app/euler.c
 	@$(MAKE) --no-print-directory link
-	
+
 euler_fixed: crt
 	$(GCC_$(ARCH)) -o euler.o app/euler_fixed.c
 	@$(MAKE) --no-print-directory link
@@ -162,6 +162,14 @@ interrupt_test: crt
 	$(GCC_$(ARCH)) -o interrupt_test.o app/interrupt_test.c
 	@$(MAKE) --no-print-directory link
 
+labyrinth: crt
+	$(GCC_$(ARCH)) -o labyrinth.o app/labyrinth.c
+	@$(MAKE) --no-print-directory link
+
+mem_test: crt
+	$(GCC_$(ARCH)) -o mem_test.o app/mem_test.c
+	@$(MAKE) --no-print-directory link
+
 newton: crt
 	$(GCC_$(ARCH)) -o newton.o app/newton.c
 	@$(MAKE) --no-print-directory link
@@ -189,7 +197,7 @@ test_crc: crt
 test_fp: crt
 	$(GCC_$(ARCH)) -o test_fp.o app/test_fp.c
 	@$(MAKE) --no-print-directory link
-	
+
 test_fixed: crt
 	$(GCC_$(ARCH)) -o test_fixed.o app/test_fixed.c
 	@$(MAKE) --no-print-directory link
@@ -229,6 +237,7 @@ test: crt
 	@$(MAKE) --no-print-directory link
 
 include app/malardalen/malardalen.mak
+include app/powerstone/powerstone.mak
 
 clean:
 	-rm -rf *~ *.o *.elf *.map *.lst *.sec *.cnt *.txt *.bin *.vhd
