@@ -48,6 +48,7 @@ module top_hf_riscv;
 	assign data_w_n_ram = ~busmux_mem.data_we;
 
 	// HF-RISC core
+	// TODO VFSD 2019/1 - trocar p entidade processor
 	datapath core(	
          .clock (cpu_busmux.clock_in),
 			.reset (cpu_busmux.reset),
@@ -64,6 +65,7 @@ module top_hf_riscv;
 	);
 
    // Peripherals / busmux logic
+   // TODO VFSD 2019/1 - trocar peripherals. o minimal_soc_vhd nao tem serial, mas gostaria de tentar a versao c serial, q esta no arquivo basic_soc_uart.vhd
    busmux #(
 		.log_file("out.txt"),
 		.uart_support("no")
