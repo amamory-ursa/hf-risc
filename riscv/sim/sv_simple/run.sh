@@ -6,12 +6,12 @@ module load modelsim
 
 vdel -all
 
-cd ../../software
+cd ../../../software
 make clean clean $1
 cd -
 
 rm -rf code.txt
-cp -f ../../software/code.txt .
+cp -f ../../../software/code.txt .
 
 vsim -c -do sim.do -t 10ps
 
