@@ -3,96 +3,120 @@
 
 module top_hf_riscv;
 
-	bit clock_in, boot_enable_n, ram_enable_n, ram_dly;
-	bit [31:0] data_read_boot, data_read_ram; 
+	bit clock_in, periph_dly, periph, ram_enable_n, ram_dly, periph_wr, periph_irq, gpio_sig, boot_enable_n;
 	bit [3:0] data_w_n_ram;
+	bit [7:0] gpioa_in, gpioa_out, gpioa_ddr;
+	bit [31:0] data_write_periph, data_read_periph_s, data_read_periph, data_read_boot, data_read_ram;
 
-	interface_cpu_busmux cpu_busmux (clock_in);
-	interface_busmux_mem busmux_mem (clock_in);
+	interface_processor_peripherals processor_peripherals(clock_in);
 
 	always #20 clock_in = ~clock_in;
-	
-	always@(posedge clock_in)
-	begin
-		if (cpu_busmux.reset == 1) begin
-			ram_dly <= 0;
-		end else begin
-			ram_dly <= ~ram_enable_n;
-		end
-	end
 
-	always@(busmux_mem.address or cpu_busmux.stall_cpu or cpu_busmux.reset or boot_enable_n)
+
+	always@(processor_peripherals.address or processor_peripherals.stall_sig or processor_peripherals.reset)
 	begin
-		if ((busmux_mem.address[31:28] == 0 && cpu_busmux.stall_cpu == 0) || cpu_busmux.reset == 1)
+		if ((processor_peripherals.address[31:28] == 0 && processor_peripherals.stall_sig == 0) || processor_peripherals.reset == 1)
 			boot_enable_n = 0;
 		else	
 			boot_enable_n = 1;
 	end
 
-	always@(busmux_mem.address or cpu_busmux.stall_cpu or cpu_busmux.reset or ram_enable_n)
+	always@(processor_peripherals.address or processor_peripherals.stall_sig or processor_peripherals.reset or ram_enable_n)
 	begin
-		if ((busmux_mem.address[31:28] == 4 && cpu_busmux.stall_cpu == 0) || cpu_busmux.reset == 1)
+		if ((processor_peripherals.address[31:28] == 4 && processor_peripherals.stall_sig == 0) || processor_peripherals.reset == 1)
 			ram_enable_n = 0;
 		else
 			ram_enable_n = 1;
 	end
 
-	always@(busmux_mem.address or ram_dly or busmux_mem.data_read or data_read_boot or data_read_ram)
+	assign data_w_n_ram = ~processor_peripherals.data_we;
+	assign processor_peripherals.ext_orq = 0; // open!
+
+	// New atributions
+	always@(posedge clock_in, processor_peripherals.reset)
 	begin
-		if (busmux_mem.address[31:28] == 0 && ram_dly == 0)
-			busmux_mem.data_read = data_read_boot;
-		else
-			busmux_mem.data_read = data_read_ram;
+		if (processor_peripherals.reset == 1) begin
+			ram_dly <= 0;
+			periph_dly <= 0;
+		end else begin
+			ram_dly <= ~ram_enable_n;
+			periph_dly <= periph;
+		end
 	end
 
-	assign data_w_n_ram = ~busmux_mem.data_we;
+	always@(processor_peripherals.address)
+	begin
+		if (processor_peripherals.address[31:28] == 14)
+			periph = 1;
+		else
+			periph = 0;
+	end
+
+	always@(processor_peripherals.data_we)
+	begin
+		if (processor_peripherals.data_we != 0)
+			periph_wr = 1;
+		else
+			periph_wr = 0;
+	end
+
+	always@(processor_peripherals.data_write)
+	begin
+		data_write_periph <= {processor_peripherals.data_write[7:0], processor_peripherals.data_write[15:8], processor_peripherals.data_write[23:16], processor_peripherals.data_write[31:24]};
+	end
+
+	always@(data_read_periph_s)
+	begin
+		data_read_periph <= {data_read_periph_s[7:0], data_read_periph_s[15:8], data_read_periph_s[23:16], data_read_periph_s[31:24]};
+	end
+
+	always@(data_read_periph or periph or periph_dly or processor_peripherals.address or ram_dly or data_read_ram or data_read_boot or data_read_periph)
+	begin
+		if (periph == 1 || periph_dly == 1) 
+			processor_peripherals.data_read = data_read_periph;
+		else if (processor_peripherals.address[31:28] == 0 && ram_dly == 0)
+			processor_peripherals.data_read = data_read_boot;
+		else
+			processor_peripherals.data_read = data_read_ram;
+	end
+
+	always@(periph_irq)
+	begin
+		processor_peripherals.ext_irq <= {"0000000", periph_irq};
+	end
+
+	always@(gpio_sig)
+	begin
+		gpioa_in <= {"0000", gpio_sig, "000"};
+	end
+
 
 	// HF-RISC core
-	// TODO VFSD 2019/1 - trocar p entidade processor
-	datapath core(	
-         .clock (cpu_busmux.clock_in),
-			.reset (cpu_busmux.reset),
-			.stall (cpu_busmux.stall_cpu),
-			.irq_vector (cpu_busmux.irq_vector_cpu),
-			.irq (cpu_busmux.irq_cpu),
-			.irq_ack (cpu_busmux.irq_ack_cpu),
-			.exception (cpu_busmux.exception_cpu),
-			.address (cpu_busmux.address_cpu),
-			.data_in (cpu_busmux.data_in_cpu),
-			.data_out (cpu_busmux.data_out_cpu),
-			.data_w (cpu_busmux.data_w_cpu),
-			.data_access (cpu_busmux.data_access_cpu)
+	processor cpu(	
+         	.clk_i 		(processor_peripherals.clock_in),
+			.rst_i		(processor_peripherals.reset),
+			.stall_i	(processor_peripherals.stall_sig),
+			.addr_o		(processor_peripherals.address),
+			.data_i 	(processor_peripherals.data_read),
+			.data_o 	(processor_peripherals.data_write),
+			.data_w_o	(processor_peripherals.data_we),
+			.extio_in 	(processor_peripherals.ext_irq),
+			.extio_out 	(processor_peripherals.ext_orq)
 	);
 
    // Peripherals / busmux logic
-   // TODO VFSD 2019/1 - trocar peripherals. o minimal_soc_vhd nao tem serial, mas gostaria de tentar a versao c serial, q esta no arquivo basic_soc_uart.vhd
-   busmux #(
-		.log_file("out.txt"),
-		.uart_support("no")
-	)
-	peripherals_busmux(
-		.clock (cpu_busmux.clock_in),
-		.reset (cpu_busmux.reset),
-		.stall (cpu_busmux.stall),
-		.stall_cpu (cpu_busmux.stall_cpu),
-		.irq_vector_cpu (cpu_busmux.irq_vector_cpu),
-		.irq_cpu (cpu_busmux.irq_cpu),
-		.irq_ack_cpu (cpu_busmux.irq_ack_cpu),
-		.exception_cpu (cpu_busmux.exception_cpu),
-		.address_cpu (cpu_busmux.address_cpu),
-		.data_in_cpu (cpu_busmux.data_in_cpu),
-		.data_out_cpu (cpu_busmux.data_out_cpu),
-		.data_w_cpu (cpu_busmux.data_w_cpu),
-		.data_access_cpu (cpu_busmux.data_access_cpu),
-		
-      	.addr_mem (busmux_mem.address),
-		.data_read_mem (busmux_mem.data_read),
-		.data_write_mem (busmux_mem.data_write),
-		.data_we_mem (busmux_mem.data_we),
-		.extio_in (8'h00),
-		.extio_out (),
-		.uart_read (1'b1),
-		.uart_write () 
+	peripherals perif(
+		.clk_i 		(processor_peripherals.clock_in),
+		.rst_i		(processor_peripherals.reset),
+		.addr_i 	(processor_peripherals.address),
+		.data_i		(data_write_periph),
+		.data_o		(data_read_periph_s),
+		.sel_i		(periph),
+		.wr_i 		(periph_wr),
+		.irq_o 		(periph_irq),
+		.gpioa_in	(gpioa_in),
+		.gpioa_out	(gpioa_out),
+		.gpioa_ddr 	(gpioa_ddr)
 	);
 
    // Boot ROM
@@ -103,9 +127,9 @@ module top_hf_riscv;
 	  .bank (0)
    )
    boot0lb(
-		.clk (clock_in),
-		.addr (busmux_mem.address[11:2]),
-		.cs_n (boot_enable_n),
+		.clk 	(clock_in),
+		.addr 	(processor_peripherals.address[11:2]),
+		.cs_n 	(boot_enable_n),
 		.we_n	(1'b1),
 		.data_i (8'h00),
 		.data_o (data_read_boot[7:0])
@@ -118,9 +142,9 @@ module top_hf_riscv;
 	  .bank (1)
    )
    boot0ub(
-		.clk (clock_in),
-		.addr (busmux_mem.address[11:2]),
-		.cs_n (boot_enable_n),
+		.clk 	(clock_in),
+		.addr 	(processor_peripherals.address[11:2]),
+		.cs_n 	(boot_enable_n),
 		.we_n	(1'b1),
 		.data_i (8'h00),
 		.data_o (data_read_boot[15:8])
@@ -133,9 +157,9 @@ module top_hf_riscv;
 	  .bank (2)
    )
    boot1lb(
-		.clk (clock_in),
-		.addr (busmux_mem.address[11:2]),
-		.cs_n (boot_enable_n),
+		.clk 	(clock_in),
+		.addr 	(processor_peripherals.address[11:2]),
+		.cs_n 	(boot_enable_n),
 		.we_n	(1'b1),
 		.data_i (8'h00),
 		.data_o (data_read_boot[23:16])
@@ -149,9 +173,9 @@ module top_hf_riscv;
 		.bank (3)
    )
    boot1ub(
-		.clk (clock_in),
-		.addr (busmux_mem.address[11:2]),
-		.cs_n (boot_enable_n),
+		.clk 	(clock_in),
+		.addr 	(processor_peripherals.address[11:2]),
+		.cs_n 	(boot_enable_n),
 		.we_n	(1'b1),
 		.data_i (8'h00),
 		.data_o (data_read_boot[31:24])
@@ -166,10 +190,10 @@ module top_hf_riscv;
 	)
 	memory0lb(
 	   .clk 	(clock_in),
-	   .addr (busmux_mem.address[15:2]),
-	   .cs_n (ram_enable_n),
+	   .addr 	(processor_peripherals.address[15:2]),
+	   .cs_n 	(ram_enable_n),
 	   .we_n	(data_w_n_ram[0]),
-	   .data_i (busmux_mem.data_write[7:0]),
+	   .data_i 	(processor_peripherals.data_write[7:0]),
 	   .data_o	(data_read_ram[7:0])
 	);
 
@@ -181,10 +205,10 @@ module top_hf_riscv;
 	)
 	memory0ub(
 	   .clk 	(clock_in),
-	   .addr (busmux_mem.address[15:2]),
-	   .cs_n (ram_enable_n),
+	   .addr 	(processor_peripherals.address[15:2]),
+	   .cs_n 	(ram_enable_n),
 	   .we_n	(data_w_n_ram[1]),
-	   .data_i (busmux_mem.data_write[15:8]),
+	   .data_i 	(processor_peripherals.data_write[15:8]),
 	   .data_o	(data_read_ram[15:8])
 	);
 
@@ -196,10 +220,10 @@ module top_hf_riscv;
 	)
 	memory1lb(
 	   .clk 	(clock_in),
-	   .addr (busmux_mem.address[15:2]),
-	   .cs_n (ram_enable_n),
+	   .addr 	(processor_peripherals.address[15:2]),
+	   .cs_n 	(ram_enable_n),
 	   .we_n	(data_w_n_ram[2]),
-	   .data_i (busmux_mem.data_write[23:16]),
+	   .data_i 	(processor_peripherals.data_write[23:16]),
 	   .data_o	(data_read_ram[23:16])
 	);
 
@@ -211,14 +235,14 @@ module top_hf_riscv;
 	)
 	memory1ub(
 	   .clk 	(clock_in),
-	   .addr (busmux_mem.address[15:2]),
-	   .cs_n (ram_enable_n),
+	   .addr 	(processor_peripherals.address[15:2]),
+	   .cs_n 	(ram_enable_n),
 	   .we_n	(data_w_n_ram[3]),
-	   .data_i (busmux_mem.data_write[31:24]),
+	   .data_i 	(processor_peripherals.data_write[31:24]),
 	   .data_o	(data_read_ram[31:24])
 	);	
 
 	// Test process
-	test_hf_riscv test (cpu_busmux, busmux_mem);
+	test_hf_riscv test (processor_peripherals);
 
 endmodule : top_hf_riscv

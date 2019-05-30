@@ -1,0 +1,559 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/home/iacana/git_workspace/hf-risc/riscv/sim/sv_simple
+Ealu
+Z1 w1559142332
+Z2 DPx4 ieee 15 std_logic_arith 0 22 [G314=:2zXJ`VORJe1J@Z1
+Z3 DPx4 ieee 18 std_logic_unsigned 0 22 ;eZjO2D4ZDz<]0>8AL<ne1
+Z4 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z5 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
+R0
+Z6 8../../core_rv32i/alu.vhd
+Z7 F../../core_rv32i/alu.vhd
+l0
+L5
+VWggcQllD:HJ7S;6^]i8Og3
+!s100 gQC02bWgh>[3bGSk[?JLS2
+Z8 OL;C;10.3c;59
+31
+Z9 !s110 1559249346
+!i10b 1
+Z10 !s108 1559249346.095880
+Z11 !s90 -93|-explicit|../../core_rv32i/alu.vhd|
+Z12 !s107 ../../core_rv32i/alu.vhd|
+!i113 0
+Z13 o-93 -explicit
+Z14 tExplicit 1
+Aarch_alu
+Z15 DEx4 work 6 bshift 0 22 BWE[DhV2i2LI=N7mioM1D1
+R2
+R3
+R4
+R5
+Z16 DEx4 work 3 alu 0 22 WggcQllD:HJ7S;6^]i8Og3
+31
+R9
+l20
+L15
+V0DChAag^c:iQ?e:N][QdD1
+!s100 Ki:G_5nLf>_O<:J5bBQ>Z0
+R8
+!i10b 1
+R10
+R11
+R12
+!i113 0
+R13
+R14
+Eboot_ram
+Z17 w1559142452
+Z18 DPx4 ieee 16 std_logic_textio 0 22 V5TSK`;aJKC<l]CEg1>mz1
+R3
+R2
+R4
+R5
+R0
+Z19 8../vhdl/boot_ram.vhd
+Z20 F../vhdl/boot_ram.vhd
+l0
+L8
+VX3[QmLW`U=NVG0BWkT5:T2
+!s100 ohDCAkc9Lad_^4HGhM]oJ2
+R8
+31
+Z21 !s110 1559249347
+!i10b 1
+Z22 !s108 1559249347.106837
+Z23 !s90 -93|-explicit|../vhdl/boot_ram.vhd|
+Z24 !s107 ../vhdl/boot_ram.vhd|
+!i113 0
+R13
+R14
+Amemory
+R18
+R3
+R2
+R4
+R5
+DEx4 work 8 boot_ram 0 22 X3[QmLW`U=NVG0BWkT5:T2
+31
+R21
+l28
+L23
+VDz[K;dmn@KLn9Amz642MY2
+!s100 z7628IND3i@KJbOEI?e4n0
+R8
+!i10b 1
+R22
+R23
+R24
+!i113 0
+R13
+R14
+Ebram
+R17
+R18
+R3
+R2
+R4
+R5
+R0
+Z25 8../vhdl/ram.vhd
+Z26 F../vhdl/ram.vhd
+l0
+L8
+V1eRAM1BWgV0ASh2`GN[Wa3
+!s100 lej2N2=:>LalFPBnRg0E=3
+R8
+31
+R21
+!i10b 1
+Z27 !s108 1559249347.159306
+Z28 !s90 -93|-explicit|../vhdl/ram.vhd|
+Z29 !s107 ../vhdl/ram.vhd|
+!i113 0
+R13
+R14
+Amemory
+R18
+R3
+R2
+R4
+R5
+DEx4 work 4 bram 0 22 1eRAM1BWgV0ASh2`GN[Wa3
+31
+R21
+l28
+L23
+VfgTjj2InQnG`<5Q@M68LM2
+!s100 MYn1TnWcDUEBTk8YKhaH]3
+R8
+!i10b 1
+R27
+R28
+R29
+!i113 0
+R13
+R14
+Ebshift
+R1
+R4
+R5
+R0
+Z30 8../../core_rv32i/bshifter.vhd
+Z31 F../../core_rv32i/bshifter.vhd
+l0
+L4
+VBWE[DhV2i2LI=N7mioM1D1
+!s100 ZlTmXIkgLP2V<e22>34DQ2
+R8
+31
+R9
+!i10b 1
+Z32 !s108 1559249346.030190
+Z33 !s90 -93|-explicit|../../core_rv32i/bshifter.vhd|
+Z34 !s107 ../../core_rv32i/bshifter.vhd|
+!i113 0
+R13
+R14
+Alogic
+R4
+R5
+R15
+31
+R9
+l17
+L13
+VR@Kh>EK5G7^[S;1h2ACPF1
+!s100 ZkK<^_JmZl3b2?dSik6DL0
+R8
+!i10b 1
+R32
+R33
+R34
+!i113 0
+R13
+R14
+Econtrol
+R1
+R2
+R3
+R4
+R5
+R0
+Z35 8../../core_rv32i/control.vhd
+Z36 F../../core_rv32i/control.vhd
+l0
+L25
+V<1XDWR[D<YjakQ`8LAPod1
+!s100 zohUQm`R1K_[[mAa6TTUK2
+R8
+31
+R9
+!i10b 1
+Z37 !s108 1559249346.425022
+Z38 !s90 -93|-explicit|../../core_rv32i/control.vhd|
+Z39 !s107 ../../core_rv32i/control.vhd|
+!i113 0
+R13
+R14
+Aarch_control
+R2
+R3
+R4
+R5
+Z40 DEx4 work 7 control 0 22 <1XDWR[D<YjakQ`8LAPod1
+31
+R9
+l42
+L41
+V;09dDa@e^MnR4J5]KL:PD1
+!s100 RV::Z][Czc3YcklIWIihm2
+R8
+!i10b 1
+R37
+R38
+R39
+!i113 0
+R13
+R14
+Edatapath
+R1
+R2
+R3
+R4
+R5
+R0
+Z41 8../../core_rv32i/datapath.vhd
+Z42 F../../core_rv32i/datapath.vhd
+l0
+L6
+V42PS;lAQGH@FDG63A[a701
+!s100 ?>;g1b@QfD:Gci]A;EZnm0
+R8
+31
+R9
+!i10b 1
+Z43 !s108 1559249346.486448
+Z44 !s90 -93|-explicit|../../core_rv32i/datapath.vhd|
+Z45 !s107 ../../core_rv32i/datapath.vhd|
+!i113 0
+R13
+R14
+Aarch_datapath
+R16
+Z46 DEx4 work 8 reg_bank 0 22 zDPR1;WC;N57jG:d^W>YN3
+R40
+R2
+R3
+R4
+R5
+Z47 DEx4 work 8 datapath 0 22 42PS;lAQGH@FDG63A[a701
+31
+R9
+l53
+L27
+VlMf0GMJ0VU^NZzMF2[B591
+!s100 _1IiMd@g@AbZe48T:BQ9R0
+R8
+!i10b 1
+R43
+R44
+R45
+!i113 0
+R13
+R14
+Yinterface_processor_peripherals
+Z48 DXx6 sv_std 3 std 0 22 <EOTafDcUY:cQeO^ICn]m3
+Z49 V`JN@9S9cnhjKRR_L]QIcM3
+r1
+!s85 0
+31
+!i10b 1
+!s100 ?oLoS47l4:`8TIK1dzDYH1
+I[8glH26Ydb6[dCKz;z[Db3
+!s105 interface_processor_peripherals_sv_unit
+S1
+R0
+w1559243491
+8interface_processor_peripherals.sv
+Finterface_processor_peripherals.sv
+L0 4
+Z50 OL;L;10.3c;59
+!s108 1559249347.202820
+!s107 interface_processor_peripherals.sv|
+!s90 -work|work|interface_processor_peripherals.sv|
+!i113 0
+Z51 o-work work -L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Einterrupt_controller
+R1
+R2
+R3
+R4
+R5
+R0
+Z52 8../../core_rv32i/int_control.vhd
+Z53 F../../core_rv32i/int_control.vhd
+l0
+L6
+V=n<VdaCFaE;9zcXg;YMYT2
+!s100 Mg]Jz>gheORW2jSh^@AO=1
+R8
+31
+R9
+!i10b 1
+Z54 !s108 1559249346.541544
+Z55 !s90 -93|-explicit|../../core_rv32i/int_control.vhd|
+Z56 !s107 ../../core_rv32i/int_control.vhd|
+!i113 0
+R13
+R14
+Aarch_interrupt_controller
+R2
+R3
+R4
+R5
+Z57 DEx4 work 20 interrupt_controller 0 22 =n<VdaCFaE;9zcXg;YMYT2
+31
+R9
+l44
+L32
+V]OJ;_P6Q3?5V]aMD_BWK>3
+!s100 F6Xe_PR?G6gD[<^mGDDDE0
+R8
+!i10b 1
+R54
+R55
+R56
+!i113 0
+R13
+R14
+Eperipherals
+R1
+R2
+R3
+R4
+R5
+R0
+Z58 8../../../devices/peripherals/basic_soc_uart.vhd
+Z59 F../../../devices/peripherals/basic_soc_uart.vhd
+l0
+L14
+V[Kn[DM=M:f3F;5SE5EQ;R0
+!s100 nS?NG64I@Pel[c_`>b>NV1
+R8
+31
+R21
+!i10b 1
+Z60 !s108 1559249347.029861
+Z61 !s90 -93|-explicit|../../../devices/peripherals/basic_soc_uart.vhd|
+Z62 !s107 ../../../devices/peripherals/basic_soc_uart.vhd|
+!i113 0
+R13
+R14
+Aperipherals_arch
+R18
+Z63 DEx4 work 4 uart 0 22 B7iGk0@`EWBDfTgMon;an0
+R2
+R3
+R4
+R5
+DEx4 work 11 peripherals 0 22 [Kn[DM=M:f3F;5SE5EQ;R0
+31
+R21
+l52
+L30
+VLA9SLo8;j8hO2CK_z1zMY0
+!s100 bNYTjAC3]OSj<;[FkJ3183
+R8
+!i10b 1
+R60
+R61
+R62
+!i113 0
+R13
+R14
+Eprocessor
+Z64 w1559233483
+R2
+R3
+R4
+R5
+R0
+Z65 8../../core_rv32i/cpu.vhd
+Z66 F../../core_rv32i/cpu.vhd
+l0
+L6
+V:k:=f?N:[e<=E_IiV8=f`2
+!s100 <Sb=YhN7<o``Y4f?z>KRE3
+R8
+31
+R9
+!i10b 1
+Z67 !s108 1559249346.652464
+Z68 !s90 -93|-explicit|../../core_rv32i/cpu.vhd|
+Z69 !s107 ../../core_rv32i/cpu.vhd|
+!i113 0
+R13
+R14
+Aarch_processor
+R57
+R47
+R2
+R3
+R4
+R5
+DEx4 work 9 processor 0 22 :k:=f?N:[e<=E_IiV8=f`2
+31
+R9
+l26
+L22
+Vd9n04Z7=EI;[Y<f33B1<;2
+!s100 2b@Mfhl3:V9iA8hYP0`Ka1
+R8
+!i10b 1
+R67
+R68
+R69
+!i113 0
+R13
+R14
+Ereg_bank
+R1
+R2
+R3
+R4
+R5
+R0
+Z70 8../../core_rv32i/reg_bank.vhd
+Z71 F../../core_rv32i/reg_bank.vhd
+l0
+L5
+VzDPR1;WC;N57jG:d^W>YN3
+!s100 AGQ3PNV[O^PC6n3<S4L0k0
+R8
+31
+R9
+!i10b 1
+Z72 !s108 1559249346.251745
+Z73 !s90 -93|-explicit|../../core_rv32i/reg_bank.vhd|
+Z74 !s107 ../../core_rv32i/reg_bank.vhd|
+!i113 0
+R13
+R14
+Aarch_reg_bank
+R2
+R3
+R4
+R5
+R46
+31
+R9
+l20
+L17
+VWOJKZR6fGlL`B4j@hj9Yl3
+!s100 F1Lj2naZ>H5>9dz?6UfA63
+R8
+!i10b 1
+R72
+R73
+R74
+!i113 0
+R13
+R14
+vtest_hf_riscv
+R48
+R49
+r1
+!s85 0
+31
+!i10b 1
+!s100 o]D1=8U`KU6ROJQLF`T`70
+IZZiY55QFW=Z>L64IoOc0@2
+!s105 test_hf_riscv_sv_unit
+S1
+R0
+w1559247045
+8test_hf_riscv.sv
+Ftest_hf_riscv.sv
+L0 4
+R50
+!s108 1559249347.276241
+!s107 test_hf_riscv.sv|
+!s90 -work|work|test_hf_riscv.sv|
+!i113 0
+R51
+vtop_hf_riscv
+R48
+R49
+r1
+!s85 0
+31
+!i10b 1
+!s100 9biIIh;d2@[JX>B__aO;T3
+I]bGBQ:21WGJRQIVXz6TlI2
+!s105 top_hf_riscv_sv_unit
+S1
+R0
+w1559249143
+8top_hf_riscv.sv
+Ftop_hf_riscv.sv
+L0 4
+R50
+!s108 1559249347.393882
+!s107 top_hf_riscv.sv|
+!s90 -work|work|top_hf_riscv.sv|
+!i113 0
+R51
+Euart
+R1
+R2
+R3
+R18
+R4
+R5
+R0
+Z75 8../../../devices/controllers/uart/uart.vhd
+Z76 F../../../devices/controllers/uart/uart.vhd
+l0
+L7
+VB7iGk0@`EWBDfTgMon;an0
+!s100 _cha3>g2kOdb<71:cna8c0
+R8
+31
+R21
+!i10b 1
+Z77 !s108 1559249346.751615
+Z78 !s90 -93|-explicit|../../../devices/controllers/uart/uart.vhd|
+Z79 !s107 ../../../devices/controllers/uart/uart.vhd|
+!i113 0
+R13
+R14
+Alogic
+R2
+R3
+R18
+R4
+R5
+R63
+31
+R21
+l34
+L22
+VTR?SQNMGJA<2[^fgm;;;i0
+!s100 _AaE1;lO[fWk6A>LE[oNb3
+R8
+!i10b 1
+R77
+R78
+R79
+!i113 0
+R13
+R14
