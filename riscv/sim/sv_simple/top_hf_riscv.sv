@@ -15,7 +15,7 @@ module top_hf_riscv;
 
 	always@(processor_peripherals.address or processor_peripherals.stall_sig or processor_peripherals.reset)
 	begin
-		if ((processor_peripherals.address[31:28] == 0 && processor_peripherals.stall_sig == 0) || processor_peripherals.reset == 1)
+		if ((processor_peripherals.address[31:28] == 4'b0000 && processor_peripherals.stall_sig == 0) || processor_peripherals.reset == 1)
 			boot_enable_n = 0;
 		else	
 			boot_enable_n = 1;
@@ -23,14 +23,13 @@ module top_hf_riscv;
 
 	always@(processor_peripherals.address or processor_peripherals.stall_sig or processor_peripherals.reset or ram_enable_n)
 	begin
-		if ((processor_peripherals.address[31:28] == 4 && processor_peripherals.stall_sig == 0) || processor_peripherals.reset == 1)
+		if ((processor_peripherals.address[31:28] == 4'b0100 && processor_peripherals.stall_sig == 0) || processor_peripherals.reset == 1)
 			ram_enable_n = 0;
 		else
 			ram_enable_n = 1;
 	end
 
 	assign data_w_n_ram = ~processor_peripherals.data_we;
-	assign processor_peripherals.ext_orq = 0; // open!
 
 	// New atributions
 	always@(posedge clock_in, processor_peripherals.reset)
@@ -46,7 +45,7 @@ module top_hf_riscv;
 
 	always@(processor_peripherals.address)
 	begin
-		if (processor_peripherals.address[31:28] == 14)
+		if (processor_peripherals.address[31:28] == 4'he)
 			periph = 1;
 		else
 			periph = 0;
@@ -54,7 +53,7 @@ module top_hf_riscv;
 
 	always@(processor_peripherals.data_we)
 	begin
-		if (processor_peripherals.data_we != 0)
+		if (processor_peripherals.data_we != 4'b0000)
 			periph_wr = 1;
 		else
 			periph_wr = 0;
@@ -74,7 +73,7 @@ module top_hf_riscv;
 	begin
 		if (periph == 1 || periph_dly == 1) 
 			processor_peripherals.data_read = data_read_periph;
-		else if (processor_peripherals.address[31:28] == 0 && ram_dly == 0)
+		else if (processor_peripherals.address[31:28] == 4'b0000 && ram_dly == 0)
 			processor_peripherals.data_read = data_read_boot;
 		else
 			processor_peripherals.data_read = data_read_ram;
@@ -82,14 +81,13 @@ module top_hf_riscv;
 
 	always@(periph_irq)
 	begin
-		processor_peripherals.ext_irq <= {"0000000", periph_irq};
+		processor_peripherals.ext_irq <= {7'b0000000, periph_irq};
 	end
 
 	always@(gpio_sig)
 	begin
-		gpioa_in <= {"0000", gpio_sig, "000"};
+		gpioa_in <= {4'b0000, gpio_sig, 3'b000};
 	end
-
 
 	// HF-RISC core
 	processor cpu(	

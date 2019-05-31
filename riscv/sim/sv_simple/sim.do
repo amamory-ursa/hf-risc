@@ -13,9 +13,9 @@ vcom -93 -explicit ../../core_rv32i/datapath.vhd
 vcom -93 -explicit ../../core_rv32i/int_control.vhd
 vcom -93 -explicit ../../core_rv32i/cpu.vhd
 # peripheral
-#vcom -93 -explicit ../../../devices/peripherals/minimal_soc.vhd
+vcom -93 -explicit ../../../devices/peripherals/minimal_soc.vhd
 vcom -93 -explicit ../../../devices/controllers/uart/uart.vhd
-vcom -93 -explicit ../../../devices/peripherals/basic_soc_uart.vhd
+#vcom -93 -explicit ../../../devices/peripherals/basic_soc_uart.vhd
 vcom -93 -explicit ../vhdl/boot_ram.vhd
 vcom -93 -explicit ../vhdl/ram.vhd
 # tb
@@ -38,7 +38,7 @@ set StdArithNoWarnings 0
 set StdNumNoWarnings 0
 set NumericStdNoWarnings 0
 
+run -all
 
-run 10000 ns
-
+quit
 

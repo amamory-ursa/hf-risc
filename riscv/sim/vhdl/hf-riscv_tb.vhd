@@ -44,7 +44,7 @@ begin
 		gpio_sig <= not gpio_sig;
 	end process;
 
-	--gpioa_in <= "0000" & gpio_sig & "000";
+	gpioa_in <= "0000" & gpio_sig & "000";
 
 	process
 	begin
@@ -55,12 +55,12 @@ begin
 	end process;
 
 	reset <= '0', '1' after 5 ns, '0' after 500 ns;
-	--stall_sig <= '0'; --stall;
-	--ext_irq <= "0000000" & periph_irq;
+	stall_sig <= '0'; --stall;
+	ext_irq <= "0000000" & periph_irq;
 
-	--boot_enable_n <= '0' when (address(31 downto 28) = "0000" and stall_sig = '0') or reset = '1' else '1';
-	--ram_enable_n <= '0' when (address(31 downto 28) = "0100" and stall_sig = '0') or reset = '1' else '1';
-	--data_read <= data_read_periph when periph = '1' or periph_dly = '1' else data_read_boot when address(31 downto 28) = "0000" and ram_dly = '0' else data_read_ram;
+	boot_enable_n <= '0' when (address(31 downto 28) = "0000" and stall_sig = '0') or reset = '1' else '1';
+	ram_enable_n <= '0' when (address(31 downto 28) = "0100" and stall_sig = '0') or reset = '1' else '1';
+	data_read <= data_read_periph when periph = '1' or periph_dly = '1' else data_read_boot when address(31 downto 28) = "0000" and ram_dly = '0' else data_read_ram;
 	data_w_n_ram <= not data_we;
 
 	process(clock_in, reset)
@@ -77,20 +77,20 @@ begin
 	-- HF-RISCV core
 	processor: entity work.processor
 	port map(	clk_i => clock_in,
-				rst_i => reset,
-				stall_i => stall_sig,
-				addr_o => address,
-				data_i => data_read,
-				data_o => data_write,
-				data_w_o => data_we,
-				extio_in => ext_irq,
-				extio_out => open
+			rst_i => reset,
+			stall_i => stall_sig,
+			addr_o => address,
+			data_i => data_read,
+			data_o => data_write,
+			data_w_o => data_we,
+			extio_in => ext_irq,
+			extio_out => open
 	);
 
-	--data_read_periph <= data_read_periph_s(7 downto 0) & data_read_periph_s(15 downto 8) & data_read_periph_s(23 downto 16) & data_read_periph_s(31 downto 24);
-	--data_write_periph <= data_write(7 downto 0) & data_write(15 downto 8) & data_write(23 downto 16) & data_write(31 downto 24);
-	--periph_wr <= '1' when data_we /= "0000" else '0';
-	--periph <= '1' when address(31 downto 28) = x"e" else '0';
+	data_read_periph <= data_read_periph_s(7 downto 0) & data_read_periph_s(15 downto 8) & data_read_periph_s(23 downto 16) & data_read_periph_s(31 downto 24);
+	data_write_periph <= data_write(7 downto 0) & data_write(15 downto 8) & data_write(23 downto 16) & data_write(31 downto 24);
+	periph_wr <= '1' when data_we /= "0000" else '0';
+	periph <= '1' when address(31 downto 28) = x"e" else '0';
 
 	peripherals: entity work.peripherals
 	port map(

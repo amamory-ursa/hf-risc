@@ -15,5 +15,5 @@ cp -f ../../../software/code.txt .
 
 vsim -c -do sim.do -t 10ps
 
-cat debug.txt
+cat sv_debug.txt
 

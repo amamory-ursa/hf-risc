@@ -13,10 +13,7 @@ cd -
 rm -rf code.txt
 cp -f ../../../software/code.txt .
 
-vsim -do sim.do -t 10ps
-
-#vsim -c -do sim.do -t 10ps
-
+vsim -c -do sim.do -t 10ps
 
 cat debug.txt
 

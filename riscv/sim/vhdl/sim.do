@@ -30,7 +30,7 @@ set StdNumNoWarnings 0
 set NumericStdNoWarnings 0
 
 
-do wave.do
+#do wave.do
 
 run -all
 
