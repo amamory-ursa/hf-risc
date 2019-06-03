@@ -1,5 +1,5 @@
 `ifndef ENVIRONMENT_SV
- `define ENVIRONMENT_SV
+`define ENVIRONMENT_SV
 
  `include "hfrv_interface.sv"
  `include "generator.sv"
