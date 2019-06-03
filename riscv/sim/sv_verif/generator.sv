@@ -21,6 +21,7 @@ class generator;
 
    task run();
       begin
+         $display("generating ram");
          ram = new(path, 32'h40000000, 'h100000);
          gen2agent.put(ram);
          // Waiting DUT to finish

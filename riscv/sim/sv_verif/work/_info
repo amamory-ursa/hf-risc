@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 d/home/marcelo/VFSD/marcelo/hf-risc/riscv/sim/sv_verif
 Ealu
-Z1 w1559570336
+Z1 w1559584914
 Z2 DPx4 ieee 15 std_logic_arith 0 22 [G314=:2zXJ`VORJe1J@Z1
 Z3 DPx4 ieee 18 std_logic_unsigned 0 22 ;eZjO2D4ZDz<]0>8AL<ne1
 Z4 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
@@ -23,9 +23,9 @@ V9`HAkL^caO>>OzVb>coXE0
 !s100 gQC02bWgh>[3bGSk[?JLS2
 Z8 OL;C;10.6e;65
 31
-Z9 !s110 1559573667
+Z9 !s110 1559591472
 !i10b 1
-Z10 !s108 1559573667.000000
+Z10 !s108 1559591472.000000
 Z11 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/alu.vhd|
 Z12 !s107 ../../core_rv32i/alu.vhd|
 !i113 0
@@ -52,13 +52,103 @@ R12
 !i113 0
 R13
 R14
+Eboot_ram
+R1
+Z17 DPx4 ieee 16 std_logic_textio 0 22 V5TSK`;aJKC<l]CEg1>mz1
+R3
+R2
+R4
+R5
+R0
+Z18 8../vhdl/boot_ram.vhd
+Z19 F../vhdl/boot_ram.vhd
+l0
+L8
+VX<VD0o]oN=n[532?D5]9z2
+!s100 ohDCAkc9Lad_^4HGhM]oJ2
+R8
+31
+R9
+!i10b 1
+R10
+Z20 !s90 -reportprogress|300|-93|-explicit|../vhdl/boot_ram.vhd|
+Z21 !s107 ../vhdl/boot_ram.vhd|
+!i113 0
+R13
+R14
+Amemory
+R17
+R3
+R2
+R4
+R5
+DEx4 work 8 boot_ram 0 22 X<VD0o]oN=n[532?D5]9z2
+31
+R9
+l28
+L23
+V3X_PPbnc2M`IhHe@GabAD3
+!s100 z7628IND3i@KJbOEI?e4n0
+R8
+!i10b 1
+R10
+R20
+R21
+!i113 0
+R13
+R14
+Ebram
+R1
+R17
+R3
+R2
+R4
+R5
+R0
+Z22 8../vhdl/ram.vhd
+Z23 F../vhdl/ram.vhd
+l0
+L8
+V^b]OS5mh`Y]]<bfI5^o3Q0
+!s100 lej2N2=:>LalFPBnRg0E=3
+R8
+31
+Z24 !s110 1559591473
+!i10b 1
+R10
+Z25 !s90 -reportprogress|300|-93|-explicit|../vhdl/ram.vhd|
+Z26 !s107 ../vhdl/ram.vhd|
+!i113 0
+R13
+R14
+Amemory
+R17
+R3
+R2
+R4
+R5
+DEx4 work 4 bram 0 22 ^b]OS5mh`Y]]<bfI5^o3Q0
+31
+R24
+l28
+L23
+VT<`o1JSREU5o4CH]Ff93m3
+!s100 MYn1TnWcDUEBTk8YKhaH]3
+R8
+!i10b 1
+R10
+R25
+R26
+!i113 0
+R13
+R14
 Ebshift
 R1
 R4
 R5
 R0
-Z17 8../../core_rv32i/bshifter.vhd
-Z18 F../../core_rv32i/bshifter.vhd
+Z27 8../../core_rv32i/bshifter.vhd
+Z28 F../../core_rv32i/bshifter.vhd
 l0
 L4
 VOSfaF=XV6?7I[RI4@8hci2
@@ -68,8 +158,8 @@ R8
 R9
 !i10b 1
 R10
-Z19 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/bshifter.vhd|
-Z20 !s107 ../../core_rv32i/bshifter.vhd|
+Z29 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/bshifter.vhd|
+Z30 !s107 ../../core_rv32i/bshifter.vhd|
 !i113 0
 R13
 R14
@@ -86,8 +176,8 @@ VAOS:PKjk98jcTZTSgEFcD2
 R8
 !i10b 1
 R10
-R19
-R20
+R29
+R30
 !i113 0
 R13
 R14
@@ -98,8 +188,8 @@ R3
 R4
 R5
 R0
-Z21 8../../core_rv32i/control.vhd
-Z22 F../../core_rv32i/control.vhd
+Z31 8../../core_rv32i/control.vhd
+Z32 F../../core_rv32i/control.vhd
 l0
 L25
 V4`1<OQmY80fZaGenPdje@2
@@ -109,8 +199,8 @@ R8
 R9
 !i10b 1
 R10
-Z23 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/control.vhd|
-Z24 !s107 ../../core_rv32i/control.vhd|
+Z33 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/control.vhd|
+Z34 !s107 ../../core_rv32i/control.vhd|
 !i113 0
 R13
 R14
@@ -119,7 +209,7 @@ R2
 R3
 R4
 R5
-Z25 DEx4 work 7 control 0 22 4`1<OQmY80fZaGenPdje@2
+Z35 DEx4 work 7 control 0 22 4`1<OQmY80fZaGenPdje@2
 31
 R9
 l42
@@ -129,8 +219,8 @@ V^[HUgFdE2LVbD]OJi_YXD1
 R8
 !i10b 1
 R10
-R23
-R24
+R33
+R34
 !i113 0
 R13
 R14
@@ -141,8 +231,8 @@ R3
 R4
 R5
 R0
-Z26 8../../core_rv32i/datapath.vhd
-Z27 F../../core_rv32i/datapath.vhd
+Z36 8../../core_rv32i/datapath.vhd
+Z37 F../../core_rv32i/datapath.vhd
 l0
 L6
 VACKklUnKXg`7GnBE5oSdh0
@@ -152,20 +242,20 @@ R8
 R9
 !i10b 1
 R10
-Z28 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/datapath.vhd|
-Z29 !s107 ../../core_rv32i/datapath.vhd|
+Z38 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/datapath.vhd|
+Z39 !s107 ../../core_rv32i/datapath.vhd|
 !i113 0
 R13
 R14
 Aarch_datapath
 R16
-Z30 DEx4 work 8 reg_bank 0 22 inhOdNHN1;hC9oI4EOGgZ2
-R25
+Z40 DEx4 work 8 reg_bank 0 22 inhOdNHN1;hC9oI4EOGgZ2
+R35
 R2
 R3
 R4
 R5
-Z31 DEx4 work 8 datapath 0 22 ACKklUnKXg`7GnBE5oSdh0
+Z41 DEx4 work 8 datapath 0 22 ACKklUnKXg`7GnBE5oSdh0
 31
 R9
 l53
@@ -175,57 +265,57 @@ V?[[=ghbi<>0e6lbR<B6b41
 R8
 !i10b 1
 R10
-R28
-R29
+R38
+R39
 !i113 0
 R13
 R14
 vdut_top
-Z32 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-Z33 VDg1SIo80bB@j0V0VzS_@n1
+Z42 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+Z43 VDg1SIo80bB@j0V0VzS_@n1
 r1
 !s85 0
 31
 !i10b 1
-!s100 Y?^gc2fPO<cW<MR>P]5mJ1
-ILT:YVD?68[cNa[XzZE8Bf2
-Z34 !s105 tb_top_sv_unit
+!s100 LB<9fU1_O@NWe;dodjIM91
+IgFNY<3n_hjH8eMXSD;gVS0
+Z44 !s105 tb_top_sv_unit
 S1
 R0
-w1559573259
+w1559591452
 8dut_top.sv
 Fdut_top.sv
 L0 6
-Z35 OL;L;10.6e;65
-R10
-Z36 !s107 callbacks/debug_uart.sv|callbacks/save_history.sv|callbacks/debug_registers.sv|callbacks/debug_instruction.sv|callbacks/RV32I_INSTR_SRA_cbs.sv|callbacks/RV32I_INSTR_SRL_cbs.sv|callbacks/RV32I_INSTR_SLL_cbs.sv|callbacks/RV32I_INSTR_XOR_cbs.sv|callbacks/RV32I_INSTR_OR_cbs.sv|callbacks/RV32I_INSTR_AND_cbs.sv|callbacks/RV32I_INSTR_SLTU_cbs.sv|callbacks/RV32I_INSTR_SLT_cbs.sv|callbacks/RV32I_INSTR_SUB_cbs.sv|callbacks/RV32I_INSTR_ADD_cbs.sv|callbacks/RV32I_INSTR_AUIPC_cbs.sv|callbacks/RV32I_INSTR_LUI_cbs.sv|callbacks/RV32I_INSTR_SRAI_cbs.sv|callbacks/RV32I_INSTR_SRLI_cbs.sv|callbacks/RV32I_INSTR_SLLI_cbs.sv|callbacks/RV32I_INSTR_XORI_cbs.sv|callbacks/RV32I_INSTR_ORI_cbs.sv|callbacks/RV32I_INSTR_ANDI_cbs.sv|callbacks/RV32I_INSTR_SLTIU_cbs.sv|callbacks/RV32I_INSTR_SLTI_cbs.sv|callbacks/RV32I_INSTR_ADDI_cbs.sv|callbacks/cover_opcodes.sv|callbacks/cover_instructions.sv|scoreboard.sv|checkr.sv|gpio.sv|monitor.sv|platform_driver.sv|agent.sv|memory.sv|generator.sv|environment.sv|types/timemachine.sv|types/snapshot.sv|types/opcode.sv|types/instruction.sv|types/base_formats.sv|dut_top.sv|hfrv_interface.sv|tb_top.sv|
-Z37 !s90 -reportprogress|300|tb_top.sv|
+Z45 OL;L;10.6e;65
+Z46 !s108 1559591473.000000
+Z47 !s107 callbacks/debug_uart.sv|callbacks/save_history.sv|callbacks/debug_registers.sv|callbacks/debug_instruction.sv|callbacks/RV32I_INSTR_SRA_cbs.sv|callbacks/RV32I_INSTR_SRL_cbs.sv|callbacks/RV32I_INSTR_SLL_cbs.sv|callbacks/RV32I_INSTR_XOR_cbs.sv|callbacks/RV32I_INSTR_OR_cbs.sv|callbacks/RV32I_INSTR_AND_cbs.sv|callbacks/RV32I_INSTR_SLTU_cbs.sv|callbacks/RV32I_INSTR_SLT_cbs.sv|callbacks/RV32I_INSTR_SUB_cbs.sv|callbacks/RV32I_INSTR_ADD_cbs.sv|callbacks/RV32I_INSTR_AUIPC_cbs.sv|callbacks/RV32I_INSTR_LUI_cbs.sv|callbacks/RV32I_INSTR_SRAI_cbs.sv|callbacks/RV32I_INSTR_SRLI_cbs.sv|callbacks/RV32I_INSTR_SLLI_cbs.sv|callbacks/RV32I_INSTR_XORI_cbs.sv|callbacks/RV32I_INSTR_ORI_cbs.sv|callbacks/RV32I_INSTR_ANDI_cbs.sv|callbacks/RV32I_INSTR_SLTIU_cbs.sv|callbacks/RV32I_INSTR_SLTI_cbs.sv|callbacks/RV32I_INSTR_ADDI_cbs.sv|callbacks/cover_opcodes.sv|callbacks/cover_instructions.sv|scoreboard.sv|checkr.sv|gpio.sv|monitor.sv|platform_driver.sv|agent.sv|memory.sv|generator.sv|environment.sv|types/timemachine.sv|types/snapshot.sv|types/opcode.sv|types/instruction.sv|types/base_formats.sv|dut_top.sv|hfrv_interface.sv|tb_top.sv|
+Z48 !s90 -reportprogress|300|tb_top.sv|
 !i113 0
-Z38 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-Z39 tCvgOpt 0
+Z49 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z50 tCvgOpt 0
 Yhfrv_interface
-R32
-R33
+R42
+R43
 r1
 !s85 0
 31
 !i10b 1
 !s100 Oj1@JkC0HdO8D[YojY82N1
 I_l9z<_kR[ZezBZVY3?a@F0
-R34
+R44
 S1
 R0
-w1559571478
+R1
 8hfrv_interface.sv
-Z40 Fhfrv_interface.sv
+Z51 Fhfrv_interface.sv
 L0 4
-R35
-R10
-R36
-R37
+R45
+R46
+R47
+R48
 !i113 0
-R38
-R39
+R49
+R50
 Einterrupt_controller
 R1
 R2
@@ -233,8 +323,8 @@ R3
 R4
 R5
 R0
-Z41 8../../core_rv32i/int_control.vhd
-Z42 F../../core_rv32i/int_control.vhd
+Z52 8../../core_rv32i/int_control.vhd
+Z53 F../../core_rv32i/int_control.vhd
 l0
 L6
 VOefhI4]S`i?a<<PU]XAPe2
@@ -244,8 +334,8 @@ R8
 R9
 !i10b 1
 R10
-Z43 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/int_control.vhd|
-Z44 !s107 ../../core_rv32i/int_control.vhd|
+Z54 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/int_control.vhd|
+Z55 !s107 ../../core_rv32i/int_control.vhd|
 !i113 0
 R13
 R14
@@ -254,7 +344,7 @@ R2
 R3
 R4
 R5
-Z45 DEx4 work 20 interrupt_controller 0 22 OefhI4]S`i?a<<PU]XAPe2
+Z56 DEx4 work 20 interrupt_controller 0 22 OefhI4]S`i?a<<PU]XAPe2
 31
 R9
 l44
@@ -264,8 +354,8 @@ V_??TTz<G0dWK<@hOFHN[J2
 R8
 !i10b 1
 R10
-R43
-R44
+R54
+R55
 !i113 0
 R13
 R14
@@ -276,8 +366,8 @@ R3
 R4
 R5
 R0
-Z46 8../../../devices/peripherals/minimal_soc.vhd
-Z47 F../../../devices/peripherals/minimal_soc.vhd
+Z57 8../../../devices/peripherals/minimal_soc.vhd
+Z58 F../../../devices/peripherals/minimal_soc.vhd
 l0
 L14
 VLcS^Lg^lbP1Yd6N08hDLR0
@@ -287,8 +377,8 @@ R8
 R9
 !i10b 1
 R10
-Z48 !s90 -reportprogress|300|-93|-explicit|../../../devices/peripherals/minimal_soc.vhd|
-Z49 !s107 ../../../devices/peripherals/minimal_soc.vhd|
+Z59 !s90 -reportprogress|300|-93|-explicit|../../../devices/peripherals/minimal_soc.vhd|
+Z60 !s107 ../../../devices/peripherals/minimal_soc.vhd|
 !i113 0
 R13
 R14
@@ -307,8 +397,8 @@ V1TSLT32Hj;k41^gdO[@oX1
 R8
 !i10b 1
 R10
-R48
-R49
+R59
+R60
 !i113 0
 R13
 R14
@@ -319,8 +409,8 @@ R3
 R4
 R5
 R0
-Z50 8../../core_rv32i/cpu.vhd
-Z51 F../../core_rv32i/cpu.vhd
+Z61 8../../core_rv32i/cpu.vhd
+Z62 F../../core_rv32i/cpu.vhd
 l0
 L6
 V22eRTUX@HQHlnGP0lXkHJ2
@@ -330,14 +420,14 @@ R8
 R9
 !i10b 1
 R10
-Z52 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/cpu.vhd|
-Z53 !s107 ../../core_rv32i/cpu.vhd|
+Z63 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/cpu.vhd|
+Z64 !s107 ../../core_rv32i/cpu.vhd|
 !i113 0
 R13
 R14
 Aarch_processor
-R45
-R31
+R56
+R41
 R2
 R3
 R4
@@ -352,8 +442,8 @@ V]6KABJ^0h<=]54ikh[zN_1
 R8
 !i10b 1
 R10
-R52
-R53
+R63
+R64
 !i113 0
 R13
 R14
@@ -364,8 +454,8 @@ R3
 R4
 R5
 R0
-Z54 8../../core_rv32i/reg_bank.vhd
-Z55 F../../core_rv32i/reg_bank.vhd
+Z65 8../../core_rv32i/reg_bank.vhd
+Z66 F../../core_rv32i/reg_bank.vhd
 l0
 L5
 VinhOdNHN1;hC9oI4EOGgZ2
@@ -375,8 +465,8 @@ R8
 R9
 !i10b 1
 R10
-Z56 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/reg_bank.vhd|
-Z57 !s107 ../../core_rv32i/reg_bank.vhd|
+Z67 !s90 -reportprogress|300|-93|-explicit|../../core_rv32i/reg_bank.vhd|
+Z68 !s107 ../../core_rv32i/reg_bank.vhd|
 !i113 0
 R13
 R14
@@ -385,7 +475,7 @@ R2
 R3
 R4
 R5
-R30
+R40
 31
 R9
 l20
@@ -395,25 +485,25 @@ VT8O<0X]i2X8Qm0<RPJ8H`3
 R8
 !i10b 1
 R10
-R56
-R57
+R67
+R68
 !i113 0
 R13
 R14
 vtb_top
-R32
-R33
+R42
+R43
 r1
 !s85 0
 31
 !i94 1
 !i10b 1
-!s100 heeF_4Blk6hz2QNgNE_G_1
-IM[=_I>m9Qf<heaJI?7LzZ0
-R34
+!s100 =:h6eDl8@]BSiN9doRYji2
+IVjR`M4fXa2mFe:0:YKjeO0
+R44
 S1
 R0
-w1559571849
+w1559588550
 8tb_top.sv
 Ftb_top.sv
 Ftypes/base_formats.sv
@@ -422,7 +512,7 @@ Ftypes/opcode.sv
 Ftypes/snapshot.sv
 Ftypes/timemachine.sv
 Fenvironment.sv
-R40
+R51
 Fgenerator.sv
 Fmemory.sv
 Fagent.sv
@@ -459,23 +549,23 @@ Fcallbacks/debug_registers.sv
 Fcallbacks/save_history.sv
 Fcallbacks/debug_uart.sv
 L0 6
-R35
-R10
-R36
-R37
+R45
+R46
+R47
+R48
 !i113 0
-R38
-R39
+R49
+R50
 Euart
 R1
 R2
 R3
-Z58 DPx4 ieee 16 std_logic_textio 0 22 V5TSK`;aJKC<l]CEg1>mz1
+R17
 R4
 R5
 R0
-Z59 8../../../devices/controllers/uart/uart.vhd
-Z60 F../../../devices/controllers/uart/uart.vhd
+Z69 8../../../devices/controllers/uart/uart.vhd
+Z70 F../../../devices/controllers/uart/uart.vhd
 l0
 L7
 VCiQa>LnZZf0A2dL;;H>UK3
@@ -485,15 +575,15 @@ R8
 R9
 !i10b 1
 R10
-Z61 !s90 -reportprogress|300|-93|-explicit|../../../devices/controllers/uart/uart.vhd|
-Z62 !s107 ../../../devices/controllers/uart/uart.vhd|
+Z71 !s90 -reportprogress|300|-93|-explicit|../../../devices/controllers/uart/uart.vhd|
+Z72 !s107 ../../../devices/controllers/uart/uart.vhd|
 !i113 0
 R13
 R14
 Alogic
 R2
 R3
-R58
+R17
 R4
 R5
 DEx4 work 4 uart 0 22 CiQa>LnZZf0A2dL;;H>UK3
@@ -506,8 +596,8 @@ R8
 R9
 !i10b 1
 R10
-R61
-R62
+R71
+R72
 !i113 0
 R13
 R14

@@ -10,6 +10,8 @@ vcom -93 -explicit ../../core_rv32i/datapath.vhd
 vcom -93 -explicit ../../core_rv32i/int_control.vhd
 vcom -93 -explicit ../../core_rv32i/cpu.vhd
 vcom -93 -explicit ../../core_rv32i/cpu.vhd
+vcom -93 -explicit ../vhdl/boot_ram.vhd
+vcom -93 -explicit ../vhdl/ram.vhd
 vlog tb_top.sv
 
 vsim work.tb_top -novopt
@@ -19,4 +21,7 @@ set NumericStdNoWarnings 1
 
 coverage save -onexit coverage.ucdb
 
+add wave -position insertpoint sim:/tb_top/iface/*
+
+#run 1us
 run -all
