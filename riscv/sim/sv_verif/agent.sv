@@ -49,6 +49,7 @@ class agent;
    task feed_dut(memory_model trans);
       memory_model boot;
       boot = new("boot.txt", 'h0, 'h100000);
+      $display("Agent is sending RAM!");
       agt2ram.put(trans);
       agt2rom.put(boot);
       agt2drv.put(start);
