@@ -5,17 +5,17 @@ use ieee.std_logic_arith.all;
 
 entity processor is
 	port (	clk_i:		in std_logic;
-		rst_i:		in std_logic;
+			rst_i:		in std_logic;
 
-		stall_i:	in std_logic;
+			stall_i:	in std_logic;
 
-		addr_o:		out std_logic_vector(31 downto 0);
-		data_i:		in std_logic_vector(31 downto 0);
-		data_o:		out std_logic_vector(31 downto 0);
-		data_w_o:	out std_logic_vector(3 downto 0);
+			addr_o:		out std_logic_vector(31 downto 0);
+			data_i:		in std_logic_vector(31 downto 0);
+			data_o:		out std_logic_vector(31 downto 0);
+			data_w_o:	out std_logic_vector(3 downto 0);
 
-		extio_in:	in std_logic_vector(7 downto 0);
-		extio_out:	out std_logic_vector(7 downto 0)
+			extio_in:	in std_logic_vector(7 downto 0);
+			extio_out:	out std_logic_vector(7 downto 0)
 	);
 end processor;
 
