@@ -19,8 +19,6 @@ vcom -93 -explicit ../../../devices/controllers/uart/uart.vhd
 vcom -93 -explicit ../vhdl/boot_ram.vhd
 vcom -93 -explicit ../vhdl/ram.vhd
 # tb
-#vlog -work work interface_cpu_busmux.sv
-#vlog -work work interface_busmux_mem.sv
 vlog -work work interface_processor_peripherals.sv
 vlog -work work test_hf_riscv.sv
 vlog -work work top_hf_riscv.sv

@@ -31,7 +31,6 @@ module top_hf_riscv;
 
 	assign data_w_n_ram = ~processor_peripherals.data_we;
 
-	// New atributions
 	always@(posedge clock_in, processor_peripherals.reset)
 	begin
 		if (processor_peripherals.reset == 1) begin
