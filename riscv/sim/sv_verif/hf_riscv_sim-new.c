@@ -4,14 +4,10 @@
  * author:        Sergio Johann Filho <sergio.filho@pucrs.br>
  */
 
-// TODO merge the current simulator with the newer one
-// https://github.com/amamory/hf-risc/blob/master/tools/sim/hf_riscv_sim/hf_riscv_sim.c
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <svdpi.h>
 
 #define MEM_SIZE			0x00100000
 #define SRAM_BASE			0x40000000
@@ -22,6 +18,8 @@
 #define IRQ_MASK			0xf0000020
 #define IRQ_STATUS			0xf0000030
 #define IRQ_EPC				0xf0000040
+#define EXTIO_IN			0xf0000080
+#define EXTIO_OUT			0xf0000090
 #define DEBUG_ADDR			0xf00000d0
 
 #define S0CAUSE				0xe1000400
@@ -76,38 +74,10 @@ typedef struct {
 	uint64_t cycles;
 } state;
 
-int flag_endof = 0;
-int8_t sram[MEM_SIZE*4];
-unsigned long sram_out2[MEM_SIZE];
-uint32_t io_out[512];
-int io_out_index;
-
+int8_t sram[MEM_SIZE];
 
 FILE *fptr;
 int32_t log_enabled = 0;
-
-extern void export_sram(int32_t *OUT);
-extern void export_io(int32_t *OUT);
-
-// Funtion to send the simulator memory to the systemVerilog Scoreaboard module 
-void export_mem(int size) {
-	unsigned int j;
-
-	// Converting bytes to 32 bits
-	for (j=0;j<size; j++){
-		sram_out2[j] = (unsigned int)sram[j*4];
-		sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+1]);
-		sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+2]);
-		sram_out2[j] = (unsigned int)((sram_out2[j] << 8) + (unsigned char)sram[j*4+3]);
-	}
-		
-	export_sram(sram_out2);
-}
-
-void export_io_c(int size) {
-	unsigned int j;
-	export_io(io_out);
-}
 
 void dumpregs(state *s){
 	int32_t i;
@@ -205,7 +175,6 @@ static int32_t mem_read(state *s, int32_t size, uint32_t address){
 }
 
 static void mem_write(state *s, int32_t size, uint32_t address, uint32_t value){
-	int cnt;
 	uint32_t i;
 	uint32_t *ptr;
 
@@ -240,9 +209,7 @@ static void mem_write(state *s, int32_t size, uint32_t address, uint32_t value){
 			if (log_enabled)
 				fclose(fptr);
 			printf("\nend of simulation - %ld cycles.\n", s->cycles);
-			flag_endof = 1;
-			return;
-			//exit(0);
+			exit(0);
 		case DEBUG_ADDR:
 			if (log_enabled)
 				fprintf(fptr, "%c", (int8_t)(value & 0xff));
@@ -291,7 +258,6 @@ void cycle(state *s){
 	uint32_t *u = (uint32_t *)s->r;
 	uint32_t ptr_l, ptr_s;
 
-	//interrupção
 	if (s->status && (s->cause & s->mask)){
 		//printf("Interupcao: s->cause = %x, s->mask = %x, s->pc = %x, s->vector = %x\n", s->cause, s->mask, s->pc, s->vector);
 		s->epc = s->pc_next;
@@ -431,13 +397,13 @@ void cycle(state *s){
 	} else {
 		s->timercause &= 0xf7;
 	}
-	// enable timer
 	s->s0cause = (s->timercause ^ s->timercause_inv) & s->timermask ? 0x04 : 0x00;
 	// enable gpio port A
 	s->pa_cause = s->pain ? 0x02 : 0x00;
 	s->s0cause |= (s->pa_cause ^ s->pa_cause_inv) & s->pa_mask ? 0x02 : 0x00;
-	if (s->s0cause != 0)
-			printf("CAAAAUSE: %d\n", s->s0cause);
+	//if (s->s0cause != 0)
+	//		printf("CAAAAUSE: %d\n", s->s0cause);
+
 	s->cause = s->s0cause ? 0x01 : 0x00;
 
 	s->cycles++;
@@ -472,96 +438,62 @@ void cycle(state *s){
 	return;
 fail:
 	printf("\ninvalid opcode (pc=0x%x opcode=0x%x)", s->pc, inst);
-	
-	return 1;
+	exit(0);
 }
 
-int run(int8_t *mem, uint32_t *io, int size, int io_size){
-
+int main(int argc, char *argv[]){
 	state context;
 	state *s;
-	int bytes, i;
-	int sim_time, io_time, io_index, io_num;
-
+	FILE *in;
+	int bytes;
+	int sim_time=0;
 
 	s = &context;
 	memset(s, 0, sizeof(state));
 	memset(sram, 0xff, sizeof(MEM_SIZE));
-	
-	if (size > MEM_SIZE){
-		printf("\nERROR: too big !!!.\n");
-		return(0);
+
+	if (argc >= 2){
+		in = fopen(argv[1], "rb");
+		if (in == 0){
+			printf("\nerror opening binary file.\n");
+			return 1;
+		}
+		bytes = fread(&sram, 1, MEM_SIZE, in);
+		fclose(in);
+		if (bytes == 0){
+			printf("\nerror reading binary file.\n");
+			return 1;
+		}
+		if (argc == 3){
+			fptr = fopen(argv[2], "wb");
+			if (!fptr){
+				printf("\nerror reading binary file.\n");
+				return 1;
+			}
+			log_enabled = 1;
+		}
+	}else{
+		printf("\nsyntax: hf_risc_sim [file.bin] [logfile.txt]\n");
+		return 1;
 	}
 
-	//printf("\n\n\n\n IIIIIIOOOOOO %d!!!.\n", io_size);
-	
-	memcpy(sram, mem, size);
-	for (i = 0; i < size; i++){
-		if (mem[i] == 0)
-			break;
-		printf("%X\n", mem[i]);
-	}
-	printf("end mem\n");
-
-	
+	memset(s, 0, sizeof(context));
 	s->pc = SRAM_BASE;
 	s->pc_next = s->pc + 4;
 	s->mem = &sram[0];
-/*
-	s->vector = 0;
-	s->cause = 0;
-	s->mask = 0;
-	s->status = 0;
-	for (i = 0; i < 4; i++)
-		s->status_dly[i] = 0;
-	s->epc = 0;
-	s->s0cause = 0;
-	s->timercause = 0;
-	s->timercause_inv = 0;
-	s->timermask = 0;
-	s->timer0 = 0;
-	s->timer1 = 0;
-	s->timer1_pre = 0;
-	s->timer1_ctc = 0;
-	s->timer1_ocr = 0;
-	s->uartcause = 0; 
-	s->uartcause_inv = 0;
-	s->uartmask = 0;
 
-	s->cycles = 0;
-	
-	io_index = 0;
-	io_num = io[0];
-	io_time = io[1];
-	io_out_index = 0;
-*/
-	//printf("\n\n\n\n IIIIIIOOOOOO %d %d!!!.\n", io_num, io_time);
-	while(1){
+	for(;;){
 		sim_time = s->cycles * 10;
+		// write in port A in cycle 10000
+		if (sim_time == 1000000){
+			//write value 12
+			s->pain = 12 & 0x0000ffff;
+			printf("IO PAIN %d - cycle %d\n", s->pain, s->cycles);
+		}
 
-		//if (sim_time % 1000000 == 0)
-		//	printf("TIME: %d\n", sim_time);
-		//if (sim_time == 6000000)
-		//	break;
-/*
-		if (io_time <= sim_time && io_index/2 <= io_num){
-			//s->pain &= 0x0000ffff;
-			s->pain = io[io_index] & 0x0000ffff;
-			//printf("IO PAIN %d \n", s->pain);
-			//s->pain |= ~io[io_index]<<24;
-			io_index = io_index + 2;
-			io_time += io[io_index+1];
-			//printf("IO %d time %d\n", io[io_index], io[io_index+1]);
-		}
-*/
 		cycle(s);
-		// Waiting end of simulation
-		if (flag_endof == 1){
-			break;
-		}
 	}
-	
-	printf("Scoreboard finished!\n");
-	return (0);
+
+	return 0;
 }
 

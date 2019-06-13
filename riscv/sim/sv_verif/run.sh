@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 rm -rf code.txt out.txt debug.txt transcript vsim.wlf wlf* read_debug.txt init.dat
 
@@ -17,8 +17,9 @@ cd -
 
 rm -rf code.txt
 cp -f ../../../software/code.txt .
+cp -f ../../../software/code.bin .
 
-vsim -c -do sim.do -t 10ps
+vsim -c -do sim_environment.do -t 10ps
 
-cat sv_debug.txt
+cat debug.txt
 

@@ -2,7 +2,7 @@
 
 directory=$PWD
 
-cd ../../../../software/
+cd ../../../../../software/
 make clean
 make sort
 cp code.txt $directory

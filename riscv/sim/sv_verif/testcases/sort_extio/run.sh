@@ -2,7 +2,7 @@
 
 directory=$PWD
 
-cd ../../../../software/
+cd ../../../../../software/
 make clean
 make extio_test
 cp code.txt $directory

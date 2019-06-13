@@ -1,19 +1,34 @@
-- INSTALAR DEPENDÊNCIAS
-	* sudo apt-get update
-	* sudo apt-get install flex bison libgmp3-dev libmpfr-dev autoconf texinfo build-essential libncurses5-dev
 
-- INSTALR TOOLCHAIN
-	* ./build_riscv_toolchain 
+This testbench has three operation modes:
 
-- MODIFICAR GCC_riscv NO MAKEFILE DO SOFTWARE
-	* GCC_riscv = riscv32-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -O2 -c -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -I ./include -DCPU_SPEED=${F_CLK} -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DDEBUG_PORT #-ffixed-s10 -ffixed-s11 -mrvc -fPIC -DDEBUG_PORT
+# **Simple mode**: 
 
-- EXECUTAR SIMULAÇÃO
-	* ./run.sh sort
-	
-- EXECUTAR SIMULAÇÃO PARA ASSEMBLY
-	* ./run.sh chuchu
-	- ENDEREÇO DE ESCRITA PARA DEBUG
-		* 0xf00000d0
-	
+It runs in this current directoy any program located at ./software/app.
+By running the run.sh script, you select ine application, compile it, and copy the code.txt 
+file to the current dir for simulation. After the simulation is finished, the sv_debug.txt
+file will have the output of the program.
 
+- syntax
+	* ./run.sh <name_of_the_application>
+
+- example
+	* ./run.sh fib
+	* cat sv_debug.txt
+boot
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 
+
+# **Batch mode**: 
+
+
+
+# **Random program mode**: 
+
+The directory testcases has a list of testcases which are run in sequence.
+The difference compared to the previous mode is the ability to run several tests in sequence and,
+at the end, generate a combined code coverage metrics. See the file testcases/run_all.sh to 
+see how it works.
+
+
+- example
+	* cd testcases
+	* ./run-all.sh

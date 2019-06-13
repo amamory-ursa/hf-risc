@@ -19,9 +19,11 @@ vsim work.tb_top -novopt
 set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
 
-coverage save -onexit coverage.ucdb
+do wave.do
 
-add wave -position insertpoint sim:/tb_top/iface/*
+#coverage save -onexit coverage.ucdb
+
+#add wave -position insertpoint sim:/tb_top/iface/*
 
 #run 1us
-run -all
+#run -all

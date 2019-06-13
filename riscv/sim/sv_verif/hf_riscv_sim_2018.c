@@ -1,11 +1,8 @@
 /* file:          hf_riscv_sim.c
  * description:   HF-RISCV simulator
- * date:          11/2015 (first release), 03/2019 (last update)
+ * date:          11/2015
  * author:        Sergio Johann Filho <sergio.filho@pucrs.br>
  */
-
-// TODO merge the current simulator with the newer one
-// https://github.com/amamory/hf-risc/blob/master/tools/sim/hf_riscv_sim/hf_riscv_sim.c
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,63 +13,32 @@
 #define MEM_SIZE			0x00100000
 #define SRAM_BASE			0x40000000
 #define EXIT_TRAP			0xe0000000
-
 #define IRQ_VECTOR			0xf0000000
 #define IRQ_CAUSE			0xf0000010
 #define IRQ_MASK			0xf0000020
 #define IRQ_STATUS			0xf0000030
 #define IRQ_EPC				0xf0000040
+#define COUNTER				0xf0000050
+#define COMPARE				0xf0000060
+#define COMPARE2			0xf0000070
+#define EXTIO_IN			0xf0000080
+#define EXTIO_OUT			0xf0000090
 #define DEBUG_ADDR			0xf00000d0
-
-#define S0CAUSE				0xe1000400
-
-#define S0_BASE				0xe1000000
-#define GPIO_BASE			(S0_BASE + 0x10000)
-#define GPIOCAUSE			(GPIO_BASE + 0x0400)
-#define GPIOCAUSEINV		(GPIO_BASE + 0x0800)
-#define GPIOMASK			(GPIO_BASE + 0x0c00)
-#define PADDR				(GPIO_BASE + 0x4000)
-#define PAOUT				(GPIO_BASE + 0x4010)
-#define PAIN				(GPIO_BASE + 0x4020)
-#define PAININV				(GPIO_BASE + 0x4030)
-#define PAINMASK			(GPIO_BASE + 0x4040)
-
-#define TIMERCAUSE			0xe1020400
-#define TIMERCAUSE_INV			0xe1020800
-#define TIMERMASK			0xe1020c00
-
-#define TIMER0				0xe1024000
-#define TIMER1				0xe1024400
-#define TIMER1_PRE			0xe1024410
-#define TIMER1_CTC			0xe1024420
-#define TIMER1_OCR			0xe1024430
-
-#define UARTCAUSE			0xe1030400
-#define UARTCAUSE_INV			0xe1030800
-#define UARTMASK			0xe1030c00
-
-#define UART0				0xe1034000
-#define UART0_DIV			0xe1034010
+#define UART_WRITE			0xf00000e0
+#define UART_READ			0xf00000e0
+#define UART_DIVISOR		0xf00000f0
 
 #define ntohs(A) ( ((A)>>8) | (((A)&0xff)<<8) )
 #define htons(A) ntohs(A)
 #define ntohl(A) ( ((A)>>24) | (((A)&0xff0000)>>8) | (((A)&0xff00)<<8) | ((A)<<24) )
 #define htonl(A) ntohl(A)
 
+
 typedef struct {
 	int32_t r[32];
 	uint32_t pc, pc_next;
 	int8_t *mem;
-	uint32_t vector, cause, mask, status, status_dly[4], epc;
-	uint32_t s0cause;
-	// gpio regiters
-	uint32_t pa_cause, pa_cause_inv, pa_mask;
-	uint32_t gpiocause, gpiocause_inv, gpiomask, paddr;
-	uint32_t paout, pain, pain_inv, pain_mask;
-	// timer register
-	uint32_t timercause, timercause_inv, timermask;
-	uint32_t timer0, timer1, timer1_pre, timer1_ctc, timer1_ocr;
-	uint32_t uartcause, uartcause_inv, uartmask;
+	uint32_t vector, cause, mask, status, status_dly[4], epc, counter, compare, compare2;
 	uint64_t cycles;
 } state;
 
@@ -111,7 +77,7 @@ void export_io_c(int size) {
 
 void dumpregs(state *s){
 	int32_t i;
-
+	
 	for (i = 0; i < 32; i+=4){
 		printf("\nr%02d [%08x] r%02d [%08x] r%02d [%08x] r%02d [%08x]", \
 		i, s->r[i], i+1, s->r[i+1], i+2, s->r[i+2], i+3, s->r[i+3]);
@@ -139,43 +105,23 @@ static int32_t mem_read(state *s, int32_t size, uint32_t address){
 	uint32_t value=0;
 	uint32_t *ptr;
 
-	switch (address){
+	switch(address){
 		case IRQ_VECTOR:	return s->vector;
-		case IRQ_CAUSE:		return s->cause;
+		case IRQ_CAUSE:		return s->cause | 0x0080 | 0x0040;
 		case IRQ_MASK:		return s->mask;
 		case IRQ_STATUS:	return s->status;
 		case IRQ_EPC:		return s->epc;
-		case S0CAUSE:		return s->s0cause;
-
-		// gpio registers
-		case GPIOCAUSE:		printf("GPIOCAUSE R - %d\n",s->cycles); return s->gpiocause;
-		case GPIOCAUSEINV:	printf("GPIOCAUSEINV R - %d\n",s->cycles); return s->gpiocause_inv;
-		case GPIOMASK:		printf("GPIOMASK R - %d\n",s->cycles); return s->gpiomask;
-		case PADDR:			printf("PADDR R - %d\n",s->cycles); return s->paddr;
-		case PAOUT:			printf("PAOUT R - %d\n",s->cycles); return s->paout;
-		case PAIN:			printf("PAIN R - %d\n",s->cycles); return s->pain;
-		case PAININV:		printf("PAININV R - %d\n",s->cycles); return s->pain_inv;
-		case PAINMASK:		printf("PAINMASK R - %d\n",s->cycles); return s->pain_mask;
-
-		case TIMERCAUSE:	return s->timercause;
-		case TIMERCAUSE_INV:	return s->timercause_inv;
-		case TIMERMASK:		return s->timermask;
-		case TIMER0:		return s->timer0;
-		case TIMER1:		return s->timer1;
-		case TIMER1_PRE:	return s->timer1_pre;
-		case TIMER1_CTC:	return s->timer1_ctc;
-		case TIMER1_OCR:	return s->timer1_ocr;
-		case UARTCAUSE:		return s->uartcause;
-		case UARTCAUSE_INV:	return s->uartcause_inv;
-		case UARTMASK:		return s->uartmask;
-		case UART0:		return getchar();
-		case UART0_DIV:		return 0;
+		case COUNTER:		return s->counter;
+		case COMPARE:		return s->compare;
+		case COMPARE2:		return s->compare2;
+		case EXTIO_IN:		return (s->cause & 0xff0000)>>16;
+		case UART_READ:		return getchar();
+		case UART_DIVISOR:	return 0;
 	}
-	if (address >= EXIT_TRAP) return 0;
 
 	ptr = (uint32_t *)(s->mem + (address % MEM_SIZE));
 
-	switch (size){
+	switch(size){
 		case 4:
 			if(address & 3){
 				printf("\nunaligned access (load word) pc=0x%x addr=0x%x", s->pc, address);
@@ -209,37 +155,23 @@ static void mem_write(state *s, int32_t size, uint32_t address, uint32_t value){
 	uint32_t i;
 	uint32_t *ptr;
 
-	switch (address){
+	switch(address){
 		case IRQ_VECTOR:	s->vector = value; return;
+		case IRQ_CAUSE:		s->cause = value; return;
 		case IRQ_MASK:		s->mask = value; return;
 		case IRQ_STATUS:	if (value == 0){ s->status = 0; for (i = 0; i < 4; i++) s->status_dly[i] = 0; }else{ s->status_dly[3] = value; } return;
 		case IRQ_EPC:		s->epc = value; return;
-
-		// gpio registers
-		case GPIOCAUSE:		printf("GPIOCAUSE W - %d\n",s->cycles); s->gpiocause = value & 0xff; return;
-		case GPIOCAUSEINV:	printf("GPIOCAUSEINV W - %d\n",s->cycles); s->gpiocause_inv = value & 0xff; return;
-		case GPIOMASK:		printf("GPIOMASK W - %d\n",s->cycles); s->gpiomask = value & 0xff; return;
-		case PADDR:			printf("PADDR W - %d\n",s->cycles); s->paddr = value & 0xff; return;
-		case PAOUT:			printf("PAOUT W - %d\n",s->cycles); s->paout = value & 0xff; return;
-		case PAIN:			printf("PAIN W - %d\n",s->cycles); s->pain = value & 0xff; return;
-		case PAININV:		printf("PAININV W - %d\n",s->cycles); s->pain_inv = value & 0xff; return;
-		case PAINMASK:		printf("PAINMASK W - %d\n",s->cycles); s->pain_mask = value & 0xff; return;
-
-		case TIMERCAUSE_INV:	s->timercause_inv = value & 0xff; return;
-		case TIMERMASK:		s->timermask = value & 0xff; return;
-		case TIMER0:		return;
-		case TIMER1:		s->timer1 = value & 0xffff; return;
-		case TIMER1_PRE:	s->timer1_pre = value & 0xffff; return;
-		case TIMER1_CTC:	s->timer1_ctc = value & 0xffff; return;
-		case TIMER1_OCR:	s->timer1_ocr = value & 0xffff; return;
-		case UARTCAUSE_INV:	s->uartcause_inv = value & 0xff; return;
-		case UARTMASK:		s->uartmask = value & 0xff; return;
-		
+		case COUNTER:		s->counter = value; return;
+		case COMPARE:		s->compare = value; s->cause &= 0xffef; return;
+		case COMPARE2:		s->compare2 = value; s->cause &= 0xffdf; return;
 		case EXIT_TRAP:
 			fflush(stdout);
-			if (log_enabled)
+				if (log_enabled)
 				fclose(fptr);
+			
 			printf("\nend of simulation - %ld cycles.\n", s->cycles);
+			
+
 			flag_endof = 1;
 			return;
 			//exit(0);
@@ -247,17 +179,22 @@ static void mem_write(state *s, int32_t size, uint32_t address, uint32_t value){
 			if (log_enabled)
 				fprintf(fptr, "%c", (int8_t)(value & 0xff));
 			return;
-		case UART0:
+		case UART_WRITE:
 			fprintf(stdout, "%c", (int8_t)(value & 0xff));
 			return;
-		case UART0_DIV:
+		case UART_DIVISOR:
+			return;
+		case EXTIO_OUT:
+			if (io_out[io_out_index-2] != value){
+				io_out[io_out_index++] = value;
+				io_out[io_out_index++] = s->cycles * 10;
+			}
 			return;
 	}
-	if (address >= EXIT_TRAP) return;
 
 	ptr = (uint32_t *)(s->mem + (address % MEM_SIZE));
-
-	switch (size){
+	
+	switch(size){
 		case 4:
 			if(address & 3){
 				printf("\nunaligned access (store word) pc=0x%x addr=0x%x", s->pc, address);
@@ -293,16 +230,18 @@ void cycle(state *s){
 
 	//interrupção
 	if (s->status && (s->cause & s->mask)){
-		//printf("Interupcao: s->cause = %x, s->mask = %x, s->pc = %x, s->vector = %x\n", s->cause, s->mask, s->pc, s->vector);
+		printf("Interupcao: s->cause = %x, s->mask = %x, s->pc = %x, s->vector = %x\n", s->cause, s->mask, s->pc, s->vector);
 		s->epc = s->pc_next;
 		s->pc = s->vector;
 		s->pc_next = s->vector + 4;
 		s->status = 0;
 		for (i = 0; i < 4; i++)
 			s->status_dly[i] = 0;
+		inst = mem_fetch(s, s->pc);
 	}
+	else
+		inst = mem_fetch(s, s->pc);
 
-	inst = mem_fetch(s, s->pc);
 
 	opcode = inst & 0x7f;
 	rd = (inst >> 7) & 0x1f;
@@ -314,7 +253,7 @@ void cycle(state *s){
 	imm_s = ((inst & 0xf80) >> 7) | ((inst & 0xfe000000) >> 20);
 	imm_sb = ((inst & 0xf00) >> 7) | ((inst & 0x7e000000) >> 20) | ((inst & 0x80) << 4) | ((inst & 0x80000000) >> 19);
 	imm_u = inst & 0xfffff000;
-	imm_uj = ((inst & 0x7fe00000) >> 20) | ((inst & 0x100000) >> 9) | (inst & 0xff000) | ((inst & 0x80000000) >> 11);
+	imm_uj = ((inst & 0x7fe00000) >> 20) | ((inst & 0x100000) >> 9) | (inst & 0xff000) | ((inst & 0x80000000) >> 11); 
 	if (inst & 0x80000000){
 		imm_i |= 0xfffff000;
 		imm_s |= 0xfffff000;
@@ -325,13 +264,13 @@ void cycle(state *s){
 	ptr_s = r[rs1] + (int32_t)imm_s;
 	r[0] = 0;
 
-	switch (opcode){
+	switch(opcode){
 		case 0x37: r[rd] = imm_u; break;										/* LUI */
 		case 0x17: r[rd] = s->pc + imm_u; break;									/* AUIPC */
 		case 0x6f: r[rd] = s->pc_next; s->pc_next = s->pc + imm_uj; break;						/* JAL */
 		case 0x67: r[rd] = s->pc_next; s->pc_next = (r[rs1] + imm_i) & 0xfffffffe; break;				/* JALR */
 		case 0x63:
-			switch (funct3){
+			switch(funct3){
 				case 0x0: if (r[rs1] == r[rs2]){ s->pc_next = s->pc + imm_sb; } break;				/* BEQ */
 				case 0x1: if (r[rs1] != r[rs2]){ s->pc_next = s->pc + imm_sb; } break;				/* BNE */
 				case 0x4: if (r[rs1] < r[rs2]){ s->pc_next = s->pc + imm_sb; } break;				/* BLT */
@@ -342,7 +281,7 @@ void cycle(state *s){
 			}
 			break;
 		case 0x3:
-			switch (funct3){
+			switch(funct3){
 				case 0x0: r[rd] = (int8_t)mem_read(s,1,ptr_l); break;						/* LB */
 				case 0x1: r[rd] = (int16_t)mem_read(s,2,ptr_l); break;						/* LH */
 				case 0x2: r[rd] = mem_read(s,4,ptr_l); break;							/* LW */
@@ -352,7 +291,7 @@ void cycle(state *s){
 			}
 			break;
 		case 0x23:
-			switch (funct3){
+			switch(funct3){
 				case 0x0: mem_write(s,1,ptr_s,r[rs2]); break;							/* SB */
 				case 0x1: mem_write(s,2,ptr_s,r[rs2]); break;							/* SH */
 				case 0x2: mem_write(s,4,ptr_s,r[rs2]); break;							/* SW */
@@ -360,7 +299,7 @@ void cycle(state *s){
 			}
 			break;
 		case 0x13:
-			switch (funct3){
+			switch(funct3){
 				case 0x0: r[rd] = r[rs1] + (int32_t)imm_i; break;						/* ADDI */
 				case 0x2: r[rd] = r[rs1] < (int32_t)imm_i; break;		 				/* SLTI */
 				case 0x3: r[rd] = u[rs1] < (uint32_t)imm_i; break;						/* SLTIU */
@@ -369,7 +308,7 @@ void cycle(state *s){
 				case 0x7: r[rd] = r[rs1] & (int32_t)imm_i; break;						/* ANDI */
 				case 0x1: r[rd] = u[rs1] << (rs2 & 0x3f); break;						/* SLLI */
 				case 0x5:
-					switch (funct7){
+					switch(funct7){
 						case 0x0: r[rd] = u[rs1] >> (rs2 & 0x3f); break;				/* SRLI */
 						case 0x20: r[rd] = r[rs1] >> (rs2 & 0x3f); break;				/* SRAI */
 						default: goto fail;
@@ -379,9 +318,9 @@ void cycle(state *s){
 			}
 			break;
 		case 0x33:
-			switch (funct3){
+			switch(funct3){
 				case 0x0:
-					switch (funct7){
+					switch(funct7){
 						case 0x0: r[rd] = r[rs1] + r[rs2]; break;					/* ADD */
 						case 0x20: r[rd] = r[rs1] - r[rs2]; break;					/* SUB */
 						default: goto fail;
@@ -392,7 +331,7 @@ void cycle(state *s){
 				case 0x3: r[rd] = u[rs1] < u[rs2]; break;		 					/* SLTU */
 				case 0x4: r[rd] = r[rs1] ^ r[rs2]; break;							/* XOR */
 				case 0x5:
-					switch (funct7){
+					switch(funct7){
 						case 0x0: r[rd] = u[rs1] >> u[rs2]; break;					/* SRL */
 						case 0x20: r[rd] = r[rs1] >> r[rs2]; break;					/* SRA */
 						default: goto fail;
@@ -405,70 +344,23 @@ void cycle(state *s){
 			break;
 		default: goto fail;
 	}
-
+	
+	
 	s->pc = s->pc_next;
 	s->pc_next = s->pc_next + 4;
 	s->status = s->status_dly[0];
 	for (i = 0; i < 3; i++)
 		s->status_dly[i] = s->status_dly[i+1];
-
-	if (s->timer0 & 0x10000) {
-		s->timercause |= 0x01;
-	} else {
-		s->timercause &= 0xfe;
-	}
-	if (s->timer0 & 0x40000) {
-		s->timercause |= 0x02;
-	} else {
-		s->timercause &= 0xfd;
-	}
-	if (s->timer1 == s->timer1_ctc) {
-		s->timer1 = 0;
-		s->timercause ^= 0x4;
-	}
-	if (s->timer1 < s->timer1_ocr) {
-		s->timercause |= 0x8;
-	} else {
-		s->timercause &= 0xf7;
-	}
-	// enable timer
-	s->s0cause = (s->timercause ^ s->timercause_inv) & s->timermask ? 0x04 : 0x00;
-	// enable gpio port A
-	s->pa_cause = s->pain ? 0x02 : 0x00;
-	s->s0cause |= (s->pa_cause ^ s->pa_cause_inv) & s->pa_mask ? 0x02 : 0x00;
-	if (s->s0cause != 0)
-			printf("CAAAAUSE: %d\n", s->s0cause);
-	s->cause = s->s0cause ? 0x01 : 0x00;
-
+	
 	s->cycles++;
-	s->timer0++;
-	switch (s->timer1_pre) {
-		case 1:
-			if (!(s->timer0 & 3)) s->timer1++;
-			break;
-		case 2:
-			if (!(s->timer0 & 15)) s->timer1++;
-			break;
-		case 3:
-			if (!(s->timer0 & 63)) s->timer1++;
-			break;
-		case 4:
-			if (!(s->timer0 & 255)) s->timer1++;
-			break;
-		case 5:
-			if (!(s->timer0 & 1023)) s->timer1++;
-			break;
-		case 6:
-			if (!(s->timer0 & 4095)) s->timer1++;
-			break;
-		case 7:
-			if (!(s->timer0 & 16383)) s->timer1++;
-			break;
-		default:
-			s->timer1++;
-	}
-	s->timer1 &= 0xffff;
-
+	s->counter++;
+	if ((s->compare2 & 0xffffff) == (s->counter & 0xffffff)) s->cause |= 0x20;		/*IRQ_COMPARE2*/
+	if (s->compare == s->counter) s->cause |= 0x10;									/*IRQ_COMPARE*/
+	if (!(s->counter & 0x10000)) s->cause |= 0x8; else s->cause &= 0xfffffff7;		/*IRQ_COUNTER2_NOT*/
+	if (s->counter & 0x10000) s->cause |= 0x4; else s->cause &= 0xfffffffb;			/*IRQ_COUNTER2*/
+	if (!(s->counter & 0x40000)) s->cause |= 0x2; else s->cause &= 0xfffffffd;		/*IRQ_COUNTER_NOT*/
+	if (s->counter & 0x40000) s->cause |= 0x1; else s->cause &= 0xfffffffe;			/*IRQ_COUNTER*/
+	
 	return;
 fail:
 	printf("\ninvalid opcode (pc=0x%x opcode=0x%x)", s->pc, inst);
@@ -492,22 +384,12 @@ int run(int8_t *mem, uint32_t *io, int size, int io_size){
 		printf("\nERROR: too big !!!.\n");
 		return(0);
 	}
-
-	//printf("\n\n\n\n IIIIIIOOOOOO %d!!!.\n", io_size);
 	
 	memcpy(sram, mem, size);
-	for (i = 0; i < size; i++){
-		if (mem[i] == 0)
-			break;
-		printf("%X\n", mem[i]);
-	}
-	printf("end mem\n");
-
 	
 	s->pc = SRAM_BASE;
 	s->pc_next = s->pc + 4;
 	s->mem = &sram[0];
-/*
 	s->vector = 0;
 	s->cause = 0;
 	s->mask = 0;
@@ -515,45 +397,26 @@ int run(int8_t *mem, uint32_t *io, int size, int io_size){
 	for (i = 0; i < 4; i++)
 		s->status_dly[i] = 0;
 	s->epc = 0;
-	s->s0cause = 0;
-	s->timercause = 0;
-	s->timercause_inv = 0;
-	s->timermask = 0;
-	s->timer0 = 0;
-	s->timer1 = 0;
-	s->timer1_pre = 0;
-	s->timer1_ctc = 0;
-	s->timer1_ocr = 0;
-	s->uartcause = 0; 
-	s->uartcause_inv = 0;
-	s->uartmask = 0;
-
+	s->counter = 0;
+	s->compare = 0;
+	s->compare2 = 0;
 	s->cycles = 0;
 	
 	io_index = 0;
 	io_num = io[0];
 	io_time = io[1];
 	io_out_index = 0;
-*/
-	//printf("\n\n\n\n IIIIIIOOOOOO %d %d!!!.\n", io_num, io_time);
 	while(1){
 		sim_time = s->cycles * 10;
 
-		//if (sim_time % 1000000 == 0)
-		//	printf("TIME: %d\n", sim_time);
-		//if (sim_time == 6000000)
-		//	break;
-/*
 		if (io_time <= sim_time && io_index/2 <= io_num){
-			//s->pain &= 0x0000ffff;
-			s->pain = io[io_index] & 0x0000ffff;
-			//printf("IO PAIN %d \n", s->pain);
-			//s->pain |= ~io[io_index]<<24;
+			s->cause &= 0x0000ffff;
+			s->cause |= io[io_index]<<16;
+			s->cause |= ~io[io_index]<<24;
 			io_index = io_index + 2;
 			io_time += io[io_index+1];
-			//printf("IO %d time %d\n", io[io_index], io[io_index+1]);
 		}
-*/
+
 		cycle(s);
 		// Waiting end of simulation
 		if (flag_endof == 1){
@@ -561,7 +424,6 @@ int run(int8_t *mem, uint32_t *io, int size, int io_size){
 		}
 	}
 	
-	printf("Scoreboard finished!\n");
 	return (0);
 }
 

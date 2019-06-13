@@ -8,6 +8,8 @@ int sort(int v[], int e){
 	for(i=0; i<e-1; i++){
 		for(j=i+1; j<e; j++){
 			if (v[i] > v[j]){
+				//printf("%d - %d: %d - %d\n",i, j, v[i] , v[j] );
+				printf("xuxuxuuxu %d - %d\n",v[i] , v[j] );
 				k = v[i];
 				v[i] = v[j];
 				v[j] = k;
@@ -51,9 +53,12 @@ int main(void){
 	for(i=0; i<ELEMENTS; i++)
 		printf("%d ", v[i]);
 	
-	time = TIMER0;
-	sort(v, ELEMENTS);
-	time = TIMER0 - time;
+	//time = TIMER0;
+	printf("\n\nsorting...\n");
+	//sort(v, ELEMENTS);
+	printf("\n\nsorted...\n");
+	//time = TIMER0 - time;
+	time = 0;
 
 	printf("\n\nsorted elements (%d cycles): ", time);
 	for(i=0; i<ELEMENTS; i++)
@@ -66,9 +71,9 @@ int main(void){
 	for(i=0; i<ELEMENTS; i++)
 		printf("%d ", v[i]);
 	
-	time = TIMER0;
+	//time = TIMER0;
 	qsort(v, 0, ELEMENTS-1);
-	time = TIMER0 - time;
+	//time = TIMER0 - time;
 
 	printf("\n\nsorted elements (%d cycles): ", time);
 	for(i=0; i<ELEMENTS; i++)

@@ -56,12 +56,20 @@ class checkr;
       begin
       	
          @(end_scb);
+         $display("checker received the end signal from the scoreboard!");
+         scb2chk.get(scb_mem);
+         $display(scb_mem);
+         scb2chk.get(scb_io);
+         $display("======================");
+         $display(scb_io);
          @(end_dut);
-                  
+         $display("checker received the end signal from the DUT!");
+
          dut_ramdump.get(ram);
          dut_romdump.get(rom); 
-         scb2chk.get(scb_mem);
-         scb2chk.get(scb_io);
+         //scb2chk.get(scb_mem);
+         //scb2chk.get(scb_io);
+         $display("checker got the generated data! checking ...");
 		   
          inst_add = ram.base;
          last_add = (ram.length/32);
