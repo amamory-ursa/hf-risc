@@ -19,7 +19,7 @@ READ_mips = mips-elf-readelf
 OBJ_mips = mips-elf-objcopy
 SIZE_mips = mips-elf-size
 
-GCC_riscv = riscv32-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -O2 -c -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -I ./include -DCPU_SPEED=${F_CLK} -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DDEBUG_PORT #-ffixed-s10 -ffixed-s11 -mrvc -fPIC -DDEBUG_PORT
+GCC_riscv = riscv32-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -O2 -c -mstrict-align -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -I ./include -DCPU_SPEED=${F_CLK} -DLITTLE_ENDIAN $(CFLAGS_STRIP) #-DDEBUG_PORT #-ffixed-s10 -ffixed-s11 -mno-div -mrvc -fPIC -DDEBUG_PORT
 AS_riscv = riscv32-unknown-elf-as -march=rv32i -mabi=ilp32 #-fPIC
 LD_riscv = riscv32-unknown-elf-ld -melf32lriscv $(LDFLAGS_STRIP)
 DUMP_riscv = riscv32-unknown-elf-objdump -Mno-aliases
@@ -43,6 +43,7 @@ crt:
 	$(GCC_$(ARCH)) -o libc.o lib/libc.c
 	$(GCC_$(ARCH)) -o interrupt.o lib/interrupt.c
 	$(GCC_$(ARCH)) -o math.o lib/math.c
+	$(GCC_$(ARCH)) -o malloc.o lib/malloc.c
 
 link:	
 	$(LD_$(ARCH)) -Tlib/$(ARCH)/hf-risc.ld -Map test.map -N -o test.elf *.o
@@ -110,6 +111,10 @@ eeprom_sim:
 	printf "%08x\n" `stat -L -c %s code.txt` >> eeprom.txt
 	cat code.txt >> eeprom.txt
 
+base64: crt
+	$(GCC_$(ARCH)) -o base64.o app/base64.c
+	@$(MAKE) --no-print-directory link
+
 coremark: crt
 	$(GCC_$(ARCH)) -o core_list_join.o app/coremark/core_list_join.c
 	$(GCC_$(ARCH)) -o core_main.o app/coremark/core_main.c -DFLAGS_STR=\"'$(GCC_$(ARCH))'\" -Dee_printf=printf
@@ -164,6 +169,10 @@ interrupt_test: crt
 
 labyrinth: crt
 	$(GCC_$(ARCH)) -o labyrinth.o app/labyrinth.c
+	@$(MAKE) --no-print-directory link
+
+malloc_test: crt
+	$(GCC_$(ARCH)) -o malloc_test.o app/malloc_test.c
 	@$(MAKE) --no-print-directory link
 
 mem_test: crt
