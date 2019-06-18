@@ -97,3 +97,7 @@ Example prototype platforms are available for both HF-RISC and HF-RISCV cores on
 If a multiplier is used (not included in this design) the score is around 2.1 Coremark/MHz.
 
 *HF-RISCV doesn't include the multiply/divide (M) extension (pure RV32I) and doesn't include dalayed branches as found on MIPS. This sacrifices performance a bit, but simplifies the ISA for deeper pipelines and OOO execution. Based on several experiments, the inclusion of the M module will boost the performance of this core beyond the HF-RISC version, even without branch prediction. 
+
+### Verification
+
+- UVM TB in development
