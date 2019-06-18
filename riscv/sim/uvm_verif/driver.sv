@@ -1,9 +1,11 @@
 `ifndef DRIVER_UVM
  `define DRIVER_UVM
 
- `include "hfrv_interface.sv"
- `include "memory_model.sv"
- 
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+`include "hfrv_interface.sv"
+`include "memory_model.sv"
+
 class driver extends uvm_driver#(memory_model);
     `uvm_component_utils(driver)
 

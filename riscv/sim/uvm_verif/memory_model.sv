@@ -1,7 +1,12 @@
 `ifndef MEMORY_MODEL_UVM
  `define MEMORY_MODEL_UVM
 
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+
 class memory_model extends uvm_sequence_item;
+    `uvm_object_utils(memory_model)
+
     // Memory information
     rand logic [31:0] data[integer];
     rand logic [31:0] base;
