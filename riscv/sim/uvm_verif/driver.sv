@@ -2,8 +2,8 @@
  `define DRIVER_UVM
 
  `include "hfrv_interface.sv"
-
-
+ `include "memory_model.sv"
+ 
 class driver extends uvm_driver#(memory_model);
     `uvm_component_utils(driver)
 
@@ -34,6 +34,11 @@ class driver extends uvm_driver#(memory_model);
 
         // To inform the Scoreboard and the Coverage
         dvr2scb_port = new("dvr2scb_port", this);
+
+        // Creates the ROM memory transaction
+        boot = mem_seq_item::type_id::create();
+        // Reads the boot.txt to get the ROM memory content
+        boot.read_from_file("boot.txt", 'h0, 'h100000);
 
     endfunction: build_phase
 
@@ -68,10 +73,7 @@ class driver extends uvm_driver#(memory_model);
         end
     endtask: run_phase
 
-    task drive();
-        // Reads the boot.txt to get the ROM memory content
-        boot = new("boot.txt", 'h0, 'h100000);
-        
+    task drive();     
         // Once we have the boot and the program code, we can start the processor
         start_cpu();
        
@@ -86,6 +88,7 @@ class driver extends uvm_driver#(memory_model);
         stop_cpu();
     endtask: drive;
 
+
     task memory_interface(memory_model memory);
         forever @(riscv_if.memory.mem) begin
             logic [31:0] data_read;
@@ -98,6 +101,7 @@ class driver extends uvm_driver#(memory_model);
         end
     endtask: memory_iface
 
+
     task verify_terminate();
         // Waits inside the forever loop, watching the condition to finish the simulation!
         forever @(riscv_if.memory.mem) begin
@@ -109,7 +113,6 @@ class driver extends uvm_driver#(memory_model);
     endtask: verify_terminate;
 
     task start_cpu();
-        #10;
         riscv_if.reset = 0;
     endtask: start_cpu;
 
