@@ -1,0 +1,39 @@
+`ifndef HFRV_INTERFACE_UVM
+ `define HFRV_INTERFACE_UVM
+
+interface hfrv_interface(input logic clk);
+   logic reset;
+   logic stall;
+   
+   logic [31:0] address;
+   logic [31:0] data_read;
+   logic [31:0] data_write;
+   logic [3:0]  data_we;
+
+   logic [7:0]  extio_in;
+   logic [7:0]  extio_out;
+
+   clocking mem @(posedge clk);
+      input     address;
+      input     data_write;
+      input     data_we;
+      output    data_read;
+   endclocking; // drv_cb
+
+   modport gpio(input extio_out, output extio_in);
+
+   modport memory(input reset,
+                  clocking mem);
+
+   modport driver(output reset, stall,
+                  clocking mem);
+
+   modport monitor(input reset, stall,
+                   clocking mem);
+
+   modport cpu(input reset, clk, data_read, extio_in, stall,
+               output address, data_write, data_we, extio_out);
+   
+endinterface // hfrv_interface
+
+`endif
