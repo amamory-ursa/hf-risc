@@ -4,16 +4,16 @@
  `include "hfrv_interface.sv"
 
 
-class driver extends uvm_driver#(TRANSACTION);
+class driver extends uvm_driver#(memory_model);
     `uvm_component_utils(driver)
 
     // RISC-V Processor (DUT) Interface
     virtual hfrv_interface riscv_if;
 
     // Port to inform the transaction to the Scoreboard and Coverage
-    uvm_analysis_port#(TRANSACTION) dvr2scb_port;
+    uvm_analysis_port#(memory_model) dvr2scb_port;
 
-    TRANSACTION req, boot;
+    memory_model req, boot;
 
     /////////////////////////////////////////////////
     // Constructor
@@ -33,14 +33,6 @@ class driver extends uvm_driver#(TRANSACTION);
             `uvm_fatal("NO_IF - DRIVER",{"virtual interface must be set for: ",get_full_name(),".riscv_if"});
 
         // To inform the Scoreboard and the Coverage
-        ////////////////////////////////////////////
-        ////////////// OBSERVATION:
-        // This port usually stay inside the monitor.
-        // Once this testbench doesn't use any driver
-        // protocol, just a dump inside the memory
-        // the use of a passive monitor to listen
-        // the driver and verifying the tx protocol
-        // is pointless.
         dvr2scb_port = new("dvr2scb_port", this);
 
     endfunction: build_phase
@@ -94,7 +86,7 @@ class driver extends uvm_driver#(TRANSACTION);
         stop_cpu();
     endtask: drive;
 
-    task memory_interface(TRANSACTION memory);
+    task memory_interface(memory_model memory);
         forever @(riscv_if.memory.mem) begin
             logic [31:0] data_read;
             
