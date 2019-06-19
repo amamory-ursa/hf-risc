@@ -32,7 +32,7 @@ class memory_model extends uvm_sequence_item;
     
     ///////////////////////////////////////////
     // Reads the content from a file
-    function read_from_file(string filename, logic [31:0] base, integer length);
+    function void read_from_file(string filename, logic [31:0] base, integer length);
         logic [31:0] inst_add, celing, write_data;
         int          code, i, r;
         int          instruction;
