@@ -14,7 +14,7 @@ class agent extends uvm_agent;
     super.new(name, parent);
   endfunction : new
  
-  // build_phase
+
   function void build_phase(uvm_phase phase);
     
 	virtual hfrv_interface riscv_if;
@@ -35,7 +35,6 @@ class agent extends uvm_agent;
       endfunction : build_phase
 
  
-  // connect_phase
   function void connect_phase(uvm_phase phase);
       drv.seq_item_port.connect(seqcr.seq_item_export);
   endfunction : connect_phase
