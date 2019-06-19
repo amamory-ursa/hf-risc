@@ -85,7 +85,7 @@ class driver extends uvm_driver#(memory_model);
             memory_interface(req);  // feed the RAM mem
             verify_terminate();     // watch the processor interface to 
         join_any // Complete the fork as soon as the earliest process finish (in this case the verify_terminate is the only one that will terminate!)
-        
+        disable fork; //https://stackoverflow.com/questions/14287446/proper-use-of-disable-fork-in-systemverilog
         // Stops the CPU to get another program and start the verification again
         stop_cpu();
     endtask: drive;
@@ -109,6 +109,7 @@ class driver extends uvm_driver#(memory_model);
         forever @(riscv_if.memory.mem) begin
             if (riscv_if.memory.mem.address == 32'he0000000 && riscv_if.memory.mem.data_we != 4'h0) begin
                 riscv_if.memory.mem.data_read <= {32{1'b0}};
+                `uvm_info("DRIVER", "FIM DO PROGRAMA", UVM_LOW);
                 break;
             end
         end
