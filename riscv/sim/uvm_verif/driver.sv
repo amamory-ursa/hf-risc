@@ -38,7 +38,7 @@ class driver extends uvm_driver#(memory_model);
         dvr2scb_port = new("dvr2scb_port", this);
 
         // Creates the ROM memory transaction
-        boot = mem_seq_item::type_id::create();
+        boot = memory_model::type_id::create();
         // Reads the boot.txt to get the ROM memory content
         boot.read_from_file("boot.txt", 'h0, 'h100000);
 
@@ -101,7 +101,7 @@ class driver extends uvm_driver#(memory_model);
             
             if (!(^data_read === 1'bX)) riscv_if.memory.mem.data_read <= data_read;
         end
-    endtask: memory_iface
+    endtask: memory_interface
 
 
     task verify_terminate();
