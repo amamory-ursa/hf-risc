@@ -24,3 +24,4 @@ history.csv
 riscv/sim/sv_verif/randomtest/apps/app/build.sh
 riscv/sim/sv_verif/randomtest/apps/app/run.sh
 riscv/sim/sv_verif/randomtest/apps/*/*.S
+tools/riscv-toolchain/**

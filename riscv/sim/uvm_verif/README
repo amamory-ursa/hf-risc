@@ -6,7 +6,7 @@
 	* ./build_riscv_toolchain 
 
 - MODIFICAR GCC_riscv NO MAKEFILE DO SOFTWARE
-	* GCC_riscv = riscv32-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -O2 -c -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -I ./include -DCPU_SPEED=${F_CLK} -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DDEBUG_PORT #-ffixed-s10 -ffixed-s11 -mrvc -fPIC -DDEBUG_PORT
+	* GCC_riscv = riscv32-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -O2 -c -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -I ./include -DCPU_SPEED=${F_CLK} -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DDEBUG_PORT #-ffixed-s10 -ffixed-s11 -mrvc -fPIC -DDEBUG_PORTamory
 
 - EXECUTAR SIMULAÇÃO
 	* ./run.sh sort
