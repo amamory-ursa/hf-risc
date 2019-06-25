@@ -120,7 +120,7 @@ module dut_top (hfrv_interface.cpu iface);
 
    // Boot ROM
    boot_ram #(	
-      .memory_file ("boot.txt"),
+      .memory_file ("../scripts/boot.txt"),
 	  .data_width (8),
 	  .address_width (12),
 	  .bank (0)
@@ -135,7 +135,7 @@ module dut_top (hfrv_interface.cpu iface);
 	);
    
    boot_ram #(	
-      .memory_file ("boot.txt"),
+      .memory_file ("../scripts/boot.txt"),
 	  .data_width (8),
 	  .address_width (12),
 	  .bank (1)
@@ -150,7 +150,7 @@ module dut_top (hfrv_interface.cpu iface);
 	);
 		
    boot_ram #(	
-      .memory_file ("boot.txt"),
+      .memory_file ("../scripts/boot.txt"),
 	  .data_width (8),
 	  .address_width (12),
 	  .bank (2)
@@ -166,7 +166,7 @@ module dut_top (hfrv_interface.cpu iface);
 		
       
    boot_ram #(	
-      .memory_file ("boot.txt"),
+      .memory_file ("../scripts/boot.txt"),
 		.data_width (8),
 		.address_width (12),
 		.bank (3)
@@ -182,7 +182,7 @@ module dut_top (hfrv_interface.cpu iface);
 
     // RAM
 	bram #(	
-	   .memory_file ("code.txt"),
+	   .memory_file ("../scripts/code.txt"),
 	   .data_width (8),
 	   .address_width (16),
 	   .bank (0)
@@ -197,7 +197,7 @@ module dut_top (hfrv_interface.cpu iface);
 	);
 
 	bram #(	
-	   .memory_file ("code.txt"),
+	   .memory_file ("../scripts/code.txt"),
 	   .data_width (8),
 	   .address_width (16),
 	   .bank (1)
@@ -212,7 +212,7 @@ module dut_top (hfrv_interface.cpu iface);
 	);
 
 	bram #(	
-	   .memory_file ("code.txt"),
+	   .memory_file ("../scripts/code.txt"),
 	   .data_width (8),
 	   .address_width (16),
 	   .bank (2)
@@ -227,7 +227,7 @@ module dut_top (hfrv_interface.cpu iface);
 	);
 
 	bram #(	
-	   .memory_file ("code.txt"),
+	   .memory_file ("../scripts/code.txt"),
 	   .data_width (8),
 	   .address_width (16),
 	   .bank (3)

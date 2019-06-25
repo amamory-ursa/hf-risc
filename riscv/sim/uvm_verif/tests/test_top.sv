@@ -1,13 +1,13 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-`include "environment.sv"
-`include "memory_model.sv"
-
+`include "../uvm_src/environment.sv"
+`include "../uvm_src/memory_model.sv"
+`include "../uvm_src/sequence.sv"
 class test_top extends uvm_test;
     `uvm_component_utils(test_top)
 
     environment env;
-    generator seq;
+    memory_sequence seq;
 
     /////////////////////////////////////////////////
     // Constructor
@@ -35,7 +35,7 @@ class test_top extends uvm_test;
         env = environment::type_id::create("env", this);
         
         // Creates the sequencer module
-        seq = generator::type_id::create("seq", this);
+        seq = memory_sequence::type_id::create("seq", this);
 
 
     endfunction: build_phase

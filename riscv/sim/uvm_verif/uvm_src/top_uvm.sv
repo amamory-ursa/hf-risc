@@ -1,7 +1,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "dut_top.sv"
-`include "test_top.sv"
+`include "../tests/test_top.sv"
 
 `timescale 1ns/1ns
 

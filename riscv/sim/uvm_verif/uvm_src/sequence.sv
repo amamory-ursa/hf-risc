@@ -5,20 +5,20 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 
 `include "memory_model.sv"
-class generator extends uvm_sequence#(memory_model);
+class memory_sequence extends uvm_sequence#(memory_model);
 
-        `uvm_object_utils(generator)
+        `uvm_object_utils(memory_sequence)
 	string path;
 	memory_model transaction;
 	_sequencer seqce;
         //Construtor
-        function new(string name="generator");
+        function new(string name="memory_model");
                 super.new(name);
-		   path = "code.txt";
+		   path = "../scripts/code.txt";
         endfunction
 
         virtual task body();
-        repeat(2)
+        while(1)
         begin
 
 		/*criando uma transaction memory_model*/

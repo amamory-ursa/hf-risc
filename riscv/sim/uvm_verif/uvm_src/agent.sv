@@ -1,7 +1,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "driver.sv"  
-`include "generator.sv"  
+  
 
 
 class agent extends uvm_agent;
@@ -9,7 +9,7 @@ class agent extends uvm_agent;
 
   driver    drv;
   _sequencer seqcr;
-  generator gen;
+  
 
  function new (string name, uvm_component parent);
     super.new(name, parent);

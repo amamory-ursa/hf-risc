@@ -7,12 +7,12 @@ import uvm_pkg::*;
 class memory_model extends uvm_sequence_item;
 
     // Memory information
-    rand logic [31:0] data[integer];
-    rand logic [31:0] base;
-    rand integer      length;
+    logic [31:0] data[integer];
+    logic [31:0] base;
+    integer      length;
 
-    // Control information
-    bit from_file = 1;
+    
+    
 
     // Analysis information
     // something here?
