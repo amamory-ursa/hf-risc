@@ -38,14 +38,14 @@ class coverage extends uvm_subscriber #(wrapper_cell);
 	covergroup CG_Instruction;
 
 		coverpoint opcode
-			{bins opcode[] = {[0:600]};
+			{bins opcode[] = {[0:600]}; // restringir para codigos validos
 				option.weight = 0;}
 		coverpoint iType
 			{bins iType[] = {[0:6]}; 
 			 option.weight = 0;}
 
 		coverpoint rdRegister
-			{bins rdRegister[] = {[0:31]}; 
+			{bins rdRegister[] = {[1:31]}; // x0 nunca estará no rd
 			 option.weight = 0;}
 
 		coverpoint r1Register
