@@ -5,6 +5,7 @@
 **/*.log
 **/*.vstf
 **/*.bin
+**/*.vscode
 **/transcript
 **/work
 **/certe_dump.xml

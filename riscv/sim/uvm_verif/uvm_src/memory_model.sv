@@ -5,15 +5,14 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 
 class memory_model extends uvm_sequence_item;
-    `uvm_object_utils(memory_model)
 
     // Memory information
-    rand logic [31:0] data[integer];
-    rand logic [31:0] base;
-    rand integer      length;
+    logic [31:0] data[integer];
+    logic [31:0] base;
+    integer      length;
 
-    // Control information
-    bit from_file = 1;
+    
+    
 
     // Analysis information
     // something here?
@@ -21,7 +20,6 @@ class memory_model extends uvm_sequence_item;
     ///////////////////////////////////////////
     // Utility and Field macros,
     `uvm_object_utils_begin(memory_model)
-        `uvm_field_int(data,UVM_ALL_ON)
         `uvm_field_int(base,UVM_ALL_ON)
         `uvm_field_int(length,UVM_ALL_ON)
     `uvm_object_utils_end
@@ -34,7 +32,7 @@ class memory_model extends uvm_sequence_item;
     
     ///////////////////////////////////////////
     // Reads the content from a file
-    function read_from_file(string filename, logic [31:0] base, integer length);
+    function void read_from_file(string filename, logic [31:0] base, integer length);
         logic [31:0] inst_add, celing, write_data;
         int          code, i, r;
         int          instruction;
@@ -87,5 +85,5 @@ class memory_model extends uvm_sequence_item;
     endfunction: read_write
 
 endclass: memory_model
-
+typedef uvm_sequencer #(memory_model) _sequencer;
  `endif
