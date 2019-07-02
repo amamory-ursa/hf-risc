@@ -5,7 +5,7 @@ ARCH="riscv"
 F_CLK=25000000
 
 LIB_PATH="/software/lib"
-LIB_PATH="../../../../../software/lib"
+LIB_PATH="../../../../../../software/lib"
 
 CRR_PATH="/hf-riscv/verif/randomtest/apps/"
 
@@ -25,6 +25,7 @@ OBJ_riscv="riscv32-unknown-elf-objcopy"
 SIZE_riscv="riscv32-unknown-elf-size"
 
 #generate object code for app
+#hahahahah
 ASNAME="AS_${ARCH}"
 ${!ASNAME} -o test.o *.S
 

@@ -43,9 +43,11 @@ task monitor::run_phase(uvm_phase phase);
 
     forever 
     begin
-        @(posedge top_uvm.clk) begin
+        @(posedge top_uvm.clk) 
+        begin
                 _hfrv_tb_block.register_block.pc_reg.read(status, rdata, UVM_BACKDOOR);
-                `uvm_info(get_type_name(), $sformatf("desired=0x%0h mirrored=0x%0h", _hfrv_tb_block.register_block.pc_reg.get(), _hfrv_tb_block.register_block.pc_reg.get_mirrored_value()), UVM_LOW)
+                `uvm_info(get_type_name(), $sformatf("desired=0x%0h mirrored=0x%0h", _hfrv_tb_block.register_block.pc_reg.get(), _hfrv_tb_block.register_block.pc_reg.get_mirrored_value()), UVM_LOW);
+                _hfrv_tb_block.register_block.ctrl_reg.read(status, rdata, UVM_BACKDOOR);
         end
     end
 endtask : run_phase
