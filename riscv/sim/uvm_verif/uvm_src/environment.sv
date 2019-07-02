@@ -5,6 +5,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "agent.sv"
 `include "hfrv_interface.sv"
+`include "../register_layer/hfrv_reg_block.sv"
 
 class environment extends uvm_env;
   `uvm_component_utils(environment)
@@ -13,6 +14,7 @@ class environment extends uvm_env;
   agent agt;
   //scoreboard scb;
   //checker ckr;
+  hfrv_tb_block   _hfrv_tb_block;
 
 
   /////////////////////////////////////////////////
@@ -36,7 +38,11 @@ class environment extends uvm_env;
 
 
       // Creates the Checker
-
+      _hfrv_tb_block          = hfrv_tb_block::type_id::create ("_hfrv_tb_block", this);
+      _hfrv_tb_block.build ();
+      _hfrv_tb_block.lock_model ();
+      uvm_config_db #(hfrv_tb_block)::set (null, "uvm_test_top", "_hfrv_tb_block", _hfrv_tb_block);
+   
 
   endfunction : build_phase
 

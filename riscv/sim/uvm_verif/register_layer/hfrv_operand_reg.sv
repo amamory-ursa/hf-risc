@@ -1,5 +1,6 @@
 
-
+`ifndef OPERAND_REG
+`define OPERAND_REG
 
 class hfrv_operand_reg extends uvm_reg;
     `uvm_object_utils( hfrv_operand_reg)
@@ -28,4 +29,6 @@ class hfrv_operand_reg extends uvm_reg;
 
     endfunction : build
 
-endclass : riscv_reg
+endclass : hfrv_operand_reg
+
+`endif 
