@@ -18,3 +18,7 @@ set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
 
 run 9 ms 
+
+#quit vsim
+quit -sim
+quit -f

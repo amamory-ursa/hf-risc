@@ -52,11 +52,11 @@ To run the verification at the End of Program Execution, follow the next steps:
       - test
 3. Copy the code.txt file to the verification directory: <br />
    ```
-   cp code.txt ../hf-riscv/verif/
+   cp code.txt ../hf-riscv/sv_verif/
    ```  
 4. Go to the verification directory: <br />
    ```
-   cd ../hf-riscv/verif/
+   cd ../hf-riscv/sv_verif/
    ```
 5. Load the Modelsim tool: <br /> 
    ```
@@ -77,7 +77,7 @@ To run the verification at the End of Program Execution, follow the next steps:
 To run the verification with Merged Coverage, follow the next steps:
 1. Go to the test cases directory: <br />
    ```
-   cd hf-riscv/verif/testcases/
+   cd hf-riscv/sv_verif/testcases/
    ```
 2. Load the Modelsim tool: <br /> 
    ```
@@ -102,7 +102,7 @@ To run the verification with Merged Coverage, follow the next steps:
 To run the verification with Merged Coverage, follow the next steps:
 1. Go to the random test directory: <br />
    ```
-   cd hf-riscv/verif/randomtest/
+   cd hf-riscv/sv_verif/randomtest/
    ```
 2. Load the Modelsim tool: <br /> 
    ```
