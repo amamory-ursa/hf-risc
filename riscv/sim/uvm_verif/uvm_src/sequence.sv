@@ -21,6 +21,7 @@ class memory_sequence extends uvm_sequence#(memory_model);
         while(1)
         begin
 
+
 		/*criando uma transaction memory_model*/
                 req = memory_model::type_id::create("transaction");
 
@@ -33,11 +34,13 @@ class memory_sequence extends uvm_sequence#(memory_model);
 		/*envia item para o sequencer*/
                 send_request(req);
 
+
 		/*bloqueia ate o driver chamar item_done*/
                 wait_for_item_done();
 
 		/*resposta do driver*/
-                get_response(rsp);
+               // get_response(rsp);
+                `uvm_info("SEQUENCE:","Memory_model consumed by DUT",UVM_LOW);
 
         end
         endtask	
