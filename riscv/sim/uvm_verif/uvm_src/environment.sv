@@ -4,6 +4,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "agent.sv"
+`include "coverage.sv"
 `include "hfrv_interface.sv"
 `include "../register_layer/hfrv_reg_block.sv"
 
@@ -14,6 +15,7 @@ class environment extends uvm_env;
   agent agt;
   //scoreboard scb;
   //checker ckr;
+  coverage cov;
   hfrv_tb_block   _hfrv_tb_block;
 
 
@@ -38,6 +40,14 @@ class environment extends uvm_env;
 
 
       // Creates the Checker
+
+
+      // creates the coverage
+      cov = coverage::type_id::create("coverage", this);
+      
+      
+
+      // create register layer
       _hfrv_tb_block          = hfrv_tb_block::type_id::create ("_hfrv_tb_block", this);
       _hfrv_tb_block.build ();
       _hfrv_tb_block.lock_model ();
@@ -60,6 +70,7 @@ class environment extends uvm_env;
   ////////////////////////////////////////////////
   function void connect_phase(uvm_phase phase);
     // Connects the agent to the Scoreboard and Checker
+    agt.mon.item_collected_port.connect(cov.analysis_export);
   endfunction : connect_phase
 
   /////////////////////////////////////////////////

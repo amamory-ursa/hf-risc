@@ -27,6 +27,8 @@ class hfrv_reg_block extends uvm_reg_block;
     rand hfrv_int_reg pc_last_reg;
     rand hfrv_int_reg pc_last2_reg;
 
+    rand hfrv_int_reg inst_in_s_reg;
+
     
     
     string register_names[0:31] = {"Zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", 
@@ -82,7 +84,16 @@ class hfrv_reg_block extends uvm_reg_block;
         ctrl_reg = hfrv_ctrl_reg::type_id::create( "ctrl_reg" );      
         ctrl_reg.configure( this, null, "" );      
         ctrl_reg.build(); 
-        ctrl_reg.add_hdl_path_slice("ctrl_reg", 0, ctrl_reg.get_n_bits());
+        //ctrl_reg.add_hdl_path_slice("reg_write_ctl_r", 0, ctrl_reg.get_n_bits());
+        ctrl_reg.add_hdl_path_slice("reg_write_ctl_r", 0, 1);
+        ctrl_reg.add_hdl_path_slice("alu_src1_ctl_r", 1, 1);
+        ctrl_reg.add_hdl_path_slice("alu_src2_ctl_r", 2, 3);
+        ctrl_reg.add_hdl_path_slice("alu_op_ctl_r", 5, 4);
+        ctrl_reg.add_hdl_path_slice("jump_ctl_r", 9, 2);
+        ctrl_reg.add_hdl_path_slice("branch_ctl_r", 11, 3);
+        ctrl_reg.add_hdl_path_slice("mem_write_ctl_r", 14, 2);
+        ctrl_reg.add_hdl_path_slice("mem_read_ctl_r", 16, 2);
+        ctrl_reg.add_hdl_path_slice("sig_read_ctl_r", 18, 1);
         default_map.add_reg( .rg( ctrl_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h03;
         //--------------------------- MEMORY 
@@ -131,6 +142,14 @@ class hfrv_reg_block extends uvm_reg_block;
         imm_u_reg.add_hdl_path_slice("imm_u_reg", 0, imm_u_reg.get_n_bits());
         default_map.add_reg( .rg( imm_u_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h03;
+
+        //--------------------------- RS2
+        inst_in_s_reg = hfrv_int_reg::type_id::create( "inst_in_s_reg" );      
+        inst_in_s_reg.configure( this, null, "" );      
+        inst_in_s_reg.build(); 
+        inst_in_s_reg.add_hdl_path_slice("inst_in_s", 0, inst_in_s_reg.get_n_bits());
+        default_map.add_reg( .rg( inst_in_s_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
+        offsetAddress += 8'h04;
         
         
         add_hdl_path("riscv.cpu.core");
