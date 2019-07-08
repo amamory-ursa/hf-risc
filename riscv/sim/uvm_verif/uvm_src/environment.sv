@@ -6,14 +6,18 @@ import uvm_pkg::*;
 `include "agent.sv"
 `include "coverage.sv"
 `include "hfrv_interface.sv"
+<<<<<<< HEAD
 `include "../register_layer/hfrv_reg_block.sv"
+=======
+`include "scoreboard.sv"
+>>>>>>> origin/verif_devel
 
 class environment extends uvm_env;
   `uvm_component_utils(environment)
   
   //Environment components
   agent agt;
-  //scoreboard scb;
+  scoreboard scb;
   //checker ckr;
   coverage cov;
   hfrv_tb_block   _hfrv_tb_block;
@@ -37,7 +41,7 @@ class environment extends uvm_env;
       agt = agent::type_id::create("agent", this);
 
       // Creates the Scoreboard
-
+      scb = new("scoreboard", this);
 
       // Creates the Checker
 
