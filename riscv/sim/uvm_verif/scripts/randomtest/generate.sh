@@ -25,7 +25,15 @@ for d in */ ; do
 done
 
 #back to main directory
-cd ..
+#cd ..
 
 #run the stuff
-bash apps/run_all.sh/
+#bash apps/run_all.sh
+#call individual builds
+for d in */ ; do
+	cd $d
+	bash run.sh	
+	cd ..
+done
+
+cd ..

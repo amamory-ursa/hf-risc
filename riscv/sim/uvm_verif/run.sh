@@ -5,7 +5,7 @@ then
 
   echo "	creating random tests... please wait"
   cd scripts/randomtest
-  ./generate.sh
+  ./run_all.sh
   
   cd ../
   

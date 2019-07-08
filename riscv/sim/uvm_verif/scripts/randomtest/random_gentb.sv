@@ -4,7 +4,7 @@
 `include "random_program.sv"
 
 
-`define NUMPROGRS 2
+`define NUMPROGRS 3
 
 module testbench;
 
@@ -29,7 +29,6 @@ module testbench;
       //save to file (note that these files are compiled elsewhere)
       $sformat(filename, "apps/app%0d/app%0d.S", i, i);
       $sformat(dirname,  "apps/app%0d", i);
-
       $system({"mkdir ", dirname});
 
       f = $fopen(filename);
