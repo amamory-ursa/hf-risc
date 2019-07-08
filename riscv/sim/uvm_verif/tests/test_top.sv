@@ -3,6 +3,7 @@ import uvm_pkg::*;
 `include "../uvm_src/environment.sv"
 `include "../uvm_src/memory_model.sv"
 `include "../uvm_src/sequence.sv"
+
 class test_top extends uvm_test;
     `uvm_component_utils(test_top)
 
@@ -45,13 +46,20 @@ class test_top extends uvm_test;
     // Run Phase
     ////////////////////////////////////////////////
     task run_phase(uvm_phase phase);
+
+
         super.run_phase(phase);
+
+        
 
         phase.raise_objection(this);
 
         // Connects the sequence to the generator inside the agent
         seq.seqce = env.agt.seqcr;
+
         seq.start(seq.seqce);
+
+
 
         phase.drop_objection(this);
         

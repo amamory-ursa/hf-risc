@@ -22,9 +22,9 @@
 
 import uvm_pkg::*;
 `include "uvm_macros.svh"
+`include "instruction_item.sv"
 
-
-class coverage extends uvm_subscriber #(wrapper_cell);
+class coverage extends uvm_subscriber #(instruction_item);
 `uvm_component_utils(coverage);
 
 	bit [6:0] opcode;
@@ -38,14 +38,17 @@ class coverage extends uvm_subscriber #(wrapper_cell);
 	covergroup CG_Instruction;
 
 		coverpoint opcode
-			{bins opcode[] = {[0:600]}; // restringir para codigos validos
+			{
+			bins opcode[] = {3,19,23,35,51,55,99,103,111,115}; // restringir para codigos validos
+			ignore_bins others = {[0:2],[4:18],[20:22],[24:34],[36:50],[52:54],[56:98],[100:102],[104:110],[112:114],[116:127]};
+
 				option.weight = 0;}
 		coverpoint iType
 			{bins iType[] = {[0:6]}; 
 			 option.weight = 0;}
 
 		coverpoint rdRegister
-			{bins rdRegister[] = {[1:31]}; // x0 nunca estará no rd
+			{bins rdRegister[] = {[0:31]}; // x0 nunca estará no rd
 			 option.weight = 0;}
 
 		coverpoint r1Register
@@ -57,7 +60,8 @@ class coverage extends uvm_subscriber #(wrapper_cell);
 			 option.weight = 0;}
 
 
-      		cross opcode, rdRegister, r1Register, r2Register;
+      		//cross opcode, rdRegister, r1Register, r2Register;
+			  cross opcode, rdRegister;
 	endgroup: CG_Instruction;
 
 
@@ -65,7 +69,8 @@ class coverage extends uvm_subscriber #(wrapper_cell);
      	// Instantiate the covergroup
      	
 	extern function new(string name, uvm_component parent);
-	extern function void write(wrapper_cell t);
+	extern function void build_phase(uvm_phase phase);
+	extern function void write(instruction_item t);
 
 endclass : coverage
 
@@ -74,12 +79,19 @@ function coverage::new(string name, uvm_component parent);
 		CG_Instruction = new();
 endfunction : new
 
-function void coverage::write(instruction i);
-	this.opcode = i.opcode;
-	this.iType  = i.iType;
-	this.rdRegister = i.rdRegister;
-	this.r1Register = i.r1Register;
-	this.r2Register = i.r2Register;
+
+function void coverage::build_phase(uvm_phase phase);
+	super.build_phase(phase);
+    
+
+endfunction : build_phase
+
+function void coverage::write(instruction_item t);
+	this.opcode = t.opcode;
+	this.iType  = 0;
+	this.rdRegister = t.rd;
+	this.r1Register = t.r1;
+	this.r2Register = t.r2;
 	CG_Instruction.sample();
 endfunction: write 
 

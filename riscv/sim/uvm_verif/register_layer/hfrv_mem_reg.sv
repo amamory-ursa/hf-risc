@@ -1,5 +1,6 @@
 
-
+`ifndef MEM_REG
+`define MEM_REG
 
 class hfrv_mem_reg extends uvm_reg;
     `uvm_object_utils( hfrv_mem_reg)
@@ -29,7 +30,7 @@ class hfrv_mem_reg extends uvm_reg;
         reg_to_mem = uvm_reg_field::type_id::create( "reg_to_mem" );
         reg_to_mem.configure(    .parent                 ( this ),
                                 .size                   ( 1   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 1    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -40,4 +41,6 @@ class hfrv_mem_reg extends uvm_reg;
 
     endfunction : build
 
-endclass : riscv_reg
+endclass : hfrv_mem_reg
+
+`endif 

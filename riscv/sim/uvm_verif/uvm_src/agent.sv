@@ -1,6 +1,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "driver.sv"  
+`include "../register_layer/hfrv_monitor.sv"
   
 
 
@@ -9,7 +10,7 @@ class agent extends uvm_agent;
 
   driver    drv;
   _sequencer seqcr;
-  
+  monitor mon;
 
  function new (string name, uvm_component parent);
     super.new(name, parent);
@@ -18,22 +19,25 @@ class agent extends uvm_agent;
 
   function void build_phase(uvm_phase phase);
     
-	virtual hfrv_interface riscv_if;
+	  virtual hfrv_interface riscv_if;
     	
-	super.build_phase(phase);
+	  super.build_phase(phase);
 
 
-    	if (!uvm_config_db #(virtual hfrv_interface)::get (this, "", "riscv_if", riscv_if) )
-      	begin
+    if (!uvm_config_db #(virtual hfrv_interface)::get (this, "", "riscv_if", riscv_if) )
+    begin
         	uvm_config_db #(int)::dump(); 
         	`uvm_fatal("agnt", "No top_receive_if");
-    	end
+    end
 
-      	drv = driver::type_id::create("driver", this);
-      	seqcr = _sequencer::type_id::create("sequencer", this);
-      	uvm_config_db #(virtual hfrv_interface)::set (this,"driver", "riscv_if", riscv_if);
-      	
-      endfunction : build_phase
+    drv = driver::type_id::create("driver", this);
+    seqcr = _sequencer::type_id::create("sequencer", this);
+    uvm_config_db #(virtual hfrv_interface)::set (this,"driver", "riscv_if", riscv_if);
+
+    mon = monitor::type_id::create("monitor", this);
+
+  endfunction : build_phase
+      
 
  
   function void connect_phase(uvm_phase phase);

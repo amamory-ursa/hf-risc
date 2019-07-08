@@ -5,6 +5,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 
 `include "memory_model.sv"
+`include "../register_layer/hfrv_reg_block.sv"
 class memory_sequence extends uvm_sequence#(memory_model);
 
         `uvm_object_utils(memory_sequence)
@@ -18,6 +19,11 @@ class memory_sequence extends uvm_sequence#(memory_model);
         endfunction
 
         virtual task body();
+        hfrv_tb_block   _hfrv_tb_block;
+        uvm_status_e      status;
+        int               rdata;
+
+        uvm_config_db#(hfrv_tb_block)::get(null, "uvm_test_top", "_hfrv_tb_block", _hfrv_tb_block);
         while(1)
         begin
 
@@ -32,6 +38,7 @@ class memory_sequence extends uvm_sequence#(memory_model);
 
 		/*envia item para o sequencer*/
                 send_request(req);
+
 
 		/*bloqueia ate o driver chamar item_done*/
                 wait_for_item_done();

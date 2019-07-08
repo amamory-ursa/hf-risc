@@ -1,5 +1,6 @@
 
-
+`ifndef CTRL_REG
+`define CTRL_REG
 
 class hfrv_ctrl_reg extends uvm_reg;
     `uvm_object_utils( hfrv_ctrl_reg)
@@ -34,7 +35,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         alu_src1 = uvm_reg_field::type_id::create( "alu_src1" );
         alu_src1.configure(    .parent                 ( this ),
                                 .size                   ( 1   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 1    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -44,7 +45,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         alu_src2 = uvm_reg_field::type_id::create( "alu_src2" );
         alu_src2.configure(    .parent                 ( this ),
                                 .size                   ( 3   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 2    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -54,7 +55,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         alu_op = uvm_reg_field::type_id::create( "alu_op" );
         alu_op.configure(    .parent                 ( this ),
                                 .size                   ( 4   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 5    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -64,7 +65,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         jump = uvm_reg_field::type_id::create( "jump" );
         jump.configure(    .parent                 ( this ),
                                 .size                   ( 2   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 9    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -74,7 +75,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         branch = uvm_reg_field::type_id::create( "branch" );
         branch.configure(    .parent                 ( this ),
                                 .size                   ( 3   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 11    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -84,7 +85,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         mem_write = uvm_reg_field::type_id::create( "mem_write" );
         mem_write.configure(    .parent                 ( this ),
                                 .size                   ( 2   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 14    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -94,7 +95,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         mem_read = uvm_reg_field::type_id::create( "mem_read" );
         mem_read.configure(    .parent                 ( this ),
                                 .size                   ( 2   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 16   ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -104,7 +105,7 @@ class hfrv_ctrl_reg extends uvm_reg;
         sig_read = uvm_reg_field::type_id::create( "sig_read" );
         sig_read.configure(    .parent                 ( this ),
                                 .size                   ( 1   ),
-                                .lsb_pos                ( 0    ),
+                                .lsb_pos                ( 18    ),
                                 .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
@@ -114,4 +115,6 @@ class hfrv_ctrl_reg extends uvm_reg;
 
     endfunction : build
 
-endclass : riscv_reg
+endclass : hfrv_ctrl_reg
+
+`endif

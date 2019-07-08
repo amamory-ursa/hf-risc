@@ -1,5 +1,6 @@
 
-
+`ifndef INT_REG
+`define INT_REG
 
 class hfrv_int_reg extends uvm_reg;
     `uvm_object_utils( hfrv_int_reg)
@@ -19,7 +20,7 @@ class hfrv_int_reg extends uvm_reg;
         register.configure(    .parent                 ( this ),
                                 .size                   ( 32   ),
                                 .lsb_pos                ( 0    ),
-                                .access                 ( "WO" ),
+                                .access                 ( "RO" ),
                                 .volatile               ( 0    ),
                                 .reset                  ( 0    ),
                                 .has_reset              ( 1    ),
@@ -30,4 +31,6 @@ class hfrv_int_reg extends uvm_reg;
 
     endfunction : build
 
-endclass : riscv_reg
+endclass : hfrv_int_reg
+
+`endif 

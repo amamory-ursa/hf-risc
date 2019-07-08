@@ -13,12 +13,12 @@ vcom -93 -explicit ../../vhdl/boot_ram.vhd
 vcom -93 -explicit ../../vhdl/ram.vhd
 vlog ../uvm_src/top_uvm.sv
 
-vsim work.top_uvm +UVM_TESTNAME=test_top -novopt
+vsim work.top_uvm -coverage +UVM_VERBOSITY=UVM_LOW +UVM_TESTNAME=test_top -novopt
+set NoQuitOnFinish 1
 set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
-
-run 9 ms 
-
-#quit vsim
-quit -sim
-quit -f
+run 400000ns
+#run 1 ms 
+coverage attribute -name TESTNAME -value test_top
+coverage save test_top.ucdb
+vcover report test_top.ucdb -cvg -details
