@@ -30,13 +30,13 @@ class monitor extends uvm_monitor;
 
 	task run_phase(uvm_phase phase);
 
-		while(1)
-		begin
+		//while(1)
+		//begin
 
-			phase.raise_objection(this);
+		phase.raise_objection(this);
 		
 
-			verify_terminate();
+		verify_terminate();
 
         	p1=uvm_event_pool::get_global_pool(); 
         	terminated = p1.get("p1");
@@ -44,8 +44,8 @@ class monitor extends uvm_monitor;
         	/*ativando evento*/
         	terminated.trigger();
 
-        phase.drop_objection(this);
-    	end
+        	phase.drop_objection(this);
+    	//end
 	endtask 
 
 	 task verify_terminate();
