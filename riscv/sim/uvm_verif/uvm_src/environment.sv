@@ -6,8 +6,16 @@ import uvm_pkg::*;
 `include "agent.sv"
 `include "coverage.sv"
 `include "hfrv_interface.sv"
+<<<<<<< HEAD
 `include "../register_layer/hfrv_reg_block.sv"
 `include "scoreboard.sv"
+=======
+<<<<<<< HEAD
+`include "../register_layer/hfrv_reg_block.sv"
+=======
+`include "scoreboard.sv"
+>>>>>>> origin/verif_devel
+>>>>>>> 5ee61e9ebb903569cf9fd8622eba98b62b5922f5
 
 class environment extends uvm_env;
   `uvm_component_utils(environment)
