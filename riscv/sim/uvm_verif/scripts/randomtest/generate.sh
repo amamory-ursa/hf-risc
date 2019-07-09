@@ -23,29 +23,3 @@ for d in */ ; do
 	bash build.sh	
 	cd ..
 done
-
-#back to main directory
-#cd ..
-
-#run the stuff
-#bash apps/run_all.sh
-for d in */ ; do
-
-	#cd ../../..
-	#cd uvm_src
-	#sed -i 's/path = \"../scripts/randomtest/apps.*/path = \"..scripts/randomtest/apps/'$d'/code.txt\"\;/' sequence.sv
-	#cd ..
-	#cd scripts/randomtest/apps
-
-
-	cd $d
-	
-	rm -rf ../../../code.txt
-	cp code.txt ../../../.
-
-	bash run.sh	
-	cd ..
-
-done
-
-cd ..
