@@ -14,8 +14,9 @@ for d in */ ; do
     ./run.sh
 done
 
-cd $directory
+cd $directory/..
 #vcover merge total_coverage.ucdb $args
 
 #cleanup
+# cd $directory
 bash cleanup.sh
