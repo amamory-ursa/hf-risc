@@ -6,13 +6,14 @@ import uvm_pkg::*;
 `include "agent.sv"
 `include "hfrv_interface.sv"
 `include "../register_layer/hfrv_reg_block.sv"
+`include "scoreboard.sv"
 
 class environment extends uvm_env;
   `uvm_component_utils(environment)
   
   //Environment components
   agent agt;
-  //scoreboard scb;
+  scoreboard scb;
   //checker ckr;
   hfrv_tb_block   _hfrv_tb_block;
 
@@ -35,7 +36,7 @@ class environment extends uvm_env;
       agt = agent::type_id::create("agent", this);
 
       // Creates the Scoreboard
-
+      scb = new("scoreboard", this);
 
       // Creates the Checker
       _hfrv_tb_block          = hfrv_tb_block::type_id::create ("_hfrv_tb_block", this);
