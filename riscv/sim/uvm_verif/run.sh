@@ -12,7 +12,7 @@ then
   
     #cleanup
     cd scripts/randomtest
-    bash cleanup.sh       # apps folders cleanup
+    bash cleanup.sh                               # apps folders cleanup
     cd ../
     rm -rf *.ini **transcript *.wlf work *.vcd
     
