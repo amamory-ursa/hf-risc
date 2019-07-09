@@ -1,19 +1,12 @@
 #!/bin/sh
 
-#runs program
-vsim -do generate.do -c
-
-#cleanup
-rm -rf transcript
-rm -rf work
-
 #setup apps
-cd apps
 directory=$PWD
 
+cd randomtest/apps
 #copy makefile into every directory
 for d in */ ; do
-	cp build.sh $d/build.sh
+	cp build.sh $d/build.sh	
 	cp run.sh $d/run.sh
 done
 
