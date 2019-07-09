@@ -23,17 +23,3 @@ for d in */ ; do
 	bash build.sh	
 	cd ..
 done
-
-#back to main directory
-#cd ..
-
-#run the stuff
-#bash apps/run_all.sh
-#call individual builds
-for d in */ ; do
-	cd $d
-	bash run.sh	
-	cd ..
-done
-
-cd ..

@@ -368,7 +368,7 @@ fail:
 	return 1;
 }
 
-int run(int8_t *mem, int size){
+int run(int8_t *mem, uint32_t *io, int size, int io_size){
 
 	state context;
 	state *s;
@@ -403,19 +403,19 @@ int run(int8_t *mem, int size){
 	s->cycles = 0;
 	
 	io_index = 0;
-	//io_num = io[0];
-	//io_time = io[1];
+	io_num = io[0];
+	io_time = io[1];
 	io_out_index = 0;
 	while(1){
 		sim_time = s->cycles * 10;
 
-		//if (io_time <= sim_time && io_index/2 <= io_num){
-			//s->cause &= 0x0000ffff;
-			//s->cause |= io[io_index]<<16;
-			//s->cause |= ~io[io_index]<<24;
-			//io_index = io_index + 2;
-			//io_time += io[io_index+1];
-		//}
+		if (io_time <= sim_time && io_index/2 <= io_num){
+			s->cause &= 0x0000ffff;
+			s->cause |= io[io_index]<<16;
+			s->cause |= ~io[io_index]<<24;
+			io_index = io_index + 2;
+			io_time += io[io_index+1];
+		}
 
 		cycle(s);
 		// Waiting end of simulation

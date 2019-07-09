@@ -5,7 +5,7 @@ ARCH="riscv"
 F_CLK=25000000
 
 LIB_PATH="/software/lib"
-LIB_PATH="../../../../../../software/lib"
+LIB_PATH="../../../../../../../software/lib"
 
 CRR_PATH="/hf-riscv/verif/randomtest/apps/"
 
