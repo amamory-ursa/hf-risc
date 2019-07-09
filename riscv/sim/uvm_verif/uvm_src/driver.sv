@@ -12,6 +12,8 @@ class driver extends uvm_driver#(memory_model);
     // RISC-V Processor (DUT) Interface
     virtual hfrv_interface riscv_if;
 
+    uvm_event_pool p1;
+    uvm_event terminated;
     // Port to inform the transaction to the Scoreboard and Coverage
     uvm_analysis_port#(memory_model) dvr2scb_port;
 
@@ -74,25 +76,37 @@ class driver extends uvm_driver#(memory_model);
             
             // Inform that the program was consumed by DUT
             seq_item_port.item_done();
+            
         end
     endtask: run_phase
 
     task drive();     
         // Once we have the boot and the program code, we can start the processor
         start_cpu();
-       
-        // And feed the RAM and ROM memories
+        
+
+
+     // And feed the RAM and ROM memories
         fork
             memory_interface(boot); // feed the ROM mem
             memory_interface(req);  // feed the RAM mem
-            verify_terminate();     // watch the processor interface to 
-        join_any // Complete the fork as soon as the earliest process finish (in this case the verify_terminate is the only one that will terminate!)
-	disable fork;
-		
-        // Stops the CPU to get another program and start the verification again
+        join_none
+
+        p1=uvm_event_pool::get_global_pool(); 
+        terminated = p1.get("p1");
+
+        /*esperando evento ser ativado*/
+        terminated.wait_trigger();
+        
+        /*resetando evento*/
+        terminated.reset();
+
+        /*desabilitando fork*/
+        disable fork;
+        
         stop_cpu();
-	`uvm_info("DRIVER","PROGRAMA FINALIZADO", UVM_LOW);
-    endtask: drive;
+        
+    endtask: drive
 
 
     task memory_interface(memory_model memory);
@@ -108,24 +122,15 @@ class driver extends uvm_driver#(memory_model);
     endtask: memory_interface
 
 
-    task verify_terminate();
-        // Waits inside the forever loop, watching the condition to finish the simulation!
-        forever @(riscv_if.memory.mem) begin
-            if (riscv_if.memory.mem.address == 32'he0000000 && riscv_if.memory.mem.data_we != 4'h0) begin
-                riscv_if.memory.mem.data_read <= {32{1'b0}};
-                break;
-            end
-        end
-    endtask: verify_terminate;
-
     task start_cpu();
         riscv_if.reset = 0;
     endtask: start_cpu;
 
+
     task stop_cpu();
         riscv_if.reset = 1;
         #10;
-    endtask: stop_cpu;
+    endtask
 
 endclass: driver
 

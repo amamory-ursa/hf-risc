@@ -2,6 +2,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "driver.sv"  
 `include "../register_layer/hfrv_monitor.sv"
+`include "monitor.sv"
   
 
 
@@ -11,6 +12,7 @@ class agent extends uvm_agent;
   driver    drv;
   _sequencer seqcr;
   monitor mon;
+  
 
  function new (string name, uvm_component parent);
     super.new(name, parent);
@@ -34,10 +36,11 @@ class agent extends uvm_agent;
     seqcr = _sequencer::type_id::create("sequencer", this);
     uvm_config_db #(virtual hfrv_interface)::set (this,"driver", "riscv_if", riscv_if);
 
-    mon = monitor::type_id::create("monitor", this);
+        mon = monitor::type_id::create("monitor", this);
 
-  endfunction : build_phase
-      
+        uvm_config_db #(virtual hfrv_interface)::set (this,"monitor", "riscv_if", riscv_if);
+      	
+      endfunction : build_phase
 
  
   function void connect_phase(uvm_phase phase);
