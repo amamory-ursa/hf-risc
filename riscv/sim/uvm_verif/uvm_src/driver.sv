@@ -122,6 +122,17 @@ class driver extends uvm_driver#(memory_model);
     endtask: memory_interface
 
 
+    task verify_terminate();
+        // Waits inside the forever loop, watching the condition to finish the simulation!
+        forever @(riscv_if.memory.mem) begin
+            if (riscv_if.memory.mem.address == 32'he0000000 && riscv_if.memory.mem.data_we != 4'h0) begin
+                riscv_if.memory.mem.data_read <= {32{1'b0}};
+                `uvm_info("DRIVER", "FIM DO PROGRAMA", UVM_LOW);
+                break;
+            end
+        end
+    endtask: verify_terminate;
+
     task start_cpu();
         riscv_if.reset = 0;
     endtask: start_cpu;
