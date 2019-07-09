@@ -29,7 +29,6 @@ done
 
 #run the stuff
 #bash apps/run_all.sh
-#call individual builds
 for d in */ ; do
 
 	#cd ../../..
@@ -46,6 +45,7 @@ for d in */ ; do
 
 	bash run.sh	
 	cd ..
+
 done
 
 cd ..
