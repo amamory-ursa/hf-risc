@@ -19,4 +19,4 @@ cd $directory/..
 
 #cleanup
 # cd $directory
-bash cleanup.sh
+# bash cleanup.sh
