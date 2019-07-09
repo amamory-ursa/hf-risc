@@ -17,7 +17,8 @@ vsim work.top_uvm -coverage +UVM_VERBOSITY=UVM_LOW +UVM_TESTNAME=test_top -novop
 set NoQuitOnFinish 1
 set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
-run 400000ns
+#run 10000ns
+run 100000ns
 #run 1 ms 
 coverage attribute -name TESTNAME -value test_top
 coverage save test_top.ucdb

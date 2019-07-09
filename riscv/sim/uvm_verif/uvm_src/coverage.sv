@@ -34,19 +34,21 @@ class coverage extends uvm_subscriber #(instruction_item);
 	bit [4:0] r2Register;
 //	bit [19:0] immRegister;
 //	bit [1:0] immType;
+    bit [17:0] instruction;
+	
 
 	covergroup CG_Instruction;
 
-		coverpoint opcode
+/*		coverpoint opcode
 			{
 			bins opcode[] = {3,19,23,35,51,55,99,103,111,115}; // restringir para codigos validos
 			ignore_bins others = {[0:2],[4:18],[20:22],[24:34],[36:50],[52:54],[56:98],[100:102],[104:110],[112:114],[116:127]};
 
-				option.weight = 0;}
-		coverpoint iType
+				option.weight = 0;}*/
+		/*coverpoint iType
 			{bins iType[] = {[0:6]}; 
-			 option.weight = 0;}
-
+			 option.weight = 0;}*/
+/*
 		coverpoint rdRegister
 			{bins rdRegister[] = {[0:31]}; // x0 nunca estará no rd
 			 option.weight = 0;}
@@ -58,11 +60,245 @@ class coverage extends uvm_subscriber #(instruction_item);
 		coverpoint r2Register
 			{bins r2Register[] = {[0:31]}; 
 			 option.weight = 0;}
+*/
+		coverpoint instruction 
+		{
+			bins LUI    = {17'b0000000_000_0110111};
 
+  			bins AUIPC  = {17'b0000000_000_0010111};
 
-      		//cross opcode, rdRegister, r1Register, r2Register;
-			  cross opcode, rdRegister;
+  			bins JAL    = {17'b0000000_000_1101111};
+
+  			bins JALR   = {17'b0000000_000_1100111};
+
+			bins BEQ 	= {17'b0000000_000_1100011};
+			bins BNE 	= {17'b0000000_001_1100011};
+			bins BLT 	= {17'b0000000_100_1100011};
+			bins BGE 	= {17'b0000000_101_1100011};
+			bins BLTU   = {17'b0000000_110_1100011};
+			bins BGEU   = {17'b0000000_111_1100011};
+
+			bins LB  	= {17'b0000000_000_0000011};
+			bins LH  	= {17'b0000000_001_0000011};
+			bins LW  	= {17'b0000000_010_0000011};
+			bins LBU 	= {17'b0000000_100_0000011};
+			bins LHU 	= {17'b0000000_101_0000011};
+
+			bins SB  	= {17'b0000000_000_0100011};
+			bins SH  	= {17'b0000000_001_0100011};
+			bins SW  	= {17'b0000000_010_0100011};
+
+			bins ADDI   = {17'b0000000_000_0010011};
+			bins SLTI   = {17'b0000000_010_0010011};
+			bins SLTIU  = {17'b0000000_011_0010011};
+			bins XORI   = {17'b0000000_100_0010011};
+			bins ORI 	= {17'b0000000_110_0010011};
+			bins ANDI   = {17'b0000000_111_0010011};
+			bins SLLI   = {17'b0000000_001_0010011};
+			bins SRLI   = {17'b0000000_101_0010011};
+			bins SRAI   = {17'b0100000_101_0010011};
+
+			bins ADD 	= {17'b0000000_000_0110011};
+			bins SUB 	= {17'b0100000_000_0110011};
+			bins SLL 	= {17'b0000000_001_0110011};
+			bins SLT 	= {17'b0000000_010_0110011};
+			bins SLTU   = {17'b0000000_011_0110011};
+			bins XOR 	= {17'b0000000_100_0110011};
+			bins SRL 	= {17'b0000000_101_0110011};
+			bins SRA 	= {17'b0100000_101_0110011};
+			bins OR  	= {17'b0000000_110_0110011};
+			bins AND 	= {17'b0000000_111_0110011};
+			
+			bins ECALL  = {17'b0000000_000_1110011};
+			bins EBREAK = {17'b0000001_000_1110011};
+		}
+
+      	
 	endgroup: CG_Instruction;
+
+	// ------------------------------------ R TYPE 
+	covergroup CG_R_TypeInstructions;
+		coverpoint rdRegister
+		{
+			bins rdRegister[] = {[0:31]}; // x0 nunca estará no rd
+			option.weight = 0;
+		}
+
+		coverpoint r1Register
+		{
+			bins r1Register[] = {[0:31]}; 
+			option.weight = 0;
+		}
+
+		coverpoint r2Register
+		{
+				bins r2Register[] = {[0:31]}; 
+			 	option.weight = 0;
+		}
+
+		coverpoint instruction 
+		{		
+			bins ADD 	= {17'b0000000_000_0110011};
+			bins SUB 	= {17'b0100000_000_0110011};
+			bins SLL 	= {17'b0000000_001_0110011};
+			bins SLT 	= {17'b0000000_010_0110011};
+			bins SLTU   = {17'b0000000_011_0110011};
+			bins XOR 	= {17'b0000000_100_0110011};
+			bins SRL 	= {17'b0000000_101_0110011};
+			bins SRA 	= {17'b0100000_101_0110011};
+			bins OR  	= {17'b0000000_110_0110011};
+			bins AND 	= {17'b0000000_111_0110011};
+		}
+		cross instruction, rdRegister, r1Register, r2Register;
+	endgroup : CG_R_TypeInstructions
+
+	// ------------------------------------ I TYPE 
+	covergroup CG_I_TypeInstructions;
+		coverpoint rdRegister
+		{
+			bins rdRegister[] = {[0:31]}; // x0 nunca estará no rd
+			option.weight = 0;
+		}
+
+		coverpoint r1Register
+		{
+			bins r1Register[] = {[0:31]}; 
+			option.weight = 0;
+		}
+
+		/*coverpoint imm
+		{
+				bins imm[] = {[0:31]}; 
+			 	option.weight = 0;
+		}*/
+
+		coverpoint instruction 
+		{		
+			bins LB  	= {17'b0000000_000_0000011};
+			bins LH  	= {17'b0000000_001_0000011};
+			bins LW  	= {17'b0000000_010_0000011};
+			bins LBU 	= {17'b0000000_100_0000011};
+			bins LHU 	= {17'b0000000_101_0000011};
+
+			bins ADDI   = {17'b0000000_000_0010011};
+			bins SLTI   = {17'b0000000_010_0010011};
+			bins SLTIU  = {17'b0000000_011_0010011};
+			bins XORI   = {17'b0000000_100_0010011};
+			bins ORI 	= {17'b0000000_110_0010011};
+			bins ANDI   = {17'b0000000_111_0010011};
+			bins SLLI   = {17'b0000000_001_0010011};
+			bins SRLI   = {17'b0000000_101_0010011};
+			bins SRAI   = {17'b0100000_101_0010011};
+		}
+		cross instruction, rdRegister, r1Register;
+	endgroup : CG_I_TypeInstructions
+
+	// ------------------------------------ S TYPE 
+	covergroup CG_S_TypeInstructions;
+		
+
+		coverpoint r1Register
+		{
+			bins r1Register[] = {[0:31]}; 
+			option.weight = 0;
+		}
+
+		/*coverpoint imm
+		{
+				bins imm[] = {[0:31]}; 
+			 	option.weight = 0;
+		}*/
+
+		coverpoint instruction 
+		{		
+
+			bins SB  	= {17'b0000000_000_0100011};
+			bins SH  	= {17'b0000000_001_0100011};
+			bins SW  	= {17'b0000000_010_0100011};
+		}
+		cross instruction, r1Register;
+	endgroup : CG_S_TypeInstructions
+
+	// ------------------------------------ SB TYPE 
+	covergroup CG_SB_TypeInstructions;
+		
+
+		coverpoint r1Register
+		{
+			bins r1Register[] = {[0:31]}; 
+			option.weight = 0;
+		}
+
+		/*coverpoint imm
+		{
+				bins imm[] = {[0:31]}; 
+			 	option.weight = 0;
+		}*/
+
+		coverpoint instruction 
+		{		
+
+			bins SB  	= {17'b0000000_000_0100011};
+			bins SH  	= {17'b0000000_001_0100011};
+			bins SW  	= {17'b0000000_010_0100011};
+		}
+		cross instruction, r1Register;
+	endgroup : CG_SB_TypeInstructions
+
+	// ------------------------------------ U TYPE 
+	covergroup CG_U_TypeInstructions;
+		
+
+
+		
+		coverpoint rdRegister
+		{
+			bins rdRegister[] = {[0:31]}; 
+			option.weight = 0;
+		}
+
+		/*coverpoint imm
+		{
+				bins imm[] = {[0:31]}; 
+			 	option.weight = 0;
+		}*/
+
+		coverpoint instruction 
+		{		
+
+			bins SB  	= {17'b0000000_000_0100011};
+			bins SH  	= {17'b0000000_001_0100011};
+			bins SW  	= {17'b0000000_010_0100011};
+		}
+		cross instruction, rdRegister;
+
+	endgroup : CG_U_TypeInstructions
+
+	// ------------------------------------ UJ TYPE 
+	covergroup CG_UJ_TypeInstructions;
+		
+
+		coverpoint rdRegister
+		{
+			bins rdRegister[] = {[0:31]}; 
+			option.weight = 0;
+		}
+
+		/*coverpoint imm
+		{
+				bins imm[] = {[0:31]}; 
+			 	option.weight = 0;
+		}*/
+
+		coverpoint instruction 
+		{		
+
+			bins JAL    = {17'b0000000_000_1101111};
+  			bins JALR   = {17'b0000000_000_1100111};
+		}
+		cross instruction, rdRegister;
+
+	endgroup : CG_UJ_TypeInstructions
 
 
 
@@ -77,6 +313,12 @@ endclass : coverage
 function coverage::new(string name, uvm_component parent);
 		super.new(name,parent);
 		CG_Instruction = new();
+		CG_R_TypeInstructions = new();
+		CG_I_TypeInstructions = new();
+		CG_S_TypeInstructions = new();
+		CG_SB_TypeInstructions = new();
+		CG_U_TypeInstructions = new();
+		CG_UJ_TypeInstructions = new();
 endfunction : new
 
 
@@ -87,12 +329,60 @@ function void coverage::build_phase(uvm_phase phase);
 endfunction : build_phase
 
 function void coverage::write(instruction_item t);
-	this.opcode = t.opcode;
-	this.iType  = 0;
-	this.rdRegister = t.rd;
-	this.r1Register = t.r1;
-	this.r2Register = t.r2;
+
+	// simple resume
+	this.instruction = t.instruction;
+	//this.rdRegister = t.rd;
+	//this.r1Register = t.r1;
+	//this.r2Register = t.r2;
 	CG_Instruction.sample();
+
+
+	if (t.instruction[6:0] == 7'b0110011) // coverage R-TYPE
+	begin
+		this.instruction = t.instruction;
+		this.rdRegister = t.rd;
+		this.r1Register = t.r1;
+		this.r2Register = t.r2;
+		CG_R_TypeInstructions.sample();
+	end
+	if (t.instruction[6:0] == 7'b0000011 || t.instruction[6:0] == 7'b0010011 ) // coverage I-TYPE
+	begin
+		this.instruction = t.instruction;
+		this.rdRegister = t.rd;
+		this.r1Register = t.r1;
+		CG_I_TypeInstructions.sample();
+	end
+	if (t.instruction[6:0] == 7'b0100011 ) // coverage S-TYPE
+	begin
+		this.instruction = t.instruction;
+		this.r1Register = t.r1;
+		CG_S_TypeInstructions.sample();
+	end
+	if (t.instruction[6:0] == 7'b0100011 ) // coverage SB-TYPE
+	begin
+		this.instruction = t.instruction;
+		this.r1Register = t.r1;
+		this.r2Register = t.r2;
+		CG_SB_TypeInstructions.sample();
+	end
+
+	if (t.instruction[6:0] == 7'b0100011 ) // coverage U-TYPE
+	begin
+		this.instruction = t.instruction;
+		this.rdRegister = t.rd;
+		
+		CG_U_TypeInstructions.sample();
+	end
+
+	if (t.instruction[6:0] == 7'b1101111 ) // coverage UJ-TYPE
+	begin
+		this.instruction = t.instruction;
+		this.rdRegister = t.rd;
+		
+		CG_U_TypeInstructions.sample();
+	end
+
 endfunction: write 
 
 `endif // COVERAGE__SV

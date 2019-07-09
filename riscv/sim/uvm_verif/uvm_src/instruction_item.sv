@@ -15,6 +15,7 @@ class instruction_item extends uvm_sequence_item;
 	bit [4:0] rd;
 	bit [4:0] r1;
 	bit [4:0] r2;
+	bit [17:0] instruction;
 	
 
 	function new(string name ="");

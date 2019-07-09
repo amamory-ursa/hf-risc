@@ -52,7 +52,8 @@ class hfrv_reg_block extends uvm_reg_block;
         for (int i = 0; i < 31; i++)
         begin
             // colocar os nomes corretos em cada registrador
-            int_regs[i] = hfrv_int_reg::type_id::create( register_names[i] );      
+            //int_regs[i] = hfrv_int_reg::type_id::create( register_names[i] );      
+            int_regs[i] = hfrv_int_reg::type_id::create( $sformatf("int_regs[%d]",i) );      
             int_regs[i].configure( this, null, "" );      
             int_regs[i].build(); 
             int_regs[i].add_hdl_path_slice($sformatf("timer_%d",i), 0, int_regs[i].get_n_bits());
@@ -70,14 +71,14 @@ class hfrv_reg_block extends uvm_reg_block;
         pc_last_reg = hfrv_int_reg::type_id::create( "pc_last_reg" );      
         pc_last_reg.configure( this, null, "" );      
         pc_last_reg.build(); 
-        pc_last_reg.add_hdl_path_slice("pc_last_reg", 0, pc_last_reg.get_n_bits());
+        pc_last_reg.add_hdl_path_slice("pc_last", 0, pc_last_reg.get_n_bits());
         default_map.add_reg( .rg( pc_last_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h04;
         //--------------------------- PC_LAST2
         pc_last2_reg = hfrv_int_reg::type_id::create( "pc_last2_reg" );      
         pc_last2_reg.configure( this, null, "" );      
         pc_last2_reg.build(); 
-        pc_last2_reg.add_hdl_path_slice("pc_last2_reg", 0, pc_last2_reg.get_n_bits());
+        pc_last2_reg.add_hdl_path_slice("pc_last2", 0, pc_last2_reg.get_n_bits());
         default_map.add_reg( .rg( pc_last2_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h04;
         //--------------------------- CONTROL
@@ -143,7 +144,7 @@ class hfrv_reg_block extends uvm_reg_block;
         default_map.add_reg( .rg( imm_u_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h03;
 
-        //--------------------------- RS2
+        //--------------------------- inst_in_s
         inst_in_s_reg = hfrv_int_reg::type_id::create( "inst_in_s_reg" );      
         inst_in_s_reg.configure( this, null, "" );      
         inst_in_s_reg.build(); 
