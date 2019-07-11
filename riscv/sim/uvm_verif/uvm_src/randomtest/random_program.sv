@@ -19,11 +19,9 @@ class random_program;
  
 
   //ctor.
-  function new(int length, itype instr_type = 0);
+  function new(int length, itype instr_type_constraint = 0, opcode instr_opcode_constraint = 0);
     
     this.progr_length = length;
-
-    instr_constraint = instr_type;
 
     //generate random instructions until reach the length
     for(int i = 0; i < this.progr_length; i++) begin     
@@ -35,7 +33,7 @@ class random_program;
       last = instr;
 
       if(instr.randomize() with{
-        it == ITYPE;
+        it == instr_type_constraint;
       }) begin
           instr_queue.push_back(instr);
       end
