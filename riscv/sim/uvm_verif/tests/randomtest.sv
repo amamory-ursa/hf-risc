@@ -41,27 +41,6 @@ class randomtest extends uvm_test;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        for (i = 0; i < `NUMPROGRS; i++) begin
-
-            //create a new randomized program
-            p = new (5); 
-            program_code = p.toString();
-
-            //display on screen
-            $display("-------------------------------");
-            $display(program_code);
-
-            //save to file (note that these files are compiled elsewhere)
-            $sformat(filename, "randomtest/apps/app%0d/app%0d.S", i, i);
-            $sformat(dirname,  "randomtest/apps/app%0d", i);
-            $system({"mkdir ", dirname});
-            f = $fopen(filename);
-            $fwrite(f, "%s", program_code);
-            $fclose(f);
-        end
-        $system({"bash randomtest/apps/generate_build.sh"});
-        // $system({"bash apps/cleanup.sh"});
-
         // Creates the environment module
         env = environment::type_id::create("env", this);
         
@@ -77,13 +56,34 @@ class randomtest extends uvm_test;
     task run_phase(uvm_phase phase);
         super.run_phase(phase);
 
-        phase.raise_objection(this);
+        for (i = 0; i < `NUMPROGRS; i++) begin
 
+            //create a new randomized program
+            p = new (5); 
+            program_code = p.toString();
+
+            //display on screen
+            $display("-------------------------------");
+            $display(program_code);
+
+            //save to file
+            $sformat(filename, "randomtest/apps/app%0d/app%0d.S", i, i);    // Auxiliary variable for assembly creation
+            $sformat(dirname,  "randomtest/apps/app%0d", i);                // Auxiliary variable for directory creation
+            $system({"mkdir ", dirname});                                   // Directory creation
+            f = $fopen(filename);                                           // Asssembly file creation
+            $fwrite(f, "%s", program_code);                                 // Asssembly creation
+            $fclose(f);                                                     // Asssembly file creation
+            $system({"cp randomtest/apps/build.sh ", dirname});             // Copy build script into app$d directory
+            $system({"(cd ", dirname, " ; bash build.sh)"});                // Build for binary creation
+            $system({"cp ", dirname, "/code.txt ./code.txt"});              // Copy binary file to simulaiton directory
+
+        end
+        // $system({"bash apps/cleanup.sh"});
+
+        phase.raise_objection(this);
         // Connects the sequence to the generator inside the agent
         seq.seqce = env.agt.seqcr;
-
         seq.start(seq.seqce);
-
         phase.drop_objection(this);
         
     endtask: run_phase
