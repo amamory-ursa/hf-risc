@@ -59,7 +59,7 @@ class randomtest extends uvm_test;
         for (i = 0; i < `NUMPROGRS; i++) begin
 
             //create a new randomized program
-            p = new (5); 
+            p = new (100, itype'(RTYPE)); 
             program_code = p.toString();
 
             //display on screen

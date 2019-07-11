@@ -52,7 +52,8 @@ typedef enum{
   UTYPE = 3, //  |imm               || rd|| op  |
   STYPE = 4, //  |imm  ||rs2||rs1||3||imm|| op  |
   BTYPE = 5, //  |imm  ||rs2||rs1||3||imm|| op  | (same as STYPE)
-  JTYPE = 6  //  |imm               || rd|| op  | (same as UTYPE)
+  JTYPE = 6, //  |imm               || rd|| op  | (same as UTYPE)
+  NULL = 0   // This is not a type. It is used for constrained random generation.
 } itype;
 
 //target arch. available registers.
