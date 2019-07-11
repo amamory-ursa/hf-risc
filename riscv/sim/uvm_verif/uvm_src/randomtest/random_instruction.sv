@@ -141,7 +141,8 @@ class random_instruction;
             s = {"  ", this.opcode.name, " ",
                  this.rd.name, ", ",
                  this.rs1.name, ", ",
-                 this.imm};
+                 this.imm, "\n"};
+            return s;
           end
  
           // STYPE = 4, |imm  ||rs2||rs1||3||imm|| op  |
@@ -151,7 +152,8 @@ class random_instruction;
             s = {"  ", this.opcode.name, " ",
                  this.rs1.name, ", ",
                  this.rs2.name, ", ",
-                 this.imm};
+                 this.imm, "\n"};
+            return s;
           end
 
           BTYPE: begin 
@@ -159,7 +161,8 @@ class random_instruction;
             s = {"  ", this.opcode.name, " ", 
                  this.rs1.name, ", ",
                  this.rs2.name, ", ",
-                 this.imm};
+                 this.imm, "\n"};
+            return s;
           end
 
           // UTYPE = 3, |imm               || rd|| op  |
@@ -168,13 +171,15 @@ class random_instruction;
             //"%0s %0d, 0x%h"
             s = {"  ", this.opcode.name, " ",
                  this.rd.name, ", ",
-                 this.imm};
+                 this.imm, "\n"};
+            return s;
           end
 
           UTYPE: begin
             //"%0s %0d, 0x%h"
             s = {"  ", this.opcode.name, " ",
-                 this.rd.name, ", ", this.imm};
+                 this.rd.name, ", ", this.imm, "\n"};
+            return s;
           end
 
       endcase

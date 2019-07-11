@@ -16,19 +16,14 @@ class random_program;
   //instruction type is randomized for every new instruction
   random_instruction last;
   rand random_instruction instr;
-    // constraint constr_seilahoque {
-    //    instr.it != JTYPE;
-    //    instr.it != last.it;
-    // };
-    constraint constr_seilahoque {
-       instr.it == instr_constraint;
-    };
  
 
   //ctor.
   function new(int length, itype instr_type = 0);
     
     this.progr_length = length;
+
+    instr_constraint = instr_type;
 
     //generate random instructions until reach the length
     for(int i = 0; i < this.progr_length; i++) begin     
@@ -39,7 +34,9 @@ class random_program;
       instr = new();
       last = instr;
 
-      if(instr.randomize()) begin
+      if(instr.randomize() with{
+        it == ITYPE;
+      }) begin
           instr_queue.push_back(instr);
       end
       else begin
