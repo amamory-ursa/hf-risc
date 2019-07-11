@@ -5,6 +5,8 @@
 //this class provides methods for the generation
 //of random programs for the RV32I riscv ISA. 
 class random_program;
+
+  itype instr_constraint;
  
   //length of generate program
   int progr_length = 0;
@@ -14,14 +16,17 @@ class random_program;
   //instruction type is randomized for every new instruction
   random_instruction last;
   rand random_instruction instr;
+    // constraint constr_seilahoque {
+    //    instr.it != JTYPE;
+    //    instr.it != last.it;
+    // };
     constraint constr_seilahoque {
-       instr.it != JTYPE;
-       instr.it != last.it;
+       instr.it == instr_constraint;
     };
  
 
   //ctor.
-  function new(int length);
+  function new(int length, itype instr_type = 0);
     
     this.progr_length = length;
 

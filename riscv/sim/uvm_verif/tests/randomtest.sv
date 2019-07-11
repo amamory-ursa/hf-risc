@@ -6,7 +6,8 @@ import uvm_pkg::*;
 `include "../uvm_src/randomtest/random_instruction.sv"
 `include "../uvm_src/randomtest/random_program.sv"
 
-`define NUMPROGRS 2
+`define NUMPROGRS   10
+`define PROGLENGTH  100
 
 class randomtest extends uvm_test;
     `uvm_component_utils(randomtest)
@@ -56,10 +57,13 @@ class randomtest extends uvm_test;
     task run_phase(uvm_phase phase);
         super.run_phase(phase);
 
+        // while coverage_current_value < coverage_acceptance
+            // p = new(prog_lentgh, coverage_next_priority_instr)
+        // end while
         for (i = 0; i < `NUMPROGRS; i++) begin
 
             //create a new randomized program
-            p = new (5); 
+            p = new (`PROGLENGTH, itype'(ITYPE), opcode'(ADD)); 
             program_code = p.toString();
 
             //display on screen
