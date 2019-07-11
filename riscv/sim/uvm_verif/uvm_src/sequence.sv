@@ -19,11 +19,7 @@ class memory_sequence extends uvm_sequence#(memory_model);
         endfunction
 
         virtual task body();
-        hfrv_tb_block   _hfrv_tb_block;
-        uvm_status_e      status;
-        int               rdata;
-
-        uvm_config_db#(hfrv_tb_block)::get(null, "uvm_test_top", "_hfrv_tb_block", _hfrv_tb_block);
+        
         while(1)
         begin
 

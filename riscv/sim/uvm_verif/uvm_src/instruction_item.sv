@@ -10,12 +10,16 @@ class instruction_item extends uvm_sequence_item;
 `uvm_object_utils(instruction_item);
 
 
-	bit [6:0] opcode;
-	bit [2:0] iType;
+	/*
 	bit [4:0] rd;
 	bit [4:0] r1;
 	bit [4:0] r2;
-	bit [17:0] instruction;
+	bit [11:0] imm;
+	bit [19:0] imm_u;
+	bit [17:0] instruction; // concat funct7_funct3_opcode
+	*/
+
+	bit [31:0] instruction;
 	
 
 	function new(string name ="");
