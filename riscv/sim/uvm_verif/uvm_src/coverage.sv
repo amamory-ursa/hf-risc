@@ -406,12 +406,12 @@ function void coverage::write(instruction_item t);
 
 	if (t.instruction[6:0] == 7'b0010111 ) // coverage U-TYPE
 	begin
-		bit [20:0] t_imm;
+		bit [19:0] t_imm;
 		this.instruction[17:11] = 7'b0_000_000;				//funct7
 		this.instruction[10:7] = 3'b000;     //funct3           
 		this.instruction[6:0] = t.instruction[6:0];			//opcode
 		this.rdRegister = t.instruction[11:7];
-		t_imm[20:0] = t.instruction[31:12];
+		t_imm[19:0] = t.instruction[31:12];
 		if (20'b00_000_000_000_000_000_000 <= t_imm && t_imm <= 20'b00_000_000_000_000_000_111)
 			this.imm_20 = 20'b00_000_000_000_000_000_000;
 		if (20'b00_000_000_000_000_001_000 <= t_imm && t_imm < 20'b11_111_111_111_111_111_000)
@@ -421,14 +421,42 @@ function void coverage::write(instruction_item t);
 		CG_U_TypeInstructions.sample();
 	end
 
-	if (t.instruction[6:0] == 7'b1101111 ) // coverage UJ-TYPE
+	if (t.instruction[6:0] == 7'b1101111 || t.instruction[6:0] == 7'b1100111 ) // coverage UJ-TYPE
 	begin
 		this.instruction[17:11] = 7'b0_000_000;				//funct7
 		this.instruction[10:7] = 3'b000;     //funct3           
 		this.instruction[6:0] = t.instruction[6:0];			//opcode
 		this.rdRegister = t.instruction[11:7];
 		// add immediates
-		CG_U_TypeInstructions.sample();
+		if (this.instruction == 17'b0000000_000_1101111) // JAL
+		begin
+		
+			bit [19:0] t_imm;
+			
+			this.r1Register = -1;
+			t_imm[19:0] = t.instruction[31:12];
+			if (20'b00_000_000_000_000_000_000 <= t_imm && t_imm <= 20'b00_000_000_000_000_000_111)
+				this.imm_20 = 20'b00_000_000_000_000_000_000;
+			if (20'b00_000_000_000_000_001_000 <= t_imm && t_imm < 20'b11_111_111_111_111_111_000)
+				this.imm_20 = 20'b10_000_000_000_000_000_000;
+			if (20'b11_111_111_111_111_111_000 <= t_imm && t_imm <= 20'b11_111_111_111_111_111_111)
+				this.imm_20 = 20'b11_111_111_111_111_111_111;
+		end
+		if (this.instruction == 17'b0000000_000_1100111) // JALR
+		begin
+		
+			bit [11:0] t_imm;
+			
+			this.r1Register = t.instruction[19:15];;
+			t_imm = t.instruction[31:20];
+			if (12'b00_000_000_000 <= t_imm && t_imm <= 12'b00_000_000_111)
+				this.imm_12 = 12'b00_000_000_000;
+			if (12'b00_000_001_000 <= t_imm && t_imm < 12'b11_111_111_000)
+				this.imm_12 = 12'b10_000_000_000;
+			if (12'b11_111_111_000 <= t_imm && t_imm <= 12'b11_111_111_111)
+				this.imm_12 = 12'b11_111_111_111;
+		end
+		CG_UJ_TypeInstructions.sample();
 	end
 
 	// simple resume

@@ -56,18 +56,6 @@ task monitor::run_phase(uvm_phase phase);
                
                 _hfrv_tb_block.register_block.inst_in_s_reg.read(status, rdata, UVM_BACKDOOR);
 
-                if (rdata[6:0]== 7'b00_100_11)
-                begin
-                    `uvm_info(get_type_name(), $sformatf("inst_in_s_=0x%0h", rdata), UVM_LOW);
-                    `uvm_info(get_type_name(), $sformatf("IMM opcode=%0b", rdata[6:0]), UVM_LOW);
-                    `uvm_info(get_type_name(), $sformatf("---     rd=%0b", rdata[11:7]), UVM_LOW);
-                    `uvm_info(get_type_name(), $sformatf("--- funct3=%0b", rdata[14:12]), UVM_LOW);
-                    `uvm_info(get_type_name(), $sformatf("---    rs1=%0b", rdata[19:15]), UVM_LOW);
-                    `uvm_info(get_type_name(), $sformatf("---    imm=%0b", rdata[31:20]), UVM_LOW);
-                    if (rdata[11:7]==0 && rdata[19:15]==0 && rdata[31:20]==0)
-                        `uvm_info(get_type_name(), "------- NOT OPERATION DETECTED -------", UVM_LOW);
-                end
-
                 // detect bubble
                 if (
                         (_hfrv_tb_block.register_block.bubble_reg.reg_to_mem_reg.get() ==1 ||
