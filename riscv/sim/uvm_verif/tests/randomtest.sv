@@ -8,7 +8,7 @@ import uvm_pkg::*;
 
 `define NUM_PROGRS          10
 `define PROG_LENGTH         10
-`define INSTRUCTS_TYPE      itype'(RTYPE)       //, ITYPE, UTYPE, STYPE, BTYPE, JTYPE, NULL_TYPE
+`define INSTRUCTS_TYPE      itype'(RTYPE)           //RTYPE, ITYPE, UTYPE, STYPE, BTYPE, JTYPE, NULL_TYPE
 `define INSTRUCTS_OPCODE    opcode'(NULL_OPCODE)    // ADD, ..., SRA, ..., LB, ..., ANDI, ..., JAL, NULL_OPCODE
 
 class randomtest extends uvm_test;
@@ -61,7 +61,8 @@ class randomtest extends uvm_test;
         // while coverage_current_value < coverage_acceptance
             // p = new(prog_lentgh, coverage_next_priority_instr)
         // end while
-	  for (i = 0; i < `NUM_PROGRS; i++) begin
+        phase.raise_objection(this);
+        for (i = 0; i < `NUM_PROGRS; i++) begin
 
             //create a new randomized program
             p = new (`PROG_LENGTH, `INSTRUCTS_TYPE, `INSTRUCTS_OPCODE);
@@ -82,20 +83,14 @@ class randomtest extends uvm_test;
             $system({"(cd ", dirname, " ; bash build.sh)"});                // Build for binary creation
             $system({"cp ", dirname, "/code.txt ./code.txt"});              // Copy binary file into simulaiton directory
 
-        // Connects the sequence to the generator inside the agent
-      
-	phase.raise_objection(this);
-      
-	  seq.seqce = env.agt.seqcr;
-        seq.start(seq.seqce);
-	
-      phase.drop_objection(this);
-//	  
-        //
+            // Connects the sequence to the generator inside the agent
+            seq.seqce = env.agt.seqcr;
+            seq.start(seq.seqce);
+            
         end
+        phase.drop_objection(this);
 	
         // $system({"bash apps/cleanup.sh"});
-
         
     endtask: run_phase
 
