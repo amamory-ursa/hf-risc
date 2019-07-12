@@ -5,8 +5,6 @@
 //this class provides methods for the generation
 //of random programs for the RV32I riscv ISA. 
 class random_program;
-
-  itype instr_constraint;
  
   //length of generate program
   int progr_length = 0;
@@ -19,7 +17,9 @@ class random_program;
  
 
   //ctor.
-  function new(int length, itype instr_type_constraint = 0, opcode instr_opcode_constraint = 0);
+  function new( int     length,
+                itype   instr_type_constraint   = itype'(NULL_TYPE), 
+                opcode  instr_opcode_constraint = opcode'(NULL_OPCODE));
     
     this.progr_length = length;
 
@@ -32,13 +32,41 @@ class random_program;
       instr = new();
       last = instr;
 
-      if(instr.randomize() with{
-        it == instr_type_constraint;
-      }) begin
-          instr_queue.push_back(instr);
-      end
-      else begin
-          i--;
+      if((instr_type_constraint != itype'(NULL_TYPE)) && (instr_opcode_constraint != opcode'(NULL_OPCODE)))begin
+        if(instr.randomize() with{
+        it      == instr_type_constraint;
+        opcode  == instr_opcode_constraint;
+        }) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
+      end else if(instr_type_constraint != itype'(NULL_TYPE))begin
+        if(instr.randomize() with{
+        it      == instr_type_constraint;
+        }) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
+      end else if (instr_opcode_constraint != opcode'(NULL_OPCODE)) begin
+        if(instr.randomize() with{
+        opcode  == instr_opcode_constraint;
+        }) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
+      end else begin
+        if(instr.randomize()) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
       end
 
       

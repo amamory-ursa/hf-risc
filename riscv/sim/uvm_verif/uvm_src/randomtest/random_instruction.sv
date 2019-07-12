@@ -42,18 +42,22 @@ typedef enum {
   BGE = 503, BLTU = 504, BGEU = 505, 
 
   //JTYPE
-  JAL  = 600
+  JAL  = 600,
+
+  //NULL_TYPE
+  NULL_OPCODE = -1  // This is not a opcode. It is used for constrained random generation.
+
 } opcode;
 
 //format of instructions
 typedef enum{
-  RTYPE = 1, //  |funct||rs2||rs1||3|| rd|| op  |
-  ITYPE = 2, //  |imm       ||rs1||3|| rd|| op  |
-  UTYPE = 3, //  |imm               || rd|| op  |
-  STYPE = 4, //  |imm  ||rs2||rs1||3||imm|| op  |
-  BTYPE = 5, //  |imm  ||rs2||rs1||3||imm|| op  | (same as STYPE)
-  JTYPE = 6, //  |imm               || rd|| op  | (same as UTYPE)
-  NULL = 0   // This is not a type. It is used for constrained random generation.
+  RTYPE = 1,      //  |funct||rs2||rs1||3|| rd|| op  |
+  ITYPE = 2,      //  |imm       ||rs1||3|| rd|| op  |
+  UTYPE = 3,      //  |imm               || rd|| op  |
+  STYPE = 4,      //  |imm  ||rs2||rs1||3||imm|| op  |
+  BTYPE = 5,      //  |imm  ||rs2||rs1||3||imm|| op  | (same as STYPE)
+  JTYPE = 6,      //  |imm               || rd|| op  | (same as UTYPE)
+  NULL_TYPE = -1  // This is not a type. It is used for constrained random generation.
 } itype;
 
 //target arch. available registers.

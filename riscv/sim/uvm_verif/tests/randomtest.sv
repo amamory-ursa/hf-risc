@@ -6,8 +6,10 @@ import uvm_pkg::*;
 `include "../uvm_src/randomtest/random_instruction.sv"
 `include "../uvm_src/randomtest/random_program.sv"
 
-`define NUMPROGRS   10
-`define PROGLENGTH  100
+`define NUM_PROGRS          3
+`define PROG_LENGTH         10
+`define INSTRUCTS_TYPE      itype'(NULL_TYPE)       // RTYPE, ITYPE, UTYPE, STYPE, BTYPE, JTYPE, NULL_TYPE
+`define INSTRUCTS_OPCODE    opcode'(NULL_OPCODE)    // ADD, ..., SRA, ..., LB, ..., ANDI, ..., JAL, NULL_OPCODE
 
 class randomtest extends uvm_test;
     `uvm_component_utils(randomtest)
@@ -20,7 +22,6 @@ class randomtest extends uvm_test;
     string dirname;
     int f;
     int i;
-
 
     /////////////////////////////////////////////////
     // Constructor
@@ -60,11 +61,10 @@ class randomtest extends uvm_test;
         // while coverage_current_value < coverage_acceptance
             // p = new(prog_lentgh, coverage_next_priority_instr)
         // end while
-        for (i = 0; i < `NUMPROGRS; i++) begin
+        for (i = 0; i < `NUM_PROGRS; i++) begin
 
             //create a new randomized program
-            p = new (`PROGLENGTH, itype'(RTYPE), opcode'(ADD)); 
-            // p = new (`PROGLENGTH, itype'(NULL), opcode'(ADD)); 
+            p = new (`PROG_LENGTH, `INSTRUCTS_TYPE, `INSTRUCTS_OPCODE);
             program_code = p.toString();
 
             //display on screen
@@ -72,7 +72,7 @@ class randomtest extends uvm_test;
             $display(program_code);
 
             //save to file
-            $sformat(filename, "randomtest/apps/app%0d/app%0d.S", i, i);    // Auxiliary variable for assembly creation
+            $sformat(filename, "randomtest/apps/app%0d/app%0d.S", i, i);    // Auxiliary variable for Assembly creation
             $sformat(dirname,  "randomtest/apps/app%0d", i);                // Auxiliary variable for directory creation
             $system({"mkdir ", dirname});                                   // Directory creation
             f = $fopen(filename);                                           // Asssembly file creation
@@ -80,7 +80,7 @@ class randomtest extends uvm_test;
             $fclose(f);                                                     // Asssembly file creation
             $system({"cp randomtest/apps/build.sh ", dirname});             // Copy build script into app$d directory
             $system({"(cd ", dirname, " ; bash build.sh)"});                // Build for binary creation
-            $system({"cp ", dirname, "/code.txt ./code.txt"});              // Copy binary file to simulaiton directory
+            $system({"cp ", dirname, "/code.txt ./code.txt"});              // Copy binary file into simulaiton directory
 
         end
         // $system({"bash apps/cleanup.sh"});
