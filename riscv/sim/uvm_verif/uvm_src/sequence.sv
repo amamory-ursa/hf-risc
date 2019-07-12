@@ -3,7 +3,6 @@
 
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-
 `include "memory_model.sv"
 `include "../register_layer/hfrv_reg_block.sv"
 class memory_sequence extends uvm_sequence#(memory_model);
@@ -19,9 +18,9 @@ class memory_sequence extends uvm_sequence#(memory_model);
         endfunction
 
         virtual task body();
-        
-        while(1)
-        begin
+
+        // while(1)
+        // begin
 
 		/*criando uma transaction memory_model*/
                 req = memory_model::type_id::create("transaction");
@@ -40,9 +39,10 @@ class memory_sequence extends uvm_sequence#(memory_model);
                 wait_for_item_done();
 
 		/*resposta do driver*/
-                get_response(rsp);
+               // get_response(rsp);
+                `uvm_info("SEQUENCE:","Memory_model consumed by DUT",UVM_LOW);
 
-        end
+        //end
         endtask	
 endclass
 `endif
