@@ -30,10 +30,11 @@ class monitor extends uvm_monitor;
 
 	task run_phase(uvm_phase phase);
 
-		//while(1)
-		//begin
+		/*while(1)
+		begin*/
 
-		phase.raise_objection(this);
+		forever begin
+		//phase.raise_objection(this);
 		
 
 		verify_terminate();
@@ -44,8 +45,8 @@ class monitor extends uvm_monitor;
         	/*ativando evento*/
         	terminated.trigger();
 
-        	phase.drop_objection(this);
-    	//end
+        	//phase.drop_objection(this);
+    		end
 	endtask 
 
 	 task verify_terminate();
@@ -54,7 +55,6 @@ class monitor extends uvm_monitor;
             if (riscv_if.memory.mem.address == 32'he0000000 && riscv_if.memory.mem.data_we != 4'h0) begin
                 riscv_if.memory.mem.data_read <= {32{1'b0}};
 
-        	`uvm_info("MONITOR:","End of the program",UVM_LOW);
                 break;
             end
         end
