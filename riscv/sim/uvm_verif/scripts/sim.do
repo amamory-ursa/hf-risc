@@ -11,7 +11,7 @@ vcom -93 -explicit ../../../core_rv32i/int_control.vhd
 vcom -93 -explicit ../../../core_rv32i/cpu.vhd
 vcom -93 -explicit ../../vhdl/boot_ram.vhd
 vcom -93 -explicit ../../vhdl/ram.vhd
-vlog ../uvm_src/top_uvm.sv
+vlog ../uvm_src/top_uvm.sv 
 
 vsim work.top_uvm +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=test_top -novopt
 set StdArithNoWarnings 1

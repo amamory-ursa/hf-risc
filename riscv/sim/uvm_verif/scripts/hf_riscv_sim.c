@@ -368,7 +368,7 @@ fail:
 	return 1;
 }
 
-int run(int8_t *mem, int size){
+int run_simulator(int8_t *mem, int size){
 
 	state context;
 	state *s;

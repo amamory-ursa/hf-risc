@@ -8,7 +8,7 @@
 
 //-----------------------C-INTERFACE-------------------------------------
 
-import "DPI-C" function int run (input byte unsigned Mem2[`N_LINES], int size);
+import "DPI-C" function int run_simulator (input byte unsigned Mem2[`N_LINES], int size);
 import "DPI-C" context function void export_mem(input int);
 export "DPI-C" function export_sram;
 
@@ -46,14 +46,19 @@ class scoreboard extends uvm_scoreboard;
      `uvm_component_utils(scoreboard)
 
      // Port to inform the transaction to the Scoreboard and Coverage
-     memory_model req;
+     //memory_model req;
      //gpio_trans trans;
      //mailbox io_gen2scb;//TODO: change to uvm fifo
      
      //export
      //fifo
-     uvm_analysis_port # (memory_model) in_drv_ap;
-     uvm_tlm_analysis_fifo #(memory_model) input_fifo;
+     
+     uvm_analysis_port #(memory_model) in_drv_ap;
+     uvm_tlm_analysis_fifo #(memory_model) scoreboard_port;
+
+     uvm_analysis_port #(memory_model) in_ckr_ap;
+     uvm_tlm_analysis_fifo #(memory_model) checker_port;
+
      int i, j, k, size;
      reg [31:0] aux;
      logic [31:0] inst_add, last_add;
@@ -72,19 +77,23 @@ class scoreboard extends uvm_scoreboard;
      function void build_phase(uvm_phase phase);
           super.build_phase(phase);
           in_drv_ap = new( "in_drv_ap", this);
-          //new export
-          input_fifo  = new("input_fifo", this); 
-          //new fifo
+          scoreboard_port  = new("scoreboard_port", this);
           uvm_config_db #(uvm_analysis_port #(memory_model) )::set(this, "", "in_drv_ap", in_drv_ap);
+          
+          in_ckr_ap = new("in_ckr_ap", this);
+          checker_port = new("checker_port", this);
+          uvm_config_db #(uvm_analysis_port #(memory_model) )::set(this, "", "in_ckr_ap", in_ckr_ap);
      endfunction: build_phase
  
      function void connect_phase(uvm_phase phase);
           //connect fifo
-          in_drv_ap.connect(input_fifo.analysis_export);
+          in_drv_ap.connect(scoreboard_port.analysis_export);
+          in_ckr_ap.connect(checker_port.analysis_export);
      endfunction: connect_phase
  
      task run_phase(uvm_phase phase);
           //forever begin
+          
           automatic memory_model scb_mem;
           automatic memory_model chk_mem;
 
@@ -93,10 +102,9 @@ class scoreboard extends uvm_scoreboard;
           // Sending memory to C simulator
           //uvm_info("dvr2scb_port == ")
           
-          if(input_fifo)
-               input_fifo.get(scb_mem);
-          else
-               $display("ERROR - Mailbox Not Received !!!!!");
+          $display("wait scoreboard_port fifo !");
+          if(scoreboard_port)
+               scoreboard_port.get(scb_mem);
           
           inst_add = scb_mem.base;
           last_add = scb_mem.base + scb_mem.length;	
@@ -113,14 +121,64 @@ class scoreboard extends uvm_scoreboard;
                inst_add = inst_add + 4;
           end
 
-          run(Mem_byte, `N_LINES);
+          $display("Call run_simulator !");
+          run_simulator(Mem_byte, `N_LINES);
+          
+          // Retreiving memory from C simulator
+          export_mem(`N_LINES);
+     
           `uvm_info("run in C simulator called", {""}, UVM_LOW);
 
-          compare();
+
+          $display("wait checker_port fifo !");
+          if(checker_port)
+               checker_port.get(chk_mem);
+
+          $display("Call compare !");
+
+          compare(Mem_from_C, chk_mem);
           //end
      endtask: run_phase
  
-     virtual function void compare();
+     virtual function void compare(reg [31:0] scb_mem [`N_LINES], memory_model chk_mem);
+          memory_model ram;
+          int read_data, i, equal; // file descriptor
+          logic [31:0] inst_add, last_add;
+
+          ram = chk_mem;
+
+          inst_add = ram.base;
+          last_add = (ram.length/32);
+          equal = 0;
+          i = 0;
+               
+          while(last_add) 
+          begin
+               read_data = ram.read_write(inst_add,0,0); //reading the RAM
+               inst_add = inst_add + 4;
+               last_add = last_add -1;
+                         
+               // Comparison word by word of scoreboard and DUT memories
+               if ((read_data == scb_mem[i]))
+               begin
+                    equal = equal + 1;
+               end
+               else
+               begin
+                    $display("%h: %h", inst_add,scb_mem[i]);
+                    $display("%h: %h", inst_add,read_data);
+               end;
+          
+               i = i + 1;
+               
+          end
+
+          if (equal == i)
+               $display("Memories are equals!");
+          else
+               $display("Memories are NOT equals!");
+
+
           if(1/*transaction_before.out == transaction_after.out*/) begin
                `uvm_info("compare", {"Test: OK!"}, UVM_LOW);
           end else begin

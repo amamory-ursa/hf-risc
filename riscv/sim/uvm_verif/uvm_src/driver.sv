@@ -15,7 +15,9 @@ class driver extends uvm_driver#(memory_model);
     uvm_event_pool p1;
     uvm_event terminated;
     // Port to inform the transaction to the Scoreboard and Coverage
-    uvm_analysis_port#(memory_model) dvr2scb_port;
+    
+    uvm_analysis_port #(memory_model) scoreboard_port;
+    uvm_analysis_port #(memory_model) checker_port;
 
     memory_model req, boot;
 
@@ -37,7 +39,8 @@ class driver extends uvm_driver#(memory_model);
             `uvm_fatal("NO_IF - DRIVER",{"virtual interface must be set for: ",get_full_name(),".riscv_if"});
 
         // To inform the Scoreboard and the Coverage
-        dvr2scb_port = new("dvr2scb_port", this);
+        scoreboard_port = new("scoreboard_port", this); 
+        checker_port = new("checker_port", this); 
 
         // Creates the ROM memory transaction
         boot = memory_model::type_id::create();
@@ -46,6 +49,16 @@ class driver extends uvm_driver#(memory_model);
 
     endfunction: build_phase
 
+    function void connect_phase(uvm_phase phase);
+        uvm_analysis_port #(memory_model) dvr2scb_port, dvr2ckr_port;
+        
+        uvm_config_db #(uvm_analysis_port #(memory_model) )::get(null, "uvm_test_top.env.scoreboard", "in_drv_ap", dvr2scb_port);
+        scoreboard_port.connect(dvr2scb_port);
+
+        uvm_config_db #(uvm_analysis_port #(memory_model) )::get(null, "uvm_test_top.env.scoreboard", "in_ckr_ap", dvr2ckr_port);
+        checker_port.connect(dvr2ckr_port);
+
+    endfunction: connect_phase
 
     /////////////////////////////////////////////////
     // Run phase
@@ -66,13 +79,16 @@ class driver extends uvm_driver#(memory_model);
         forever begin
             // Gets a new program from the sequencer
             seq_item_port.get_next_item(req);
-            
-            dvr2scb_port.write(req);
+            $display("send to fifo !!!!!");
+            scoreboard_port.debug_connected_to();
+            scoreboard_port.write(req);
 
             // Provide the program to the processor!
             drive();
-	    
-	    /* SEND REQ TO SCOREBOARD AND CHECKER */
+
+            /* SEND REQ TO SCOREBOARD AND CHECKER */
+            checker_port.debug_connected_to();
+            checker_port.write(req);
             
             // Inform that the program was consumed by DUT
             seq_item_port.item_done();
