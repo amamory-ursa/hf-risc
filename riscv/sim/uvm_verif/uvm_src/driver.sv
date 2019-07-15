@@ -51,7 +51,7 @@ class driver extends uvm_driver#(memory_model);
 
     function void connect_phase(uvm_phase phase);
         uvm_analysis_port #(memory_model) dvr2scb_port, dvr2ckr_port;
-        
+
         uvm_config_db #(uvm_analysis_port #(memory_model) )::get(null, "uvm_test_top.env.scoreboard", "in_drv_ap", dvr2scb_port);
         scoreboard_port.connect(dvr2scb_port);
 
@@ -86,7 +86,7 @@ class driver extends uvm_driver#(memory_model);
             // Provide the program to the processor!
             drive();
 
-            /* SEND REQ TO SCOREBOARD AND CHECKER */
+            /* Send req result to the scoreboard for comparison*/
             checker_port.debug_connected_to();
             checker_port.write(req);
             

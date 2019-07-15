@@ -2,27 +2,15 @@
 `ifndef SCOREBOARD__SV
 `define SCOREBOARD__SV
 `define N_LINES 1048576/32
-`define N_IO 512
-//`include "gpio.sv"
+
 `include "memory_model.sv"
 
-//-----------------------C-INTERFACE-------------------------------------
-
+//DPI-C Interface
 import "DPI-C" function int run_simulator (input byte unsigned Mem2[`N_LINES], int size);
 import "DPI-C" context function void export_mem(input int);
 export "DPI-C" function export_sram;
 
-//import "DPI-C" context function void export_io_c(input int);
-//export "DPI-C" function export_io;
-
-//---------------------------------------------------------------------
-
 reg[31:0] Mem_from_C[`N_LINES];
-//bit[31:0] Io_from_C[`N_IO];
-
-//--------------------RETREIVE-FROM-C-FUNCTIONS-------------------------
-
-//---Pull-Memory------------------------
 
 function void export_sram(input reg[31:0] _sram[`N_LINES]);
         for (int h=0; h<`N_LINES; h++)begin
@@ -30,29 +18,14 @@ function void export_sram(input reg[31:0] _sram[`N_LINES]);
         end
 endfunction
 
-/*function void export_io(input bit[31:0] _io[`N_IO]);
-        for (int h=0; h<`N_IO; h++)begin
-               Io_from_C[h] = _io[h];
-        end
-endfunction*/
 
-//----------------------------SCOREBOARD--------------------------------
-
-
+//The SCOREBOARD starts here
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
 class scoreboard extends uvm_scoreboard;
      `uvm_component_utils(scoreboard)
 
-     // Port to inform the transaction to the Scoreboard and Coverage
-     //memory_model req;
-     //gpio_trans trans;
-     //mailbox io_gen2scb;//TODO: change to uvm fifo
-     
-     //export
-     //fifo
-     
      uvm_analysis_port #(memory_model) in_drv_ap;
      uvm_tlm_analysis_fifo #(memory_model) scoreboard_port;
 
@@ -63,15 +36,10 @@ class scoreboard extends uvm_scoreboard;
      reg [31:0] aux;
      logic [31:0] inst_add, last_add;
 
-     //transactions
-     byte unsigned Mem_byte[`N_LINES];// = {default : '0};
-     //int unsigned io_info[`N_IO];// = {default : '0};
-     //int num_io;// = {default : '0};
+     byte unsigned Mem_byte[`N_LINES];
  
      function new(string name, uvm_component parent);
           super.new(name, parent);
-          //dvr2scb_port = new("dvr2scb_port",this);
-          //new transactions
      endfunction: new
  
      function void build_phase(uvm_phase phase);
@@ -97,12 +65,7 @@ class scoreboard extends uvm_scoreboard;
           automatic memory_model scb_mem;
           automatic memory_model chk_mem;
 
-          //wait(start_scb.triggered);
-          //input_fifo.get(req);
-          // Sending memory to C simulator
-          //uvm_info("dvr2scb_port == ")
-          
-          $display("wait scoreboard_port fifo !");
+          $display("[Scoreboard] Waiting for scoreboard_port request");
           if(scoreboard_port)
                scoreboard_port.get(scb_mem);
           
@@ -121,20 +84,19 @@ class scoreboard extends uvm_scoreboard;
                inst_add = inst_add + 4;
           end
 
-          $display("Call run_simulator !");
+          $display("[Scoreboard] Call the simulator in C (DPI-C run_simulator function)");
           run_simulator(Mem_byte, `N_LINES);
           
           // Retreiving memory from C simulator
           export_mem(`N_LINES);
      
-          `uvm_info("run in C simulator called", {""}, UVM_LOW);
+          $display("[Scoreboard] Simulator executed and memory exported");
 
-
-          $display("wait checker_port fifo !");
+          $display("[Scoreboard] Waiting for checker_port request");
           if(checker_port)
                checker_port.get(chk_mem);
 
-          $display("Call compare !");
+          $display("[Scoreboard] Call checker");
 
           compare(Mem_from_C, chk_mem);
           //end
@@ -165,8 +127,8 @@ class scoreboard extends uvm_scoreboard;
                end
                else
                begin
-                    $display("%h: %h", inst_add,scb_mem[i]);
-                    $display("%h: %h", inst_add,read_data);
+                    $display("[Checker] %h: %h", inst_add,scb_mem[i]);
+                    $display("[Checker] %h: %h", inst_add,read_data);
                end;
           
                i = i + 1;
@@ -174,18 +136,12 @@ class scoreboard extends uvm_scoreboard;
           end
 
           if (equal == i)
-               $display("Memories are equals!");
+               $display("[Checker] Memories are equals!");
           else
-               $display("Memories are NOT equals!");
+               $display("[Checker] Memories are NOT equals!");
 
-
-          if(1/*transaction_before.out == transaction_after.out*/) begin
-               `uvm_info("compare", {"Test: OK!"}, UVM_LOW);
-          end else begin
-               `uvm_info("compare", {"Test: Fail!"}, UVM_LOW);
-          end
      endfunction: compare
 endclass: scoreboard
 
 
-`endif // SCOREBOARD__SV
+`endif //scoreboard
