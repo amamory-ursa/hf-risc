@@ -6,22 +6,23 @@ import uvm_pkg::*;
 `include "../uvm_src/randomtest/random_instruction.sv"
 `include "../uvm_src/randomtest/random_program.sv"
 
-`define NUM_PROGRS          10
-`define PROG_LENGTH         10
-`define INSTRUCTS_TYPE      itype'(RTYPE)           //RTYPE, ITYPE, UTYPE, STYPE, BTYPE, JTYPE, NULL_TYPE
-`define INSTRUCTS_OPCODE    opcode'(NULL_OPCODE)    // ADD, ..., SRA, ..., LB, ..., ANDI, ..., JAL, NULL_OPCODE
+`define NUM_PROGRS          3                       // Amount of constrained random programs to be created and simulated
+`define PROG_LENGTH         10                      // Amount of instructions in each constrained random program
+`define INSTRUCTS_TYPE      itype'(ITYPE)           // RTYPE, ITYPE, UTYPE,    STYPE,   BTYPE, JTYPE, NULL_TYPE
+`define INSTRUCTS_OPCODE    opcode'(NULL_OPCODE)    // ADD,   ...,   SRA, ..., LB, ..., ANDI,  ...,   JAL,   NULL_OPCODE
+`define ITYPE_MEM_RANGE     
 
 class randomtest extends uvm_test;
     `uvm_component_utils(randomtest)
 
-    environment env;
-    memory_sequence seq;
-    random_program p;
-    string program_code;
-    string filename;
-    string dirname;
-    int f;
-    int i;
+    environment env;                //
+    memory_sequence seq;            //
+    random_program program_rand;    // random assembly program
+    string program_code;            // assembly code on string format
+    string filename;                //
+    string dirname;                 //  program directory 
+    int f;                          //  program code file handler
+    int i;                          //
 
     /////////////////////////////////////////////////
     // Constructor
@@ -59,14 +60,14 @@ class randomtest extends uvm_test;
         super.run_phase(phase);
 
         // while coverage_current_value < coverage_acceptance
-            // p = new(prog_lentgh, coverage_next_priority_instr)
+            // program_rand = new(prog_lentgh, coverage_next_priority_instr)
         // end while
         phase.raise_objection(this);
         for (i = 0; i < `NUM_PROGRS; i++) begin
 
             //create a new randomized program
-            p = new (`PROG_LENGTH, `INSTRUCTS_TYPE, `INSTRUCTS_OPCODE);
-            program_code = p.toString();
+            program_rand = new (`PROG_LENGTH, `INSTRUCTS_TYPE, `INSTRUCTS_OPCODE);
+            program_code = program_rand.toString();
 
             //display on screen
             $display("-------------------------------");

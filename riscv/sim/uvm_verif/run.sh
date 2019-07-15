@@ -3,7 +3,8 @@
 if [ "$1" = "rand" ]
 then
 
-  echo "	simulating random tests... please wait"
+  echo "	simulating random tests... please wait."
+  echo "	simulation log on \"simulation.log\""
   # module load modelsim
   {
 
@@ -33,6 +34,7 @@ then
 
   # module load modelsim
   echo "	simulating standard tests... please wait"
+  echo "	simulation log on \"simulation.log\""
   {
 
     #run sim

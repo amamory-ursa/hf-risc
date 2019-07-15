@@ -102,6 +102,12 @@ class random_instruction;
 
   //rs1 for RTYPE, BTYPE, STYPE and ITYPE
   rand register rs1; //all registers, no constraint
+  // constraint rs1_value{
+  //   (it == RTYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  //   (it == BTYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  //   (it == STYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  //   (it == ITYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  // }
 
   //rs2 for RTYPE, BTYPE and STYPE
   rand register rs2; //all registers, no constraint
@@ -125,6 +131,7 @@ class random_instruction;
   function string toString();
 
       string s = "";
+      string imm_format = "";
 
       case(this.it)
 
@@ -135,37 +142,56 @@ class random_instruction;
                  this.rd.name, ", ",
                  this.rs1.name, ", ",
                  this.rs2.name, "\n"};
-            return s;
           end
 
           // ITYPE = 2, |imm       ||rs1||3|| rd|| op  |
           ITYPE: begin 
-            //"%0s %d, %d, 0x%h"
-            s = {"  ", this.opcode.name, " ",
-                 this.rd.name, ", ",
-                 this.rs1.name, ", ",
-                 this.imm, "\n"};
-            return s;
+
+            // LB, LH, LW, LBU, LHU
+            // Format: lw s9,1024(ra)
+            if ( (opcode < 205) || (opcode > 213)) begin 
+
+              $sformat(imm_format, "%0d", this.rs2);
+              s = {"  ", this.opcode.name, " ",
+                  this.rd.name, ", ",
+                  imm_format, "(",
+                  this.rs1.name, ")", "\n"};
+              
+            // ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI
+            // Format: ANDI s9, ra, 12
+            end else begin  
+
+              $sformat(imm_format, "%0d", this.rs2);
+              s = {"  ", this.opcode.name, " ",
+                    this.rd.name, ", ",
+                    this.rs1.name, ", ",
+                    imm_format, "\n"};
+              
+            end
+            // $sformat(imm_format, "%d", 1024);
+            // s = {"  ", this.opcode.name, " ",
+            //      this.rd.name, ", ",
+            //      imm_format, "(",
+            //      this.rs1.name, ")", "\n"};
+
           end
  
           // STYPE = 4, |imm  ||rs2||rs1||3||imm|| op  |
-          // BTYPE = 5, |imm  ||rs2||rs1||3||imm|| op  |
           STYPE: begin 
             //"%0s %d, %d, 0x%h
             s = {"  ", this.opcode.name, " ",
                  this.rs1.name, ", ",
                  this.rs2.name, ", ",
                  this.imm, "\n"};
-            return s;
           end
 
+          // BTYPE = 5, |imm  ||rs2||rs1||3||imm|| op  |
           BTYPE: begin 
             //"%0s %0d, %d, 0x%h"
             s = {"  ", this.opcode.name, " ", 
                  this.rs1.name, ", ",
                  this.rs2.name, ", ",
                  this.imm, "\n"};
-            return s;
           end
 
           // UTYPE = 3, |imm               || rd|| op  |
@@ -175,17 +201,17 @@ class random_instruction;
             s = {"  ", this.opcode.name, " ",
                  this.rd.name, ", ",
                  this.imm, "\n"};
-            return s;
           end
 
           UTYPE: begin
             //"%0s %0d, 0x%h"
             s = {"  ", this.opcode.name, " ",
                  this.rd.name, ", ", this.imm, "\n"};
-            return s;
           end
-
       endcase
+
+      return s;
+
   endfunction
    
 endclass
