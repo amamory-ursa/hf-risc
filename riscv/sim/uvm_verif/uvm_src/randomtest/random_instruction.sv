@@ -25,11 +25,10 @@ typedef enum {
   SLTU = 104, XOR = 105, SRL = 106, SRA = 107,
 
   //ITYPE
-  LB = 200, LH = 201, LW = 202, LBU = 203, LHU = 204,
-  ADDI = 205, SLTI = 206, SLTIU = 207, XORI = 208,
-  ORI = 209, ANDI = 210,  
-  
-  SLLI = 211, SRLI = 212, SRAI = 213,
+  LB    = 200,  LH   = 201, LW    = 202, LBU  = 203, LHU = 204,
+  ADDI  = 205,  SLTI = 206, SLTIU = 207, XORI = 208,
+  ORI   = 209,  ANDI = 210,  
+  SLLI  = 211,  SRLI = 212, SRAI  = 213,
 
   //UTYPE
   LUI = 300, AUIPC = 301,
@@ -38,7 +37,7 @@ typedef enum {
   SB  = 400, SH = 401, SW = 402,
 
   //BTYPE 
-  BEQ = 500, BNE = 501, BLT = 502, 
+  BEQ = 500, BNE  = 501, BLT  = 502, 
   BGE = 503, BLTU = 504, BGEU = 505, 
 
   //JTYPE
@@ -62,23 +61,23 @@ typedef enum{
 
 //target arch. available registers.
 typedef enum {
-  zero = 0, //x0: hardwired zero-value
-  ra = 1,   //x1: return address
-  sp = 2,   //x2: stack pointer
-  gp = 3,   //x3: global pointer
-  tp = 4,   //x4: thread pointer
-  t0 = 5, t1 = 6, t2 = 7,         // temporaries
-  t3 =28, t4 =29, t5 =30, t6 =31, //
-  s0 = 8,   //x8: saved register (alt. framepointer - fp)
-  s1 = 9,   //x9: saved register
-  s2 =18, s3 =19, s4 =20, //
-  s5 =21, s6 =22, s7 =23, //
-  s8 =24, s9 =25, s10=26, // saved registers
-  s11=27,                 //
-  a0 =10, a1=11, //x10 and x11: function args/return values
-  a2 =12, a3=13, //
-  a4 =14, a5=15, // function arguments
-  a6 =16, a7=17  //
+  zero = 0,                         //x0: hardwired zero-value
+  ra  =  1,                         //x1: return address
+  sp  =  2,                         //x2: stack pointer
+  gp  =  3,                         //x3: global pointer
+  tp  =  4,                         //x4: thread pointer
+  t0  =  5, t1 = 6, t2 = 7,         // temporaries
+  t3  = 28, t4 =29, t5 =30, t6 =31, //
+  s0  =  8,                         //x8: saved register (alt. framepointer - fp)
+  s1  =  9,                         //x9: saved register
+  s2  = 18, s3 =  19, s4  = 20,     //
+  s5  = 21, s6 =  22, s7  = 23,     //
+  s8  = 24, s9 =  25, s10 = 26,     // saved registers
+  s11 = 27,                         //
+  a0  = 10, a1=11,                  //x10 and x11: function args/return values
+  a2  = 12, a3=13,                  //
+  a4  = 14, a5=15,                  // function arguments
+  a6  = 16, a7=17                   //
 } register;
 
 //base class: all instruction classes inherit from it
