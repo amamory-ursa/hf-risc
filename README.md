@@ -100,4 +100,19 @@ If a multiplier is used (not included in this design) the score is around 2.1 Co
 
 ### Verification
 
-- UVM TB in development
+For verificaiton there are different verification environments built with different languages and methodologies. Choose the one most appropriated to your case:
+
+- **vhdl**: It is a very simple testbench where it models the memory, which is loaded with the compiled application;
+- **sv_simple**: it is pretty much the same testbench above, but translated to SystemVerilog;
+- **sv_verif**: It is a more complex testbench divided into several submodules (monitor, driver, generator, scoreboard, checker, environment, coverage, etc). It has two modes, a simpler one that read an application from a file, and a pseudo-random code generator;
+- **uvm_verif**: It is similar to the previous one, but using UVM methodology. Using uvm_verif, it is possible to evaluate the simulation of standard applications such as Fibonacci and Sort, and applications generated with constrained randomization.
+
+  - To simulate standard applications run on hf-riscv/hf-risc/riscv/sim/uvm_verif: 
+  
+    ./run std
+  
+  - To simulate applications generated with constrained randomization run on hf-riscv/hf-risc/riscv/sim/uvm_verif: 
+  
+    ./run rand
+
+  - Dependencies: GCC_riscv and QuestaSim. For GCC_riscv installation follow instruction in: hf-riscv/hf-risc/tools/riscv-toolchain/INSTALL.md

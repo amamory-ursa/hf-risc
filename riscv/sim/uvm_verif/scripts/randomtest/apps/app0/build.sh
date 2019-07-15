@@ -25,6 +25,7 @@ OBJ_riscv="riscv32-unknown-elf-objcopy"
 SIZE_riscv="riscv32-unknown-elf-size"
 
 #generate object code for app
+#hahahahah
 ASNAME="AS_${ARCH}"
 ${!ASNAME} -o test.o *.S
 

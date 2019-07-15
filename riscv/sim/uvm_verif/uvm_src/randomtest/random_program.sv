@@ -14,14 +14,12 @@ class random_program;
   //instruction type is randomized for every new instruction
   random_instruction last;
   rand random_instruction instr;
-    constraint constr_seilahoque {
-       instr.it != JTYPE;
-       instr.it != last.it;
-    };
  
 
   //ctor.
-  function new(int length);
+  function new( int     length,
+                itype   instr_type_constraint   = itype'(NULL_TYPE), 
+                opcode  instr_opcode_constraint = opcode'(NULL_OPCODE));
     
     this.progr_length = length;
 
@@ -34,11 +32,41 @@ class random_program;
       instr = new();
       last = instr;
 
-      if(instr.randomize()) begin
-          instr_queue.push_back(instr);
-      end
-      else begin
-          i--;
+      if((instr_type_constraint != itype'(NULL_TYPE)) && (instr_opcode_constraint != opcode'(NULL_OPCODE)))begin
+        if(instr.randomize() with{
+        it      == instr_type_constraint;
+        opcode  == instr_opcode_constraint;
+        }) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
+      end else if(instr_type_constraint != itype'(NULL_TYPE))begin
+        if(instr.randomize() with{
+        it      == instr_type_constraint;
+        }) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
+      end else if (instr_opcode_constraint != opcode'(NULL_OPCODE)) begin
+        if(instr.randomize() with{
+        opcode  == instr_opcode_constraint;
+        }) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
+      end else begin
+        if(instr.randomize()) begin
+            instr_queue.push_back(instr);
+        end
+        else begin
+            i--;
+        end
       end
 
       

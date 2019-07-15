@@ -2,6 +2,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "dut_top.sv"
 `include "../tests/test_top.sv"
+`include "../tests/randomtest.sv"
 
 `timescale 1ns/1ns
 
@@ -22,6 +23,7 @@ module top_uvm;
     dut_top riscv(riscv_if);      // DUT
 
     initial begin
+        
         uvm_config_db#(virtual hfrv_interface)::set(null, "*", "riscv_if", riscv_if);
 
         uvm_config_db#(virtual hfrv_interface)::set(null, "uvm_test_top.env.agt.drv", "riscv_if", riscv_if);

@@ -12,6 +12,8 @@ import uvm_pkg::*;
 `include "hfrv_mem_reg.sv"
 `include "hfrv_operand_reg.sv"
 
+`include "hfrv_bubble_reg.sv"
+
 class hfrv_reg_block extends uvm_reg_block;
     `uvm_object_utils( hfrv_reg_block )
  
@@ -26,6 +28,9 @@ class hfrv_reg_block extends uvm_reg_block;
     rand hfrv_int_reg pc_reg;
     rand hfrv_int_reg pc_last_reg;
     rand hfrv_int_reg pc_last2_reg;
+
+    rand hfrv_int_reg inst_in_s_reg;
+    rand hfrv_bubble_reg bubble_reg;
 
     
     
@@ -43,17 +48,19 @@ class hfrv_reg_block extends uvm_reg_block;
 
     virtual function void build();
         int  offsetAddress = 8'h00;
+
         default_map = create_map( "", .base_addr( 8'h00 ), .n_bytes( 4 ), .endian( UVM_LITTLE_ENDIAN ) );      
 
         //--------------------------- GENERAL-PURPOSE REGISTERS
-        
-        for (int i = 0; i < 31; i++)
+        for (int i = 0; i <= 31; i++)
         begin
-            // colocar os nomes corretos em cada registrador
+
             int_regs[i] = hfrv_int_reg::type_id::create( register_names[i] );      
+//            int_regs[i] = hfrv_int_reg::type_id::create( $sformatf("int_regs[%d]",i) );      
             int_regs[i].configure( this, null, "" );      
             int_regs[i].build(); 
-            int_regs[i].add_hdl_path_slice($sformatf("timer_%d",i), 0, int_regs[i].get_n_bits());
+            int_regs[i].add_hdl_path_slice($sformatf("register_bank.registers[%d]",i), 0, int_regs[i].get_n_bits());
+            //int_regs[i].add_hdl_path_slice("register_bank.registers", offsetAddress, int_regs[i].get_n_bits());
             default_map.add_reg( this.int_regs[i], .offset( offsetAddress ), .rights( "RO" ) );
             offsetAddress += 8'h04;
         end
@@ -68,28 +75,38 @@ class hfrv_reg_block extends uvm_reg_block;
         pc_last_reg = hfrv_int_reg::type_id::create( "pc_last_reg" );      
         pc_last_reg.configure( this, null, "" );      
         pc_last_reg.build(); 
-        pc_last_reg.add_hdl_path_slice("pc_last_reg", 0, pc_last_reg.get_n_bits());
+        pc_last_reg.add_hdl_path_slice("pc_last", 0, pc_last_reg.get_n_bits());
         default_map.add_reg( .rg( pc_last_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h04;
         //--------------------------- PC_LAST2
         pc_last2_reg = hfrv_int_reg::type_id::create( "pc_last2_reg" );      
         pc_last2_reg.configure( this, null, "" );      
         pc_last2_reg.build(); 
-        pc_last2_reg.add_hdl_path_slice("pc_last2_reg", 0, pc_last2_reg.get_n_bits());
+        pc_last2_reg.add_hdl_path_slice("pc_last2", 0, pc_last2_reg.get_n_bits());
         default_map.add_reg( .rg( pc_last2_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h04;
         //--------------------------- CONTROL
         ctrl_reg = hfrv_ctrl_reg::type_id::create( "ctrl_reg" );      
         ctrl_reg.configure( this, null, "" );      
         ctrl_reg.build(); 
-        ctrl_reg.add_hdl_path_slice("ctrl_reg", 0, ctrl_reg.get_n_bits());
+        //ctrl_reg.add_hdl_path_slice("reg_write_ctl_r", 0, ctrl_reg.get_n_bits());
+        ctrl_reg.add_hdl_path_slice("reg_write_ctl_r", 0, 1);
+        ctrl_reg.add_hdl_path_slice("alu_src1_ctl_r", 1, 1);
+        ctrl_reg.add_hdl_path_slice("alu_src2_ctl_r", 2, 3);
+        ctrl_reg.add_hdl_path_slice("alu_op_ctl_r", 5, 4);
+        ctrl_reg.add_hdl_path_slice("jump_ctl_r", 9, 2);
+        ctrl_reg.add_hdl_path_slice("branch_ctl_r", 11, 3);
+        ctrl_reg.add_hdl_path_slice("mem_write_ctl_r", 14, 2);
+        ctrl_reg.add_hdl_path_slice("mem_read_ctl_r", 16, 2);
+        ctrl_reg.add_hdl_path_slice("sig_read_ctl_r", 18, 1);
         default_map.add_reg( .rg( ctrl_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h03;
         //--------------------------- MEMORY 
         mem_reg = hfrv_mem_reg::type_id::create( "mem_reg" );      
         mem_reg.configure( this, null, "" );      
         mem_reg.build(); 
-        mem_reg.add_hdl_path_slice("mem_reg", 0, mem_reg.get_n_bits());
+        mem_reg.add_hdl_path_slice("mem_to_reg", 0, 1);
+        mem_reg.add_hdl_path_slice("reg_to_mem", 1, 1);
         default_map.add_reg( .rg( mem_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h01;
         //--------------------------- IMMEDIATES
@@ -114,24 +131,47 @@ class hfrv_reg_block extends uvm_reg_block;
         rs1_reg = hfrv_operand_reg::type_id::create( "rs1_reg" );      
         rs1_reg.configure( this, null, "" );      
         rs1_reg.build(); 
-        rs1_reg.add_hdl_path_slice("rs1_reg", 0, rs1_reg.get_n_bits());
+        rs1_reg.add_hdl_path_slice("rs1_r", 0, rs1_reg.get_n_bits());
         default_map.add_reg( .rg( rs1_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h01;
         //--------------------------- RS2
         rs2_reg = hfrv_operand_reg::type_id::create( "rs2_reg" );      
         rs2_reg.configure( this, null, "" );      
         rs2_reg.build(); 
-        rs2_reg.add_hdl_path_slice("rs2_reg", 0, rs2_reg.get_n_bits());
+        rs2_reg.add_hdl_path_slice("rs2_r", 0, rs2_reg.get_n_bits());
         default_map.add_reg( .rg( rs2_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h01;
         //--------------------------- RS2
         imm_u_reg = hfrv_imm_u_reg::type_id::create( "imm_u_reg" );      
         imm_u_reg.configure( this, null, "" );      
         imm_u_reg.build(); 
-        imm_u_reg.add_hdl_path_slice("imm_u_reg", 0, imm_u_reg.get_n_bits());
+        imm_u_reg.add_hdl_path_slice("imm_u_r", 0, imm_u_reg.get_n_bits());
         default_map.add_reg( .rg( imm_u_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
         offsetAddress += 8'h03;
+
+        //--------------------------- inst_in_s
+        inst_in_s_reg = hfrv_int_reg::type_id::create( "inst_in_s_reg" );      
+        inst_in_s_reg.configure( this, null, "" );      
+        inst_in_s_reg.build(); 
+        inst_in_s_reg.add_hdl_path_slice("inst_in_s", 0, inst_in_s_reg.get_n_bits());
+        default_map.add_reg( .rg( inst_in_s_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
+        offsetAddress += 8'h04;
         
+        //--------------------------- bubble_reg
+        bubble_reg = hfrv_bubble_reg::type_id::create( "bubble_reg" );      
+        bubble_reg.configure( this, null, "" );      
+        bubble_reg.build(); 
+        bubble_reg.add_hdl_path_slice("reg_to_mem_r", 0, 1);
+        bubble_reg.add_hdl_path_slice("mem_to_reg_r", 1, 1);
+        bubble_reg.add_hdl_path_slice("except", 2, 1);
+        bubble_reg.add_hdl_path_slice("branch_taken", 3, 1);
+        bubble_reg.add_hdl_path_slice("jump_taken", 4, 1);
+        bubble_reg.add_hdl_path_slice("bds", 5, 1);
+        bubble_reg.add_hdl_path_slice("mwait", 6, 1);
+        bubble_reg.add_hdl_path_slice("irq_ack_s", 7, 1);
+        bubble_reg.add_hdl_path_slice("stall", 8, 1);
+        default_map.add_reg( .rg( bubble_reg  ), .offset( offsetAddress ), .rights( "RO" ) );      
+        offsetAddress += 8'h02;
         
         add_hdl_path("riscv.cpu.core");
         lock_model(); // finalize the address mapping
