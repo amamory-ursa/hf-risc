@@ -79,7 +79,7 @@ class driver extends uvm_driver#(memory_model);
         forever begin
             // Gets a new program from the sequencer
             seq_item_port.get_next_item(req);
-            $display("send to fifo !!!!!");
+            $display("[Driver] Send to scoreboard_port");
             scoreboard_port.debug_connected_to();
             scoreboard_port.write(req);
 
@@ -87,6 +87,7 @@ class driver extends uvm_driver#(memory_model);
             drive();
 
             /* Send req result to the scoreboard for comparison*/
+            $display("[Driver] Send to checker_port");
             checker_port.debug_connected_to();
             checker_port.write(req);
             
