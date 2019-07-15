@@ -43,6 +43,12 @@ class monitor extends uvm_monitor;
 
 	task run_phase(uvm_phase phase);
 
+    function void connect_phase(uvm_phase phase);
+        uvm_config_db#(hfrv_tb_block)::get(null, "uvm_test_top", "_hfrv_tb_block", _hfrv_tb_block);
+    endfunction : connect_phase
+
+	task run_phase(uvm_phase phase);
+
 		forever begin
 		
             fork
@@ -51,13 +57,15 @@ class monitor extends uvm_monitor;
                 capture_instructions(phase);  
             join_any
 
+            `uvm_info("MONITOR:","------------------------End of the program",UVM_LOW);
+            
 		    p1=uvm_event_pool::get_global_pool(); 
         	terminated = p1.get("p1");
         	
         	/*ativando evento*/
         	terminated.trigger();
         end
-        
+
 	endtask 
 
 	task verify_terminate();
@@ -65,7 +73,6 @@ class monitor extends uvm_monitor;
         forever @(riscv_if.memory.mem) begin
             if (riscv_if.memory.mem.address == 32'he0000000 && riscv_if.memory.mem.data_we != 4'h0) begin
                 riscv_if.memory.mem.data_read <= {32{1'b0}};
-
                 break;
             end
         end
@@ -87,7 +94,6 @@ class monitor extends uvm_monitor;
         begin
             @(posedge top_uvm.clk) 
             begin
-                    
                     instruction_item tx = instruction_item::type_id::create();
                 
                     _hfrv_tb_block.register_block.inst_in_s_reg.read(status, rdata, UVM_BACKDOOR);
