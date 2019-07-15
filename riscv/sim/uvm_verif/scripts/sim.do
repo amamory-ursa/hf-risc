@@ -1,5 +1,5 @@
 vlib work
-########vlog hf_riscv_sim.c
+vlog hf_riscv_sim.c
 vcom -93 -explicit ../../../../devices/peripherals/minimal_soc.vhd
 vcom -93 -explicit ../../../core_rv32i/bshifter.vhd
 vcom -93 -explicit ../../../core_rv32i/alu.vhd

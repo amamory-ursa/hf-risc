@@ -83,7 +83,7 @@ class scoreboard extends uvm_scoreboard;
           in_drv_ap.connect(input_fifo.analysis_export);
      endfunction: connect_phase
  
-     task run();
+     task run_phase(uvm_phase phase);
           //forever begin
           automatic memory_model scb_mem;
           automatic memory_model chk_mem;
@@ -113,13 +113,12 @@ class scoreboard extends uvm_scoreboard;
                inst_add = inst_add + 4;
           end
 
-          //TODO: call run here
-          //run(Mem_byte, `N_LINES);
+          run(Mem_byte, `N_LINES);
           `uvm_info("run in C simulator called", {""}, UVM_LOW);
 
           compare();
           //end
-     endtask: run
+     endtask: run_phase
  
      virtual function void compare();
           if(1/*transaction_before.out == transaction_after.out*/) begin
