@@ -179,10 +179,11 @@ class random_instruction;
           // STYPE = 4, |imm  ||rs2||rs1||3||imm|| op  |
           STYPE: begin 
             //"%0s %d, %d, 0x%h
+            $sformat(imm_format, "%0d", this.rs2);
             s = {"  ", this.opcode.name, " ",
-                 this.rs1.name, ", ",
-                 this.rs2.name, ", ",
-                 this.imm, "\n"};
+                  this.rd.name, ", ",
+                  imm_format, "(",
+                  this.rs1.name, ")", "\n"};
           end
 
           // BTYPE = 5, |imm  ||rs2||rs1||3||imm|| op  |
