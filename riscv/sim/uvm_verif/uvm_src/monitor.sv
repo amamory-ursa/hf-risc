@@ -36,10 +36,12 @@ class monitor extends uvm_monitor;
 		forever begin
 		//phase.raise_objection(this);
 		
+		fork
+			verify_terminate();
+			time_out(phase);
+		join_any
 
-		verify_terminate();
-
-        	p1=uvm_event_pool::get_global_pool(); 
+		p1=uvm_event_pool::get_global_pool(); 
         	terminated = p1.get("p1");
         	
         	/*ativando evento*/
@@ -58,10 +60,17 @@ class monitor extends uvm_monitor;
                 break;
             end
         end
+	endtask
+	task time_out(uvm_phase phase);
+		#20s
+		`uvm_info("MONITOR:","timeout",UVM_LOW);
+		//`uvm_fatal("TIMEOUT - MONITOR",{"TEMPO ACABOU"});
+		//phase.drop_objection(this);
+	endtask
         
 
 
-    endtask
+    
 
 
 
