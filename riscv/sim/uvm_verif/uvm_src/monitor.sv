@@ -36,13 +36,6 @@ class monitor extends uvm_monitor;
 		
 	endfunction
 
-
-    function void connect_phase(uvm_phase phase);
-        uvm_config_db#(hfrv_tb_block)::get(null, "uvm_test_top", "_hfrv_tb_block", _hfrv_tb_block);
-    endfunction : connect_phase
-
-	task run_phase(uvm_phase phase);
-
     function void connect_phase(uvm_phase phase);
         uvm_config_db#(hfrv_tb_block)::get(null, "uvm_test_top", "_hfrv_tb_block", _hfrv_tb_block);
     endfunction : connect_phase
