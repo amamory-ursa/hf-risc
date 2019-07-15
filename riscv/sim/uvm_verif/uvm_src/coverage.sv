@@ -447,7 +447,7 @@ function void coverage::write(instruction_item t);
 		
 			bit [11:0] t_imm;
 			
-			this.r1Register = t.instruction[19:15];;
+			this.r1Register = t.instruction[19:15];
 			t_imm = t.instruction[31:20];
 			if (12'b00_000_000_000 <= t_imm && t_imm <= 12'b00_000_000_111)
 				this.imm_12 = 12'b00_000_000_000;
