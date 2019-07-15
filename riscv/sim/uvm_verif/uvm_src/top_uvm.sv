@@ -23,6 +23,7 @@ module top_uvm;
     dut_top riscv(riscv_if);      // DUT
 
     initial begin
+        
         uvm_config_db#(virtual hfrv_interface)::set(null, "*", "riscv_if", riscv_if);
 
         uvm_config_db#(virtual hfrv_interface)::set(null, "uvm_test_top.env.agt.drv", "riscv_if", riscv_if);

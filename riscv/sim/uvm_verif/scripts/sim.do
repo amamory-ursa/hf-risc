@@ -13,8 +13,25 @@ vcom -93 -explicit ../../vhdl/boot_ram.vhd
 vcom -93 -explicit ../../vhdl/ram.vhd
 vlog ../uvm_src/top_uvm.sv
 
-vsim work.top_uvm +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=test_top -novopt
+vsim work.top_uvm -coverage +UVM_VERBOSITY=UVM_LOW +UVM_TESTNAME=test_top -novopt
+#set NoQuitOnFinish 1
 set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
 
-run 9 ms 
+add wave -position insertpoint  sim:/top_uvm/clk
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/clock
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/pc
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/inst_in_s
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/branch
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/jump_taken
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/branch_taken
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/bds
+add wave -position insertpoint  sim:/top_uvm/riscv/cpu/core/mwait
+
+#run 5000ns
+#run 10000ns
+#run 150000ns
+run 1 ms 
+coverage attribute -name TESTNAME -value test_top
+coverage save test_top.ucdb
+#vcover report test_top.ucdb -cvg -details
