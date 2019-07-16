@@ -12,7 +12,7 @@ vcom -93 -explicit ../../vhdl/boot_ram.vhd
 vcom -93 -explicit ../../vhdl/ram.vhd
 vlog ../uvm_src/top_uvm.sv
 
-vsim work.top_uvm +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=randomtest -novopt
+vsim work.top_uvm +UVM_VERBOSITY=UVM_LOW +UVM_TESTNAME=randomtest -novopt
 set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
 
