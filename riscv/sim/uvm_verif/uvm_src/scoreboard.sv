@@ -86,6 +86,8 @@ class scoreboard extends uvm_scoreboard;
 
                $display("[Scoreboard] Call the simulator in C (DPI-C run_simulator function)");
                run_simulator(Mem_byte, `N_LINES);
+               $display("[Scoreboard] simulator in C executed");
+
                
                // Retreiving memory from C simulator
                export_mem(`N_LINES);
@@ -122,6 +124,7 @@ class scoreboard extends uvm_scoreboard;
                last_add = last_add -1;
                          
                // Comparison word by word of scoreboard and DUT memories
+               //scb_mem[i][0] = 0; //modify the memory to check if an error occur
                if ((read_data == scb_mem[i]))
                begin
                     equal = equal + 1;
@@ -142,8 +145,12 @@ class scoreboard extends uvm_scoreboard;
           end
           else
           begin
-               `uvm_info("CHECKER:","Memories are NOT equals!", UVM_HIGH);
+               `uvm_error("CHECKER", "Memories are NOT equals!");
+               $display("[Checker] Memories are NOT equals!");
+               `uvm_info("CHECKER","Memories are NOT equals!", UVM_HIGH);
           end
+          $display(equal);
+          $display(i);
 
      endfunction: compare
 endclass: scoreboard
