@@ -6,8 +6,6 @@ import uvm_pkg::*;
 `include "../uvm_src/randomtest/random_instruction.sv"
 `include "../uvm_src/randomtest/random_program.sv"
 
-// `define NUM_PROGRS          3                       // Amount of constrained random programs to be created and simulated
-// `define INSTRUCTS_TYPE      itype'(ITYPE)           // RTYPE, ITYPE, UTYPE,    STYPE,   BTYPE, JTYPE, NULL_TYPE
 `define NUM_PROGRS_RTYPE    3                       // Amount of constrained random programs to be created and simulated
 `define NUM_PROGRS_ITYPE    0                       // Amount of constrained random programs to be created and simulated
 `define NUM_PROGRS_STYPE    0                       // Amount of constrained random programs to be created and simulated
