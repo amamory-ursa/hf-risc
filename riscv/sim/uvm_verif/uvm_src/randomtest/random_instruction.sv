@@ -25,11 +25,10 @@ typedef enum {
   SLTU = 104, XOR = 105, SRL = 106, SRA = 107,
 
   //ITYPE
-  LB = 200, LH = 201, LW = 202, LBU = 203, LHU = 204,
-  ADDI = 205, SLTI = 206, SLTIU = 207, XORI = 208,
-  ORI = 209, ANDI = 210,  
-  
-  SLLI = 211, SRLI = 212, SRAI = 213,
+  LB    = 200,  LH   = 201, LW    = 202, LBU  = 203, LHU = 204,
+  ADDI  = 205,  SLTI = 206, SLTIU = 207, XORI = 208,
+  ORI   = 209,  ANDI = 210,  
+  SLLI  = 211,  SRLI = 212, SRAI  = 213,
 
   //UTYPE
   LUI = 300, AUIPC = 301,
@@ -38,42 +37,47 @@ typedef enum {
   SB  = 400, SH = 401, SW = 402,
 
   //BTYPE 
-  BEQ = 500, BNE = 501, BLT = 502, 
+  BEQ = 500, BNE  = 501, BLT  = 502, 
   BGE = 503, BLTU = 504, BGEU = 505, 
 
   //JTYPE
-  JAL  = 600
+  JAL  = 600,
+
+  //NULL_TYPE
+  NULL_OPCODE = -1  // This is not a opcode. It is used for constrained random generation.
+
 } opcode;
 
 //format of instructions
 typedef enum{
-  RTYPE = 1, //  |funct||rs2||rs1||3|| rd|| op  |
-  ITYPE = 2, //  |imm       ||rs1||3|| rd|| op  |
-  UTYPE = 3, //  |imm               || rd|| op  |
-  STYPE = 4, //  |imm  ||rs2||rs1||3||imm|| op  |
-  BTYPE = 5, //  |imm  ||rs2||rs1||3||imm|| op  | (same as STYPE)
-  JTYPE = 6  //  |imm               || rd|| op  | (same as UTYPE)
+  RTYPE = 1,      //  |funct||rs2||rs1||3|| rd|| op  |
+  ITYPE = 2,      //  |imm       ||rs1||3|| rd|| op  |
+  UTYPE = 3,      //  |imm               || rd|| op  |
+  STYPE = 4,      //  |imm  ||rs2||rs1||3||imm|| op  |
+  BTYPE = 5,      //  |imm  ||rs2||rs1||3||imm|| op  | (same as STYPE)
+  JTYPE = 6,      //  |imm               || rd|| op  | (same as UTYPE)
+  NULL_TYPE = -1  // This is not a type. It is used for constrained random generation.
 } itype;
 
 //target arch. available registers.
 typedef enum {
-  zero = 0, //x0: hardwired zero-value
-  ra = 1,   //x1: return address
-  sp = 2,   //x2: stack pointer
-  gp = 3,   //x3: global pointer
-  tp = 4,   //x4: thread pointer
-  t0 = 5, t1 = 6, t2 = 7,         // temporaries
-  t3 =28, t4 =29, t5 =30, t6 =31, //
-  s0 = 8,   //x8: saved register (alt. framepointer - fp)
-  s1 = 9,   //x9: saved register
-  s2 =18, s3 =19, s4 =20, //
-  s5 =21, s6 =22, s7 =23, //
-  s8 =24, s9 =25, s10=26, // saved registers
-  s11=27,                 //
-  a0 =10, a1=11, //x10 and x11: function args/return values
-  a2 =12, a3=13, //
-  a4 =14, a5=15, // function arguments
-  a6 =16, a7=17  //
+  zero = 0,                         //x0: hardwired zero-value
+  ra  =  1,                         //x1: return address
+  sp  =  2,                         //x2: stack pointer
+  gp  =  3,                         //x3: global pointer
+  tp  =  4,                         //x4: thread pointer
+  t0  =  5, t1 = 6, t2 = 7,         // temporaries
+  t3  = 28, t4 =29, t5 =30, t6 =31, //
+  s0  =  8,                         //x8: saved register (alt. framepointer - fp)
+  s1  =  9,                         //x9: saved register
+  s2  = 18, s3 =  19, s4  = 20,     //
+  s5  = 21, s6 =  22, s7  = 23,     //
+  s8  = 24, s9 =  25, s10 = 26,     // saved registers
+  s11 = 27,                         //
+  a0  = 10, a1=11,                  //x10 and x11: function args/return values
+  a2  = 12, a3=13,                  //
+  a4  = 14, a5=15,                  // function arguments
+  a6  = 16, a7=17                   //
 } register;
 
 //base class: all instruction classes inherit from it
@@ -98,6 +102,12 @@ class random_instruction;
 
   //rs1 for RTYPE, BTYPE, STYPE and ITYPE
   rand register rs1; //all registers, no constraint
+  // constraint rs1_value{
+  //   (it == RTYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  //   (it == BTYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  //   (it == STYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  //   (it == ITYPE) -> { rs1 dist {[0, 15, 31]:/1} }
+  // }
 
   //rs2 for RTYPE, BTYPE and STYPE
   rand register rs2; //all registers, no constraint
@@ -121,6 +131,7 @@ class random_instruction;
   function string toString();
 
       string s = "";
+      string imm_format = "";
 
       case(this.it)
 
@@ -131,52 +142,79 @@ class random_instruction;
                  this.rd.name, ", ",
                  this.rs1.name, ", ",
                  this.rs2.name, "\n"};
-            return s;
           end
 
           // ITYPE = 2, |imm       ||rs1||3|| rd|| op  |
           ITYPE: begin 
-            //"%0s %d, %d, 0x%h"
-            s = {"  ", this.opcode.name, " ",
-                 this.rd.name, ", ",
-                 this.rs1.name, ", ",
-                 this.imm};
+
+            // LB, LH, LW, LBU, LHU
+            // Format: lw s9,1024(ra)
+            if ( (opcode < 205) || (opcode > 213)) begin 
+
+              $sformat(imm_format, "%0d", this.rs2);
+              s = {"  ", this.opcode.name, " ",
+                  this.rd.name, ", ",
+                  imm_format, "(",
+                  this.rs1.name, ")", "\n"};
+              
+            // ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI
+            // Format: ANDI s9, ra, 12
+            end else begin  
+
+              $sformat(imm_format, "%0d", this.rs2);
+              s = {"  ", this.opcode.name, " ",
+                    this.rd.name, ", ",
+                    this.rs1.name, ", ",
+                    imm_format, "\n"};
+              
+            end
+            // $sformat(imm_format, "%d", 1024);
+            // s = {"  ", this.opcode.name, " ",
+            //      this.rd.name, ", ",
+            //      imm_format, "(",
+            //      this.rs1.name, ")", "\n"};
+
           end
  
           // STYPE = 4, |imm  ||rs2||rs1||3||imm|| op  |
-          // BTYPE = 5, |imm  ||rs2||rs1||3||imm|| op  |
           STYPE: begin 
             //"%0s %d, %d, 0x%h
+            $sformat(imm_format, "%0d", this.rs2);
             s = {"  ", this.opcode.name, " ",
-                 this.rs1.name, ", ",
-                 this.rs2.name, ", ",
-                 this.imm};
+                  this.rd.name, ", ",
+                  imm_format, "(",
+                  this.rs1.name, ")", "\n"};
           end
 
+          // BTYPE = 5, |imm  ||rs2||rs1||3||imm|| op  |
           BTYPE: begin 
             //"%0s %0d, %d, 0x%h"
             s = {"  ", this.opcode.name, " ", 
                  this.rs1.name, ", ",
                  this.rs2.name, ", ",
-                 this.imm};
+                 this.imm, "\n"};
           end
 
           // UTYPE = 3, |imm               || rd|| op  |
           // JTYPE = 6  |imm               || rd|| op  |
           JTYPE: begin 
             //"%0s %0d, 0x%h"
+            $sformat(imm_format, "%0d", this.rs2);
             s = {"  ", this.opcode.name, " ",
-                 this.rd.name, ", ",
-                 this.imm};
+                    this.rd.name, ", ",
+                    this.rs1.name, ", ",
+                    imm_format, "\n"};
           end
 
           UTYPE: begin
             //"%0s %0d, 0x%h"
             s = {"  ", this.opcode.name, " ",
-                 this.rd.name, ", ", this.imm};
+                 this.rd.name, ", ", this.imm, "\n"};
           end
-
       endcase
+
+      return s;
+
   endfunction
    
 endclass

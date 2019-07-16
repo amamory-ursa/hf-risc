@@ -36,33 +36,29 @@ class monitor extends uvm_monitor;
 		
 	endfunction
 
-
     function void connect_phase(uvm_phase phase);
         uvm_config_db#(hfrv_tb_block)::get(null, "uvm_test_top", "_hfrv_tb_block", _hfrv_tb_block);
     endfunction : connect_phase
 
 	task run_phase(uvm_phase phase);
 
-		//while(1)
-		//begin
-
-		phase.raise_objection(this);
+		forever begin
 		
-        fork
-            verify_terminate();  
-            capture_instructions(phase);  
-        join_any
-        `uvm_info("MONITOR:","------------------------End of the program",UVM_LOW);
-		
+            fork
+                verify_terminate();
+                time_out(phase);
+                capture_instructions(phase);  
+            join_any
 
-        p1=uvm_event_pool::get_global_pool(); 
-        terminated = p1.get("p1");
-        
-        /*ativando evento*/
-        terminated.trigger();
+            `uvm_info("MONITOR:","------------------------End of the program",UVM_LOW);
+            
+		    p1=uvm_event_pool::get_global_pool(); 
+        	terminated = p1.get("p1");
+        	
+        	/*ativando evento*/
+        	terminated.trigger();
+        end
 
-        phase.drop_objection(this);
-    	//end
 	endtask 
 
 	task verify_terminate();
@@ -70,11 +66,17 @@ class monitor extends uvm_monitor;
         forever @(riscv_if.memory.mem) begin
             if (riscv_if.memory.mem.address == 32'he0000000 && riscv_if.memory.mem.data_we != 4'h0) begin
                 riscv_if.memory.mem.data_read <= {32{1'b0}};
-        	    `uvm_info("MONITOR:","End of the program",UVM_LOW);
                 break;
             end
         end
-
+	endtask
+	
+    task time_out(uvm_phase phase);
+		#20s
+		`uvm_info("MONITOR:","timeout",UVM_LOW);
+		//`uvm_fatal("TIMEOUT - MONITOR",{"TEMPO ACABOU"});
+		//phase.drop_objection(this);
+        `uvm_info("MONITOR:","End of the program",UVM_LOW);
     endtask
         
     task capture_instructions(uvm_phase phase);
@@ -112,10 +114,5 @@ class monitor extends uvm_monitor;
             end
         end
     endtask : capture_instructions
-
-
-
-
-
    endclass
    `endif

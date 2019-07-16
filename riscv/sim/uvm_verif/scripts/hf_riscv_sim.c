@@ -52,7 +52,7 @@ int io_out_index;
 FILE *fptr;
 int32_t log_enabled = 0;
 
-extern void export_sram(int32_t *OUT);
+extern void export_sram(long unsigned int *);
 extern void export_io(int32_t *OUT);
 
 // Funtion to send the simulator memory to the systemVerilog Scoreaboard module 
@@ -365,10 +365,10 @@ void cycle(state *s){
 fail:
 	printf("\ninvalid opcode (pc=0x%x opcode=0x%x)", s->pc, inst);
 	
-	return 1;
+	return;
 }
 
-int run(int8_t *mem, uint32_t *io, int size, int io_size){
+void run_simulator(int8_t *mem, int size){
 
 	state context;
 	state *s;
@@ -382,7 +382,7 @@ int run(int8_t *mem, uint32_t *io, int size, int io_size){
 	
 	if (size > MEM_SIZE){
 		printf("\nERROR: too big !!!.\n");
-		return(0);
+		return;
 	}
 	
 	memcpy(sram, mem, size);
@@ -403,19 +403,19 @@ int run(int8_t *mem, uint32_t *io, int size, int io_size){
 	s->cycles = 0;
 	
 	io_index = 0;
-	io_num = io[0];
-	io_time = io[1];
+	//io_num = io[0];
+	//io_time = io[1];
 	io_out_index = 0;
 	while(1){
 		sim_time = s->cycles * 10;
 
-		if (io_time <= sim_time && io_index/2 <= io_num){
-			s->cause &= 0x0000ffff;
-			s->cause |= io[io_index]<<16;
-			s->cause |= ~io[io_index]<<24;
-			io_index = io_index + 2;
-			io_time += io[io_index+1];
-		}
+		//if (io_time <= sim_time && io_index/2 <= io_num){
+			//s->cause &= 0x0000ffff;
+			//s->cause |= io[io_index]<<16;
+			//s->cause |= ~io[io_index]<<24;
+			//io_index = io_index + 2;
+			//io_time += io[io_index+1];
+		//}
 
 		cycle(s);
 		// Waiting end of simulation
@@ -424,6 +424,6 @@ int run(int8_t *mem, uint32_t *io, int size, int io_size){
 		}
 	}
 	
-	return (0);
+	return;
 }
 

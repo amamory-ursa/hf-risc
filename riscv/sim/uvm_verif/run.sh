@@ -3,19 +3,27 @@
 if [ "$1" = "rand" ]
 then
 
-  echo "	simulating random tests... please wait"
+  echo "	simulating random tests... please wait."
+  echo "	simulation log on \"simulation.log\""
   # module load modelsim
   {
+
+    #remove apps subfolders
     cd scripts/randomtest
-    ./run_all.sh
+    bash cleanup.sh         # apps folders cleanup
     cd ../../
-  
-    #cleanup
-    cd scripts/randomtest
-    bash cleanup.sh       # apps folders cleanup
-    cd ../
-    rm -rf *.ini **transcript *.wlf work *.vcd
     
+    # ./run_all.sh
+    # cd ../../
+
+    cd scripts/
+    vsim -c -do sim_randomtest.do
+    cd ../
+
+    #cleanup
+    cd scripts
+    rm -rf *.ini **transcript *.wlf work *.vcd
+    cd ../
 
   # } > /dev/null
   } > simulation.log
@@ -25,7 +33,8 @@ elif [ "$1" = "std" ]
 then
 
   # module load modelsim
-  echo "	simulating... please wait"
+  echo "	simulating standard tests... please wait"
+  echo "	simulation log on \"simulation.log\""
   {
 
     #run sim
