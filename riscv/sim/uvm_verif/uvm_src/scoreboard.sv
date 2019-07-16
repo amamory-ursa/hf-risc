@@ -60,46 +60,47 @@ class scoreboard extends uvm_scoreboard;
      endfunction: connect_phase
  
      task run_phase(uvm_phase phase);
-          //forever begin
-          
-          automatic memory_model scb_mem;
-          automatic memory_model chk_mem;
+          forever begin
+               
+               automatic memory_model scb_mem;
+               automatic memory_model chk_mem;
 
-          $display("[Scoreboard] Waiting for scoreboard_port request");
-          if(scoreboard_port)
-               scoreboard_port.get(scb_mem);
-          
-          inst_add = scb_mem.base;
-          last_add = scb_mem.base + scb_mem.length;	
-          j=0;
-          
-          // Converting 32 bits to byte
-          while(inst_add < last_add) begin
-               aux = scb_mem.read_write(inst_add,0,0); //reading the RA
-               for (k=0;k<4; k++) begin
-                    Mem_byte[j*4+k] = (aux & 32'hff000000) >> 24;
-                    aux = aux << 8;
+               $display("[Scoreboard] Waiting for scoreboard_port request");
+               if(scoreboard_port)
+                    scoreboard_port.get(scb_mem);
+               
+               inst_add = scb_mem.base;
+               last_add = scb_mem.base + scb_mem.length;	
+               j=0;
+               
+               // Converting 32 bits to byte
+               while(inst_add < last_add) begin
+                    aux = scb_mem.read_write(inst_add,0,0); //reading the RA
+                    for (k=0;k<4; k++) begin
+                         Mem_byte[j*4+k] = (aux & 32'hff000000) >> 24;
+                         aux = aux << 8;
+                    end
+                    j = j +1;
+                    inst_add = inst_add + 4;
                end
-               j = j +1;
-               inst_add = inst_add + 4;
-          end
 
-          $display("[Scoreboard] Call the simulator in C (DPI-C run_simulator function)");
-          run_simulator(Mem_byte, `N_LINES);
+               $display("[Scoreboard] Call the simulator in C (DPI-C run_simulator function)");
+               run_simulator(Mem_byte, `N_LINES);
+               
+               // Retreiving memory from C simulator
+               export_mem(`N_LINES);
           
-          // Retreiving memory from C simulator
-          export_mem(`N_LINES);
-     
-          $display("[Scoreboard] Simulator executed and memory exported");
+               $display("[Scoreboard] Simulator executed and memory exported");
 
-          $display("[Scoreboard] Waiting for checker_port request");
-          if(checker_port)
-               checker_port.get(chk_mem);
+               $display("[Scoreboard] Waiting for checker_port request");
+               if(checker_port)
+                    checker_port.get(chk_mem);
 
-          $display("[Scoreboard] Call checker");
+               $display("[Scoreboard] Call checker");
 
-          compare(Mem_from_C, chk_mem);
-          //end
+               compare(Mem_from_C, chk_mem);
+
+          end
      endtask: run_phase
  
      virtual function void compare(reg [31:0] scb_mem [`N_LINES], memory_model chk_mem);
@@ -136,9 +137,13 @@ class scoreboard extends uvm_scoreboard;
           end
 
           if (equal == i)
+          begin
                $display("[Checker] Memories are equals!");
+          end
           else
-               $display("[Checker] Memories are NOT equals!");
+          begin
+               `uvm_info("CHECKER:","Memories are NOT equals!", UVM_HIGH);
+          end
 
      endfunction: compare
 endclass: scoreboard

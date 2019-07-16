@@ -52,7 +52,7 @@ int io_out_index;
 FILE *fptr;
 int32_t log_enabled = 0;
 
-extern void export_sram(int32_t *OUT);
+extern void export_sram(long unsigned int *);
 extern void export_io(int32_t *OUT);
 
 // Funtion to send the simulator memory to the systemVerilog Scoreaboard module 
@@ -365,10 +365,10 @@ void cycle(state *s){
 fail:
 	printf("\ninvalid opcode (pc=0x%x opcode=0x%x)", s->pc, inst);
 	
-	return 1;
+	return;
 }
 
-int run_simulator(int8_t *mem, int size){
+void run_simulator(int8_t *mem, int size){
 
 	state context;
 	state *s;
@@ -382,7 +382,7 @@ int run_simulator(int8_t *mem, int size){
 	
 	if (size > MEM_SIZE){
 		printf("\nERROR: too big !!!.\n");
-		return(0);
+		return;
 	}
 	
 	memcpy(sram, mem, size);
@@ -424,6 +424,6 @@ int run_simulator(int8_t *mem, int size){
 		}
 	}
 	
-	return (0);
+	return;
 }
 
