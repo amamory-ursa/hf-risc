@@ -116,3 +116,6 @@ For verificaiton there are different verification environments built with differ
     ./run rand
 
   - Dependencies: GCC_riscv and QuestaSim. For GCC_riscv installation follow instruction in: hf-riscv/hf-risc/tools/riscv-toolchain/INSTALL.md
+
+![alt text](https://raw.githubusercontent.com/amamory/hf-risc/verif_devel/riscv/sim/uvm_verif/hf-riscv.png)
+
