@@ -199,9 +199,11 @@ class random_instruction;
           // JTYPE = 6  |imm               || rd|| op  |
           JTYPE: begin 
             //"%0s %0d, 0x%h"
+            $sformat(imm_format, "%0d", this.rs2);
             s = {"  ", this.opcode.name, " ",
-                 this.rd.name, ", ",
-                 this.imm, "\n"};
+                    this.rd.name, ", ",
+                    this.rs1.name, ", ",
+                    imm_format, "\n"};
           end
 
           UTYPE: begin

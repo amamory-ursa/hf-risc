@@ -8,10 +8,10 @@ import uvm_pkg::*;
 
 `define NUM_PROGRS_RTYPE    2               // Amount of constrained random RTYPE programs to be created and simulated
 `define NUM_PROGRS_ITYPE    2               // Amount of constrained random ITYPE programs to be created and simulated
-`define NUM_PROGRS_STYPE    1               // Amount of constrained random STYPE programs to be created and simulated
+`define NUM_PROGRS_STYPE    0               // Amount of constrained random STYPE programs to be created and simulated
 `define NUM_PROGRS_BTYPE    0               // Amount of constrained random BTYPE programs to be created and simulated
 `define NUM_PROGRS_UTYPE    0               // Amount of constrained random UTYPE programs to be created and simulated
-`define NUM_PROGRS_JTYPE    1               // Amount of constrained random JTYPE programs to be created and simulated
+`define NUM_PROGRS_JTYPE    0               // Amount of constrained random JTYPE programs to be created and simulated
 `define PROG_LENGTH         100             // Amount of instructions in each constrained random program
 `define ITYPE_MEM_RANGE                     // For memomry write address range control
 `define INSTRUCTS_OPCODE    opcode'(NULL_OPCODE)    // ADD,   ...,   SRA, ..., LB, ..., ANDI,  ...,   JAL,   NULL_OPCODE
