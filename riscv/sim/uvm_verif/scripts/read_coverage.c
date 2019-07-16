@@ -145,32 +145,6 @@ error_handler(void *data,
         exit(1);
 }
 
-int
-mymain(int argc, char* argv[])
-{
-    if (argc<2) {
-        printf("Usage:   %s <ucdb file name>\n",argv[0]);
-        printf("Purpose: Read coveritem counts in a UCDB.\n");
-        return 1;
-    }
-    ucdb_RegisterErrorHandler(error_handler, NULL);
-    example_code(argv[1]);
-    return 0;
-}
-
-int
-mymain2(int argc)
-{
-    if (argc<2) {
-        
-        printf("Purpose: Read coveritem counts in a UCDB. argc: %d\n",argc);
-        return 1;
-    }
-    ucdb_RegisterErrorHandler(error_handler, NULL);
-    
-    return 0;
-}
-
 int mymain3(char* argv, int* qtd, int* valores, char** textos)
 {
 

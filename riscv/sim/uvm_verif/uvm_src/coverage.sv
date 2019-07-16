@@ -43,8 +43,6 @@ class coverage extends uvm_subscriber #(instruction_item);
 	bit [4:0] r2Register;
 	bit [11:0] imm_12;
 	bit [19:0] imm_20;
-//	bit [19:0] immRegister;
-//	bit [1:0] immType;
     bit [17:0] instruction;
 	
 
@@ -231,11 +229,13 @@ class coverage extends uvm_subscriber #(instruction_item);
 			option.weight = 0;
 		}
 
-		/*coverpoint imm
+		coverpoint imm_12
 		{
-				bins imm[] = {[0:31]}; 
+				bins lowest[]  = {12'b00_000_000_000}; 
+				bins middle[]  = {12'b10_000_000_000}; 
+				bins highest[] = {12'b11_111_111_111}; 
 			 	option.weight = 0;
-		}*/
+		}
 
 		coverpoint instruction 
 		{		
@@ -290,11 +290,22 @@ class coverage extends uvm_subscriber #(instruction_item);
 			option.weight = 0;
 		}
 
-		/*coverpoint imm
+		coverpoint imm_12
 		{
-				bins imm[] = {[0:31]}; 
+			
+				bins lowest[]  = {12'b00_000_000_000}; 
+				bins middle[]  = {12'b10_000_000_000}; 
+				bins highest[] = {12'b11_111_111_111}; 
 			 	option.weight = 0;
-		}*/
+		}
+
+		coverpoint imm_20
+		{
+				bins lowest[]  = {20'b00_000_000_000_000_000_000}; 
+				bins middle[]  = {20'b10_000_000_000_000_000_000}; 
+				bins highest[] = {20'b11_111_111_111_111_111_111}; 
+			 	option.weight = 0;
+		}
 
 		coverpoint instruction 
 		{		
@@ -386,11 +397,20 @@ function void coverage::write(instruction_item t);
 	end
 	if (t.instruction[6:0] == 7'b1100011 ) // coverage SB-TYPE
 	begin
+		bit [11:0]t_imm;
 		this.instruction[17:11] = 7'b0_000_000;				//funct7
 		this.instruction[10:7] = t.instruction[14:12];     //funct3           
 		this.instruction[6:0] = t.instruction[6:0];			//opcode
 		this.r1Register = t.instruction[19:15];
 		this.r2Register = t.instruction[24:20];
+		t_imm[11:5] = t.instruction[31:25];					// immediate
+		t_imm[4:0] = t.instruction[11:7];					// immediate
+		if (12'b00_000_000_000 <= t_imm && t_imm <= 12'b00_000_000_111)
+			this.imm_12 = 12'b00_000_000_000;
+		if (12'b00_000_001_000 <= t_imm && t_imm < 12'b11_111_111_000)
+			this.imm_12 = 12'b10_000_000_000;
+		if (12'b11_111_111_000 <= t_imm && t_imm <= 12'b11_111_111_111)
+			this.imm_12 = 12'b11_111_111_111;
 		CG_SB_TypeInstructions.sample();
 	end
 
@@ -417,7 +437,7 @@ function void coverage::write(instruction_item t);
 		this.instruction[10:7] = 3'b000;     //funct3           
 		this.instruction[6:0] = t.instruction[6:0];			//opcode
 		this.rdRegister = t.instruction[11:7];
-		// add immediates
+		
 		if (this.instruction == 17'b0000000_000_1101111) // JAL
 		begin
 		
@@ -431,6 +451,8 @@ function void coverage::write(instruction_item t);
 				this.imm_20 = 20'b10_000_000_000_000_000_000;
 			if (20'b11_111_111_111_111_111_000 <= t_imm && t_imm <= 20'b11_111_111_111_111_111_111)
 				this.imm_20 = 20'b11_111_111_111_111_111_111;
+			// evitando bins existentes . roubadinha
+			this.imm_12=12'b00_000_000_011;
 		end
 		if (this.instruction == 17'b0000000_000_1100111) // JALR
 		begin
@@ -445,6 +467,8 @@ function void coverage::write(instruction_item t);
 				this.imm_12 = 12'b10_000_000_000;
 			if (12'b11_111_111_000 <= t_imm && t_imm <= 12'b11_111_111_111)
 				this.imm_12 = 12'b11_111_111_111;
+			// evitando bins existentes . roubadinha
+			this.imm_20=20'b00_000_000_000_000_000_111;
 		end
 		CG_UJ_TypeInstructions.sample();
 	end
@@ -470,7 +494,6 @@ function coverage::sendCoverageData();
             if(match(textos[i],crossSymbol)) 
             begin
                 pair p;
-
                 p.text = textos[i];
                 p.value = valores[i];
                 cv_tx._cross.push_back(p);
@@ -484,7 +507,7 @@ function coverage::sendCoverageData();
             end
         end        
 		cv_tx.printAll();
-
+		//TODO: enviar a coverage_item para realizar um novo teste
 endfunction
 
 

@@ -85,7 +85,6 @@ class monitor extends uvm_monitor;
         begin
             @(posedge top_uvm.clk) 
             begin
-                    // MIGRAR PARA MONITOR DA GEANINE
                     instruction_item tx = instruction_item::type_id::create();
                 
                     _hfrv_tb_block.register_block.inst_in_s_reg.read(status, rdata, UVM_BACKDOOR);
@@ -103,7 +102,7 @@ class monitor extends uvm_monitor;
                         && _hfrv_tb_block.register_block.bubble_reg.stall_reg.get() == 0
                     )
                     begin
-                        `uvm_info(get_type_name(), $sformatf("bubble=0x%0b DETECTED BUBBLE ", bubble), UVM_LOW);
+                        `uvm_info(get_type_name(), $sformatf("bubble=0x%0b DETECTED BUBBLE ", bubble), UVM_HIGH);
                     end
                     else
                     begin
