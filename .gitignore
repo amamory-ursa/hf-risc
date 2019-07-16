@@ -22,3 +22,4 @@ software/*.txt
 *.bin
 **/coverage/
 history.csv
+riscv/sim/uvm_verif/scripts/randomtest/apps*
