@@ -23,6 +23,15 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "instruction_item.sv"
+`include "../uvm_src/coverage_item.sv"
+
+
+//-----------------------C-INTERFACE-------------------------------------
+import "DPI-C" function int mymain (input int argc, string argv[1]);
+import "DPI-C" function int mymain3 (input string argv,output int qtd, output int valores[5000], output string textos[5000]);
+import "DPI-C" function int mymain2(input int argc);
+
+
 
 class coverage extends uvm_subscriber #(instruction_item);
 `uvm_component_utils(coverage);
@@ -41,28 +50,6 @@ class coverage extends uvm_subscriber #(instruction_item);
 
 	covergroup CG_Instruction;
 
-/*		coverpoint opcode
-			{
-			bins opcode[] = {3,19,23,35,51,55,99,103,111,115}; // restringir para codigos validos
-			ignore_bins others = {[0:2],[4:18],[20:22],[24:34],[36:50],[52:54],[56:98],[100:102],[104:110],[112:114],[116:127]};
-
-				option.weight = 0;}*/
-		/*coverpoint iType
-			{bins iType[] = {[0:6]}; 
-			 option.weight = 0;}*/
-/*
-		coverpoint rdRegister
-			{bins rdRegister[] = {[0:31]}; // x0 nunca estará no rd
-			 option.weight = 0;}
-
-		coverpoint r1Register
-			{bins r1Register[] = {[0:31]}; 
-			 option.weight = 0;}
-
-		coverpoint r2Register
-			{bins r2Register[] = {[0:31]}; 
-			 option.weight = 0;}
-*/
 		coverpoint instruction 
 		{
 			bins LUI    = {17'b0000000_000_0110111};
@@ -117,6 +104,8 @@ class coverage extends uvm_subscriber #(instruction_item);
 
       	
 	endgroup: CG_Instruction;
+
+
 
 	// ------------------------------------ R TYPE 
 	covergroup CG_R_TypeInstructions;
@@ -317,19 +306,19 @@ class coverage extends uvm_subscriber #(instruction_item);
 
 	endgroup : CG_UJ_TypeInstructions
 
-
-
      	// Instantiate the covergroup
      	
 	extern function new(string name, uvm_component parent);
 	extern function void build_phase(uvm_phase phase);
 	extern function void write(instruction_item t);
-
+	extern function sendCoverageData();
+	extern function match(string s1,s2); 
 endclass : coverage
 
 function coverage::new(string name, uvm_component parent);
 		super.new(name,parent);
 		CG_Instruction = new();
+		
 		CG_R_TypeInstructions = new();
 		CG_I_TypeInstructions = new();
 		CG_S_TypeInstructions = new();
@@ -341,6 +330,7 @@ endfunction : new
 
 function void coverage::build_phase(uvm_phase phase);
 	super.build_phase(phase);
+    $set_coverage_db_name("t.ucdb");
     
 
 endfunction : build_phase
@@ -461,6 +451,59 @@ function void coverage::write(instruction_item t);
 
 	// simple resume
 	CG_Instruction.sample();
+	
 endfunction: write 
+
+function coverage::sendCoverageData();
+        coverage_item cv_tx = new();
+        int v, qtd;
+        int valores[5000];
+        string textos[5000];
+
+
+        v = mymain3("t.ucdb",qtd, valores, textos);
+        $display("v: %d qtd: %d",v, qtd);
+        for (int i = 0; i < qtd; i++)
+        begin
+            string crossSymbol = "<";
+            
+            if(match(textos[i],crossSymbol)) 
+            begin
+                pair p;
+
+                p.text = textos[i];
+                p.value = valores[i];
+                cv_tx._cross.push_back(p);
+            end
+            else
+            begin
+                pair p;
+                p.text = textos[i];
+                p.value = valores[i];
+                cv_tx._instruction.push_back(p);
+            end
+        end        
+		cv_tx.printAll();
+
+endfunction
+
+
+    function coverage::match(string s1,s2); 
+        // from http://www.vlsiencyclopedia.com/2015/09/systemverilog-strings.html
+        int len1,len2; 
+
+        len1 = s1.len(); 
+        len2 = s2.len(); 
+
+        if( len2 > len1 ) 
+            return 0; 
+            
+        for(int i = 0;i < len1 - len2 + 1; i ++) 
+            if( s1.substr(i,i+len2 -1) == s2) 
+                return 1; 
+            
+        return 0;
+    endfunction
+
 
 `endif // COVERAGE__SV

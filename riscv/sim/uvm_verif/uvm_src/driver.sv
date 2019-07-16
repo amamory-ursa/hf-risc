@@ -66,7 +66,7 @@ class driver extends uvm_driver#(memory_model);
         forever begin
             // Gets a new program from the sequencer
             seq_item_port.get_next_item(req);
-            
+            dvr2scb_port.debug_connected_to();
             dvr2scb_port.write(req);
 
             // Provide the program to the processor!

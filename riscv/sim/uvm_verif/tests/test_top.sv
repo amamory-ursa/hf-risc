@@ -4,6 +4,7 @@ import uvm_pkg::*;
 `include "../uvm_src/memory_model.sv"
 `include "../uvm_src/sequence.sv"
 
+
 class test_top extends uvm_test;
     `uvm_component_utils(test_top)
 
@@ -46,8 +47,8 @@ class test_top extends uvm_test;
     // Run Phase
     ////////////////////////////////////////////////
     task run_phase(uvm_phase phase);
-
-
+        
+        
         super.run_phase(phase);
 
         
@@ -62,6 +63,8 @@ class test_top extends uvm_test;
 
 
         phase.drop_objection(this);
+        
+        env.cov.sendCoverageData();
         
     endtask: run_phase
 
