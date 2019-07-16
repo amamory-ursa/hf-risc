@@ -25,13 +25,11 @@ class random_program;
 
     //generate random instructions until reach the length
     for(int i = 0; i < this.progr_length; i++) begin     
-      
-      //must use new here! otherwise the initial instance will
-      //be randomized several times and the queue will be filled
-      //with the same value for all positions.
+
       instr = new();
       last = instr;
 
+      // Random generation choosing iType and Opcode
       if((instr_type_constraint != itype'(NULL_TYPE)) && (instr_opcode_constraint != opcode'(NULL_OPCODE)))begin
         if(instr.randomize() with{
         it      == instr_type_constraint;
@@ -42,6 +40,7 @@ class random_program;
         else begin
             i--;
         end
+      // Random generation choosing iType
       end else if(instr_type_constraint != itype'(NULL_TYPE))begin
         if(instr.randomize() with{
         it      == instr_type_constraint;
@@ -51,6 +50,7 @@ class random_program;
         else begin
             i--;
         end
+      // Random generation choosing Opcode
       end else if (instr_opcode_constraint != opcode'(NULL_OPCODE)) begin
         if(instr.randomize() with{
         opcode  == instr_opcode_constraint;
@@ -60,6 +60,7 @@ class random_program;
         else begin
             i--;
         end
+      // Pure random generation
       end else begin
         if(instr.randomize()) begin
             instr_queue.push_back(instr);

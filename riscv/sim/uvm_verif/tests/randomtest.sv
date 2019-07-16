@@ -6,25 +6,15 @@ import uvm_pkg::*;
 `include "../uvm_src/randomtest/random_instruction.sv"
 `include "../uvm_src/randomtest/random_program.sv"
 
-<<<<<<< HEAD
-`define NUM_PROGRS_RTYPE    3               // Amount of constrained random RTYPE programs to be created and simulated
-`define NUM_PROGRS_ITYPE    0               // Amount of constrained random ITYPE programs to be created and simulated
-`define NUM_PROGRS_STYPE    0               // Amount of constrained random STYPE programs to be created and simulated
+`define NUM_PROGRS_RTYPE    2               // Amount of constrained random RTYPE programs to be created and simulated
+`define NUM_PROGRS_ITYPE    2               // Amount of constrained random ITYPE programs to be created and simulated
+`define NUM_PROGRS_STYPE    1               // Amount of constrained random STYPE programs to be created and simulated
 `define NUM_PROGRS_BTYPE    0               // Amount of constrained random BTYPE programs to be created and simulated
 `define NUM_PROGRS_UTYPE    0               // Amount of constrained random UTYPE programs to be created and simulated
-`define NUM_PROGRS_JTYPE    0               // Amount of constrained random JTYPE programs to be created and simulated
+`define NUM_PROGRS_JTYPE    1               // Amount of constrained random JTYPE programs to be created and simulated
 `define PROG_LENGTH         100             // Amount of instructions in each constrained random program
-=======
-`define NUM_PROGRS_RTYPE    3                       // Amount of constrained random programs to be created and simulated
-`define NUM_PROGRS_ITYPE    0                       // Amount of constrained random programs to be created and simulated
-`define NUM_PROGRS_STYPE    0                       // Amount of constrained random programs to be created and simulated
-`define NUM_PROGRS_BTYPE    0                       // Amount of constrained random programs to be created and simulated
-`define NUM_PROGRS_UTYPE    0                       // Amount of constrained random programs to be created and simulated
-`define NUM_PROGRS_JTYPE    0                       // Amount of constrained random programs to be created and simulated
-`define PROG_LENGTH         100                      // Amount of instructions in each constrained random program
->>>>>>> 3992eda9adb7782f7a50fb3c299c042ffb4c115e
-`define INSTRUCTS_OPCODE    opcode'(SUB)    // ADD,   ...,   SRA, ..., LB, ..., ANDI,  ...,   JAL,   NULL_OPCODE
 `define ITYPE_MEM_RANGE                     // For memomry write address range control
+`define INSTRUCTS_OPCODE    opcode'(NULL_OPCODE)    // ADD,   ...,   SRA, ..., LB, ..., ANDI,  ...,   JAL,   NULL_OPCODE
 
 class randomtest extends uvm_test;
     `uvm_component_utils(randomtest)
@@ -73,10 +63,9 @@ class randomtest extends uvm_test;
     task run_phase(uvm_phase phase);
         super.run_phase(phase);
 
-        // while coverage_current_value < coverage_acceptance
-            // program_rand = new(prog_lentgh, coverage_next_priority_instr)
-        // end while
         phase.raise_objection(this);
+
+        // RTYPE
         for (i = 0; i < `NUM_PROGRS_RTYPE; i++) begin
 
             //create a new randomized program
@@ -103,6 +92,8 @@ class randomtest extends uvm_test;
             seq.start(seq.seqce);
             
         end
+
+        // ITYPE
         for (i = 0; i < `NUM_PROGRS_ITYPE; i++) begin
 
             //create a new randomized program
@@ -129,6 +120,8 @@ class randomtest extends uvm_test;
             seq.start(seq.seqce);
             
         end
+
+        // STYPE
         for (i = 0; i < `NUM_PROGRS_STYPE; i++) begin
 
             //create a new randomized program
@@ -155,6 +148,8 @@ class randomtest extends uvm_test;
             seq.start(seq.seqce);
             
         end
+
+        // UTYPE
         for (i = 0; i < `NUM_PROGRS_UTYPE; i++) begin
 
             //create a new randomized program
@@ -181,6 +176,8 @@ class randomtest extends uvm_test;
             seq.start(seq.seqce);
             
         end
+
+        // BTYPE
         for (i = 0; i < `NUM_PROGRS_BTYPE; i++) begin
 
             //create a new randomized program
@@ -207,6 +204,8 @@ class randomtest extends uvm_test;
             seq.start(seq.seqce);
             
         end
+
+        // JTYPE
         for (i = 0; i < `NUM_PROGRS_JTYPE; i++) begin
 
             //create a new randomized program
