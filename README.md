@@ -118,4 +118,6 @@ For verificaiton there are different verification environments built with differ
   - Dependencies: GCC_riscv and QuestaSim. For GCC_riscv installation follow instruction in: hf-riscv/hf-risc/tools/riscv-toolchain/INSTALL.md
 
 ![alt text](https://raw.githubusercontent.com/amamory/hf-risc/verif_devel/riscv/sim/uvm_verif/hf-riscv.png)
+ - You can edit the figure using the online tool: www.draw.io 
+ - The figure source file is /riscv/sim/uvm_verif/hf-riscv.drawio
 
